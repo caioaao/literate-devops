@@ -1,0 +1,657 @@
+#+TITLE: Notebook setup (Pop OS)
+
+Requirements: emacs (obviously), git
+
+* Desktop
+
+** Setup dotfiles
+
+   First, install zsh and change the login shell:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y zsh || true
+     chsh -s /bin/zsh caio
+   #+END_SRC
+
+   Create antigen repo:
+
+   #+BEGIN_SRC shell :dir ~/ :results output silent
+     mkdir reps || true
+     cd reps
+     git clone https://github.com/zsh-users/antigen.git || true
+     cd antigen
+     git checkout master && git pull origin master
+   #+END_SRC
+
+   Let's create a directory for some useful commands.
+
+   #+BEGIN_SRC shell :results output silent
+   mkdir -p ~/utils/bin || true
+   #+END_SRC
+
+   And now some cool scripts:
+
+   - Notify when an execution ends.
+
+     #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
+       #!/usr/bin/env bash
+
+       # Notify when execution finishes. First arg is the success message, second arg
+       # is the failure message and the rest is the command to run
+
+       (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
+     #+END_SRC
+
+   Now, tangle the basic zshrc:
+
+   #+BEGIN_SRC shell :tangle ~/.zshrc
+     REPS_PATH=~/reps
+
+     source ${REPS_PATH}/antigen/antigen.zsh
+
+     # Load the oh-my-zsh's library.
+     antigen use oh-my-zsh
+
+     # Bundles from the default repo (robbyrussell's oh-my-zsh).
+     antigen bundle git
+     antigen bundle heroku
+     antigen bundle pip
+     antigen bundle lein
+     antigen bundle command-not-found
+     antigen bundle autojump
+     antigen bundle emacs
+     antigen bundle archlinux
+     antigen bundle common-aliases
+
+     # Syntax highlighting bundle.
+     antigen bundle zsh-users/zsh-syntax-highlighting
+
+     # Load the theme.
+     antigen theme gallois
+
+     # Tell antigen that you're done.
+     antigen apply
+
+     # Export zsh config dir path and import base config
+     export ZSH_CONFIG=~/.zsh.d
+     source $ZSH_CONFIG/base # base config
+     source $ZSH_CONFIG/apps # apps config
+     source $ZSH_CONFIG/localrc # local dotfile
+   #+END_SRC
+
+   Now, let's create the zsh config dir:
+
+   #+BEGIN_SRC shell :dir ~/ :results output silent
+     mkdir .zsh.d || true
+   #+END_SRC
+
+   The base config:
+
+   #+BEGIN_SRC shell :tangle ~/.zsh.d/base
+     #!/usr/bin/env bash
+
+     # add useful scripts to the path
+     export PATH=$PATH:~/utils/bin
+
+     # gpg-agent configuration
+     export GPG_TTY=$(tty)
+     gpg-connect-agent updatestartuptty /bye >/dev/null
+
+     unset SSH_AGENT_PID
+     if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+       export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+     fi
+   #+END_SRC
+
+   And apps config:
+
+   #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
+     #!/usr/bin/env bash
+
+     bindkey -A emacs main # set emacs as default
+
+     export BROWSER=chromium
+
+     # Configs for zsh to work nicelly inside emacs
+
+     if [ -n "$INSIDE_EMACS" ]; then
+         export TERM=vt100
+         chpwd() { print -P "\033AnSiTc %d" }
+         print -P "\033AnSiTu %n"
+         print -P "\033AnSiTc %d"
+     fi
+   #+END_SRC
+
+   Also create the ~localrc~ file. This should be the place to add local configs
+   (company notebook configs for instance).
+
+   #+BEGIN_SRC shell :dir ~/ :results output silent
+   touch ~/.zsh.d/localrc
+   #+END_SRC
+
+** Yubikey
+
+   Install the manager and dependencies
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt-add-repository ppa:yubico/stable
+     apt update
+     apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
+   #+END_SRC
+
+   Start and enable the appropriate service
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     systemctl enable pcscd.service
+     systemctl start pcscd.service
+   #+END_SRC
+
+   To create keys, see https://github.com/caioaao/YubiKey-Guide
+
+** GnuPG / SSH
+
+   Tangle the gpg-agent config.
+
+   #+BEGIN_SRC text :tangle ~/.gnupg/gpg-agent.conf
+     enable-ssh-support
+     log-file ~/.gnupg/gpg-agent.log
+     allow-emacs-pinentry
+     allow-loopback-pinentry
+     pinentry-program /usr/bin/pinentry-gnome3
+     default-cache-ttl 60
+     max-cache-ttl 120
+   #+END_SRC
+
+   Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
+   installed together with it, for some reason.
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y gcr
+   #+END_SRC
+
+** Git
+
+   Basic configs
+
+   #+BEGIN_SRC conf :tangle ~/.gitconfig
+     [user]
+     name="Caio Oliveira"
+     email=[redacted]
+     signingKey=DD90B67479EFA704
+
+     [core]
+     editor=emacs
+
+     [commit]
+     gpgsign=true
+   #+END_SRC
+
+** Locale and aspell
+
+   Set system language:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     localectl set-locale LANG=en_US.UTF-8
+   #+END_SRC
+
+   Keyboard config:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
+   #+END_SRC
+
+   Installing aspell:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y aspell aspell-en
+   #+END_SRC
+
+** Redshift (screen temperature)
+
+   Install it
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y redshift
+   #+END_SRC
+
+   Tangle the config
+
+   #+BEGIN_SRC conf :tangle ~/.config/redshift/redshift.conf :mkdirp yes
+     ; Global settings for redshift
+     [redshift]
+     ; Set the day and night screen temperatures
+     temp-day=5700
+     temp-night=3500
+
+     ; Disable the smooth fade between temperatures when Redshift starts and stops.
+     ; 0 will cause an immediate change between screen temperatures.
+     ; 1 will gradually apply the new screen temperature over a couple of seconds.
+     fade=1
+
+     ; Solar elevation thresholds.
+     ; By default, Redshift will use the current elevation of the sun to determine
+     ; whether it is daytime, night or in transition (dawn/dusk). When the sun is
+     ; above the degrees specified with elevation-high it is considered daytime and
+     ; below elevation-low it is considered night.
+     ;elevation-high=3
+     ;elevation-low=-6
+
+     ; Custom dawn/dusk intervals.
+     ; Instead of using the solar elevation, the time intervals of dawn and dusk
+     ; can be specified manually. The times must be specified as HH:MM in 24-hour
+     ; format.
+     ;dawn-time=6:00-7:45
+     ;dusk-time=18:35-20:15
+
+     ; Set the screen brightness. Default is 1.0.
+     ;brightness=0.9
+     ; It is also possible to use different settings for day and night
+     ; since version 1.8.
+     ;brightness-day=0.7
+     ;brightness-night=0.4
+     ; Set the screen gamma (for all colors, or each color channel
+     ; individually)
+     gamma=0.8
+     ;gamma=0.8:0.7:0.8
+     ; This can also be set individually for day and night since
+     ; version 1.10.
+     ;gamma-day=0.8:0.7:0.8
+     ;gamma-night=0.6
+
+     ; Set the location-provider: 'geoclue2', 'manual'
+     ; type 'redshift -l list' to see possible values.
+     ; The location provider settings are in a different section.
+     location-provider=manual
+
+     ; Set the adjustment-method: 'randr', 'vidmode'
+     ; type 'redshift -m list' to see all possible values.
+     ; 'randr' is the preferred method, 'vidmode' is an older API.
+     ; but works in some cases when 'randr' does not.
+     ; The adjustment method settings are in a different section.
+     adjustment-method=randr
+
+     ; Configuration of the location-provider:
+     ; type 'redshift -l PROVIDER:help' to see the settings.
+     ; ex: 'redshift -l manual:help'
+     ; Keep in mind that longitudes west of Greenwich (e.g. the Americas)
+     ; are negative numbers.
+     [manual]
+     lat=-23.5475
+     lon=-46.63611
+
+     ; Configuration of the adjustment-method
+     ; type 'redshift -m METHOD:help' to see the settings.
+     ; ex: 'redshift -m randr:help'
+     ; In this example, randr is configured to adjust only screen 0.
+     ; Note that the numbering starts from 0, so this is actually the first screen.
+     ; If this option is not specified, Redshift will try to adjust _all_ screens.
+     [randr]
+     screen=0
+   #+END_SRC
+
+   Enable the service:
+
+   #+BEGIN_SRC shell :results output silent
+     systemctl --user enable redshift.service
+   #+END_SRC
+
+   Optionally, start the service:
+
+   #+BEGIN_SRC shell :results output silent
+     systemctl --user start redshift.service
+   #+END_SRC
+
+** ProtonVPN
+
+   First install the requirements
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y openvpn dialog wget
+   #+END_SRC
+
+   Clone the CLI project:
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d protonvpn-cli ] || git clone git@github.com:ProtonVPN/protonvpn-cli.git
+   #+END_SRC
+
+   Install update-resolve-conf:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     mkdir -p "/etc/openvpn/"
+     file_sha512sum="81cf5ed20ec2a2f47f970bb0185fffb3e719181240f2ca3187dbee1f4d102ce63ab048ffee9daa6b68c96ac59d1d86ad4de2b1cfaf77f1b1f1918d143e96a588"
+     curl "https://raw.githubusercontent.com/ProtonVPN/scripts/master/update-resolv-conf.sh" > "/etc/openvpn/update-resolv-conf"
+     if [[ ($? == 0) && ($(sha512sum "/etc/openvpn/update-resolv-conf" | cut -d " " -f1) == "$file_sha512sum")  ]]; then
+         chmod +x "/etc/openvpn/update-resolv-conf"
+         echo "[*] Done."
+     else
+         echo "[!] Error installing update-resolv-conf."
+         rm -f "/etc/openvpn/update-resolv-conf" 2> /dev/null
+         exit 1
+     fi
+   #+END_SRC
+
+   Install:
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/protonvpn-cli :results output silent
+     ./protonvpn-cli.sh --install
+   #+END_SRC
+
+   Run ~protonvpn-cli --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
+
+* Development
+
+** Upgrade org-mode
+
+   (more info [[http://orgmode.org/manual/Installation.html][here]])
+
+   First, clone the repo
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
+   #+END_SRC
+
+   Now update the repo and compile the project:
+
+   #+BEGIN_SRC shell :dir ~/reps/org-mode :results output silent
+     git checkout master && git pull
+
+     make autoloads
+     make
+   #+END_SRC
+
+   And install
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode :results output silent
+     make install
+   #+END_SRC
+
+** Clojure
+
+   Install the Clojure package
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y clojure
+   #+END_SRC
+
+   Download leiningen
+
+   #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
+     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein > lein
+     chmod +x lein
+
+     # lein self-install
+     lein
+   #+END_SRC
+
+   Also tangle the user ~profiles.clj~
+
+   #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj
+     {:user {:plugins      [[lein-pprint "1.1.2"]
+                            [com.jakemccrary/lein-test-refresh "0.23.0" :exclusions [org.clojure/tools.namespace]]
+                            [refactor-nrepl "2.4.0"]
+                            [cider/cider-nrepl "0.19.0-SNAPSHOT"]]
+             :dependencies [[nrepl "0.4.5"]
+                            [spyscope "0.1.6"]]
+             :injections   [(require 'spyscope.core)]
+             :test-refresh {:notify-command ["notify-send" "-t" "1000"]
+                            :quiet          true
+                            :changes-only   true}}}
+   #+END_SRC
+
+** Python
+
+*** conda
+
+    Download, install anaconda and add path to ~/.localrc
+
+    #+BEGIN_SRC shell :dir /tmp :results output silent
+      wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh
+    #+END_SRC
+
+    Run ~bash /tmp/Anaconda3-4.4.0-Linux-x86_64.sh~. It's an interactive script,
+    so it can't be run here :(
+
+    Add to path and set ~WORKON_HOME~.
+
+    #+BEGIN_SRC shell :results output silent
+      echo "export PATH=${HOME}/anaconda3/bin:\$PATH" >> ~/.localrc
+      echo "export WORKON_HOME=${HOME}/anaconda3/envs" >> ~/.localrc
+    #+END_SRC
+
+*** Emacs config
+
+    First install packages with python
+
+    #+BEGIN_SRC sh :dir /sudo:: :results output silent
+    pip install rope
+    pip install jedi
+    pip install flake8
+    pip install importmagic
+    #+END_SRC
+
+    Now, install elpy
+
+    #+BEGIN_SRC elisp :results output silent
+      (package-refresh-contents)
+      (package-install 'elpy)
+    #+END_SRC
+
+** R
+
+   First, some dependencies.
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   pacman -S R tcl tk
+   #+END_SRC
+
+   Setup config:
+
+   #+BEGIN_SRC R :tangle ~/.Rprofile
+     options(repos=structure(c(CRAN="https://vps.fmvz.usp.br/CRAN/")))
+   #+END_SRC
+
+   Now, useful libraries:
+
+   #+BEGIN_SRC R :results output silent
+     install.packages("tidyverse",
+                      dependencies=TRUE)
+   #+END_SRC
+
+** Rust
+
+   Unfortunatelly, the first command is interactive, so run this on the
+   terminal: ~curl https://sh.rustup.rs -sSf | sh~. It should install everything
+   and add the cargo binary directory to the ~PATH~ env in ~~/.bash_profile~.
+
+   Let's install useful stuff for developing now. We'll be running ~source
+   ~/.cargo/env~ because, as the ~PATH~ was altered in ~~/.bash_profile~, it
+   will only take effect on the next login :\.
+
+   First, racer.
+
+   #+BEGIN_SRC shell :results output silent
+     source ~/.cargo/env
+     cargo install racer
+   #+END_SRC
+
+   For racer to work, we need rust source code.
+
+   #+BEGIN_SRC shell :results output silent
+     source ~/.cargo/env
+     rustup component add rust-src
+   #+END_SRC
+
+   Now, let's set the src env var:
+
+   #+BEGIN_SRC shell :results output silent
+     toolchain=`rustup toolchain list | sed 's/\(.*\) .*/\1/'`
+     echo "RUST_SRC_PATH=${HOME}/.multirust/toolchains/${toolchain}/lib/rustlib/src/rust/src" >> ~/.localrc
+   #+END_SRC
+
+** NVIDIA docker
+
+   Just run ~yaourt -S nvidia-docker~.
+
+** Clojure
+
+   Install clojure:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -Sy --noconfirm clojure
+   #+END_SRC
+
+   Download the lein script:
+
+   #+BEGIN_SRC shell :dir /sudo::/usr/local/bin :results output silent
+     wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+     chmod a+rx /usr/local/bin/lein
+   #+END_SRC
+
+   And run it for the first time to download it:
+
+   #+BEGIN_SRC shell :results output silent
+     lein
+   #+END_SRC
+
+* Other
+
+** Setup ~udev~ rule for HDMI cable
+
+   Create script that checks HDMI status and executes xrandr. Remember to change
+   ~DISPLAY~ to match the one used on the machine.
+
+   #+BEGIN_SRC sh :tangle /sudo::/usr/local/bin/toggle_display :tangle-mode (identity #o755) :padline no
+     #!/usr/bin/env bash
+
+     export DISPLAY=":0.0"
+
+     USER=`ps -aux | grep Xorg | cut -d\  -f 1 | head -n1`
+
+     export XAUTHORITY="/home/${USER}/.Xauthority"
+
+     CARDS=("card0" "card1")
+
+     for CARD in ${CARDS[*]}; do
+         HDMI_STATUS_PATH="/sys/class/drm/$CARD-HDMI-A-1/status"
+         if [ -f $HDMI_STATUS_PATH ]; then
+             HDMI_STATUS=`cat $HDMI_STATUS_PATH`
+
+             # echo "------------------------------------------------" >> /tmp/toggle_monitor.log
+             # echo "$(date) - DISPLAY: ${DISPLAY}, HDMI_STATUS: ${HDMI_STATUS}, USER: ${USER}" >> /tmp/toggle_monitor.log
+             xrandr > /dev/null # >> /tmp/toggle_monitor.log
+
+             if [[ ${HDMI_STATUS} == 'connected' ]]; then
+                 # echo "Turning monitor on" >> /tmp/toggle_monitor.log
+                 xrandr --output eDP1 --auto --pos 0x360 --output HDMI1 --auto --pos 1920x0
+             else
+                 # echo "Turning monitor off" >> /tmp/toggle_monitor.log
+                 xrandr --output HDMI1 --off
+             fi
+         fi
+     done
+   #+END_SRC
+
+   Create udev rule:
+
+   #+BEGIN_SRC sh :tangle /sudo::/etc/udev/rules.d/90-monitor.rules :padline no
+     KERNEL=="card0", SUBSYSTEM=="drm", RUN+="/usr/local/bin/toggle_display"
+     KERNEL=="card1", SUBSYSTEM=="drm", RUN+="/usr/local/bin/toggle_display"
+   #+END_SRC
+
+   After tangle, run this to enable the systemd unit and reload udev rules.
+
+   #+BEGIN_SRC sh :dir /sudo::/ :results output silent
+     udevadm control --reload
+   #+END_SRC
+
+** Ledger CLI
+
+   First, let's clone
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     if [ -d 'ledger' ]; then
+         cd ledger
+         git pull origin next
+     else
+         git clone git@github.com:ledger/ledger.git
+     fi
+   #+END_SRC
+
+   Make sure CMake is present:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -Syy --noconfirm cmake
+   #+END_SRC
+
+   Now build. This is also the command for updating it.
+
+   #+BEGIN_SRC shell :dir ~/reps/ledger :results output silent
+     ./acprep update
+   #+END_SRC
+
+   And install:
+
+   #+BEGIN_SRC shell :dir /sudo::~/reps/ledger :results output silent
+   make install
+   #+END_SRC
+
+** Command for gif recording
+
+   Dependencies:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
+   #+END_SRC
+
+   And then install FFcast:
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
+     ./bootstrap
+     ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+     make
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
+     make install
+   #+END_SRC
+
+   #+BEGIN_SRC shell :tangle /sudo::/usr/bin/gifrecord :tangle-mode (identity #o755)
+     #!/bin/bash
+     TMP_AVI=$(mktemp /tmp/outXXXXXXXXXX.avi)
+     ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
+            -video_size %s -i %D+%c -codec:v huffyuv               \
+            -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
+         && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
+   #+END_SRC
+
+** xml-coreutils
+
+   Cool little tools to work with XML files.
+
+   Download, configure and build:
+
+   #+BEGIN_SRC shell :dir /tmp
+     wget https://downloads.sourceforge.net/project/xml-coreutils/xml-coreutils-0.8.1.tar.gz
+     tar xfz xml-coreutils-0.8.1.tar.gz
+     cd xml-coreutils-0.8.1
+     ./configure
+     make
+     make check
+   #+END_SRC
+
+   #+RESULTS:
+
+   Now install
+
+   #+BEGIN_SRC shell :dir /sudo::/tmp/xml-coreutils-0.8.1 :results output silent
+     make install
+   #+END_SRC
+
+** Play DRM content on chromium
+
+   Install ~chromium-widevine~ using yaourt.
