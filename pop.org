@@ -108,7 +108,7 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
 
      bindkey -A emacs main # set emacs as default
 
-     export BROWSER=chromium
+     export BROWSER=chromium-browser
 
      # Configs for zsh to work nicelly inside emacs
 
