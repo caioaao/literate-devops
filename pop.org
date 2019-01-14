@@ -267,6 +267,7 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      [Desktop Entry]
      Name=StumpWM
      Comment=StumpWM
+     Exec=env gnome-session --session=stumpwm
      Exec=stumpwm
      TryExec=stumpwm
      Type=Application
