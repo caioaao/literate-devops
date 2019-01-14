@@ -634,6 +634,25 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      make install
    #+END_SRC
 
-** Play DRM content on chromium
+** Spotify
 
-   Install ~chromium-widevine~ using yaourt.
+   Add Spotify repository signing keys to be able to verify downloaded packages:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+   #+END_SRC
+
+   Then add the repository
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     echo deb http://repository.spotify.com stable non-free | tee /etc/apt/sources.list.d/spotify.list
+     apt update
+   #+END_SRC
+
+   And install spotify
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y spotify-client
+   #+END_SRC
+
+   Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
