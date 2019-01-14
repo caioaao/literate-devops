@@ -473,10 +473,11 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      apt install -y clojure
    #+END_SRC
 
-   Download leiningen
+   Download leiningen. I'm using v2.8.1 because 2.8.2 doesn't work with
+   cider-nrepl >= 0.16.
 
    #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
-     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
+     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein > lein
      chmod +x lein
 
      # lein self-install
