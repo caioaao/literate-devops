@@ -2,6 +2,10 @@
 
 Requirements: emacs (obviously), git
 
+In the current version of emacs, code execution is broken in org-mode (org-mode
+v9.2). The best is to [[*Upgrade org-mode][upgrade it manually]] and uninstall the broken
+org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
+
 * Desktop
 
 ** Setup dotfiles
@@ -10,7 +14,7 @@ Requirements: emacs (obviously), git
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
      apt install -y zsh || true
-     chsh -s /bin/zsh caio
+     chsh -s /bin/zsh $USER
    #+END_SRC
 
    Create antigen repo:
@@ -79,15 +83,9 @@ Requirements: emacs (obviously), git
      source $ZSH_CONFIG/localrc # local dotfile
    #+END_SRC
 
-   Now, let's create the zsh config dir:
+   Now, let's tangle the base zsh config:
 
-   #+BEGIN_SRC shell :dir ~/ :results output silent
-     mkdir .zsh.d || true
-   #+END_SRC
-
-   The base config:
-
-   #+BEGIN_SRC shell :tangle ~/.zsh.d/base
+   #+BEGIN_SRC shell :tangle ~/.zsh.d/base :mkdirp yes
      #!/usr/bin/env bash
 
      # add useful scripts to the path
@@ -176,7 +174,7 @@ Requirements: emacs (obviously), git
    #+BEGIN_SRC conf :tangle ~/.gitconfig
      [user]
      name="Caio Oliveira"
-     email=[redacted]
+     email=caio@braveno.com
      signingKey=DD90B67479EFA704
 
      [core]
@@ -276,8 +274,8 @@ Requirements: emacs (obviously), git
      ; Keep in mind that longitudes west of Greenwich (e.g. the Americas)
      ; are negative numbers.
      [manual]
-     lat=-23.5475
-     lon=-46.63611
+     lat=29.62
+     lon=-82.37
 
      ; Configuration of the adjustment-method
      ; type 'redshift -m METHOD:help' to see the settings.
@@ -306,29 +304,13 @@ Requirements: emacs (obviously), git
    First install the requirements
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     apt install -y openvpn dialog wget
+     apt install -y openvpn dialog wget resolvconf
    #+END_SRC
 
    Clone the CLI project:
 
    #+BEGIN_SRC shell :dir ~/reps :results output silent
      [ -d protonvpn-cli ] || git clone git@github.com:ProtonVPN/protonvpn-cli.git
-   #+END_SRC
-
-   Install update-resolve-conf:
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     mkdir -p "/etc/openvpn/"
-     file_sha512sum="81cf5ed20ec2a2f47f970bb0185fffb3e719181240f2ca3187dbee1f4d102ce63ab048ffee9daa6b68c96ac59d1d86ad4de2b1cfaf77f1b1f1918d143e96a588"
-     curl "https://raw.githubusercontent.com/ProtonVPN/scripts/master/update-resolv-conf.sh" > "/etc/openvpn/update-resolv-conf"
-     if [[ ($? == 0) && ($(sha512sum "/etc/openvpn/update-resolv-conf" | cut -d " " -f1) == "$file_sha512sum")  ]]; then
-         chmod +x "/etc/openvpn/update-resolv-conf"
-         echo "[*] Done."
-     else
-         echo "[!] Error installing update-resolv-conf."
-         rm -f "/etc/openvpn/update-resolv-conf" 2> /dev/null
-         exit 1
-     fi
    #+END_SRC
 
    Install:
@@ -340,6 +322,27 @@ Requirements: emacs (obviously), git
    Run ~protonvpn-cli --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
 
 * Development
+
+** Docker
+
+   Install stuff
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y docker docker-compose
+   #+END_SRC
+
+   Add user to docker group
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     usermod -aG docker caio
+   #+END_SRC
+
+   And create the docker bridge:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     ip link add name docker0 type bridge
+     ip addr add dev docker0 172.17.0.1/16
+   #+END_SRC
 
 ** Upgrade org-mode
 
@@ -377,11 +380,11 @@ Requirements: emacs (obviously), git
    Download leiningen
 
    #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
-     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein > lein
+     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
      chmod +x lein
 
      # lein self-install
-     lein
+     ./lein
    #+END_SRC
 
    Also tangle the user ~profiles.clj~
@@ -493,27 +496,6 @@ Requirements: emacs (obviously), git
 
    Just run ~yaourt -S nvidia-docker~.
 
-** Clojure
-
-   Install clojure:
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     pacman -Sy --noconfirm clojure
-   #+END_SRC
-
-   Download the lein script:
-
-   #+BEGIN_SRC shell :dir /sudo::/usr/local/bin :results output silent
-     wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
-     chmod a+rx /usr/local/bin/lein
-   #+END_SRC
-
-   And run it for the first time to download it:
-
-   #+BEGIN_SRC shell :results output silent
-     lein
-   #+END_SRC
-
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
@@ -601,13 +583,13 @@ Requirements: emacs (obviously), git
    Dependencies:
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
+     apt install -y ffmpeg imagemagick autoconf libx11-dev
    #+END_SRC
 
    And then install FFcast:
 
    #+BEGIN_SRC shell :dir ~/reps :results output silent
-     [ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
+     [ -d 'FFcast' ] || git clone --recursive git@github.com:lolilolicon/FFcast.git
    #+END_SRC
 
    #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
