@@ -204,6 +204,102 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      apt install -y aspell aspell-en
    #+END_SRC
 
+** StumpWM
+
+   Make sure we have sbcl and build tools.
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y sbcl autoconf
+   #+END_SRC
+
+   To install the lisp packages we need, first we need to make sure quicklisp is
+   installed:
+
+   #+BEGIN_SRC emacs-lisp :results output silent
+     (install-quicklisp)
+   #+END_SRC
+
+   Now fire a SLIME REPL:
+
+   #+BEGIN_SRC emacs-lisp :results output silent
+     (slime)
+   #+END_SRC
+
+   And install the CL dependencies for StumpWM.
+
+   #+BEGIN_SRC lisp :results output silent
+     (ql:quickload "clx-truetype")
+     (ql:quickload "clx")
+     (ql:quickload "cl-ppcre")
+     (ql:quickload "alexandria")
+   #+END_SRC
+
+   Now clone the project.
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     git clone git@github.com:stumpwm/stumpwm.git
+   #+END_SRC
+
+   And build it:
+
+   #+BEGIN_SRC shell :dir ~/reps/stumpwm :results output silent
+     autoconf
+     ./configure
+     make clean && make stumpwm
+   #+END_SRC
+
+   Finally, install.
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm :results output silent
+     make install
+   #+END_SRC
+
+   Clone the config and create a symlink to it so stumpwm can find it.
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     git clone git@github.com:caioaao/stumpwm.d.git
+     ln -s ~/reps/stumpwm.d ~/.stumpwm.d
+   #+END_SRC
+
+   And tangle the desktop config file:
+
+   #+BEGIN_SRC conf :tangle /sudo::/usr/share/xsessions/stumpwm.desktop
+     [Desktop Entry]
+     Name=StumpWM
+     Comment=StumpWM
+     Exec=stumpwm
+     TryExec=stumpwm
+     Type=Application
+     DesktopNames=StumpWM
+     Keywords=tiling;wm;windowmanager;window;manager;stumpwm
+   #+END_SRC
+
+*** twmn
+
+    Install dependencies:
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     # twmn dependencies
+     pacman --noconfirm -Sy boost boost-libs
+     pacman --noconfirm -Sy qt5-base qt5-x11extras
+   #+END_SRC
+
+    Now clone and build.
+
+    #+BEGIN_SRC shell :dir ~/reps :results output silent
+      git clone git@github.com:sboli/twmn.git || true
+      cd twmn
+      git checkout master && git pull origin master
+      qmake
+      make
+    #+END_SRC
+
+    And install.
+
+    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn :results output silent
+      make install
+    #+END_SRC
+
 ** Redshift (screen temperature)
 
    Install it
