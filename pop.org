@@ -754,3 +754,27 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
    #+END_SRC
 
    Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
+
+** Org exporter
+
+   Tangle the following file. It will search for a Dropbox token in
+   ~/.tokens/dropbox.txt and use it to upload all files inside
+   /tmp/org-exported. See [[https://orgmode.org/manual/Exporting-agenda-views.html][this manual]] for an easy way of exporting agenda views.
+
+   #+BEGIN_SRC shell :tangle ~/utils/bin/org_to_dropbox :tangle-mode (identity #o755)
+     #!/usr/bin/env bash
+
+     org_exported_dir='/tmp/org-exported'
+
+     mkdir ${org_exported_dir} || true
+
+     /usr/bin/emacs -eval '(org-batch-store-agenda-views)' -kill
+
+     for f in $(ls ${org_exported_dir}/*.org); do
+         curl -X POST https://content.dropboxapi.com/2/files/upload \
+             --header "Authorization: Bearer $(cat ~/.tokens/dropbox.txt)" \
+             --header "Dropbox-API-Arg: {\"path\": \"/$(basename ${f})\",\"mode\": \"overwrite\"}" \
+             --header "Content-Type: application/octet-stream" \
+             --data-binary ${f}
+     done
+   #+END_SRC
