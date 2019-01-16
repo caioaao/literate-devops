@@ -474,11 +474,10 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      apt install -y clojure
    #+END_SRC
 
-   Download leiningen. I'm using v2.8.1 because 2.8.2 doesn't work with
-   cider-nrepl >= 0.16.
+   Download leiningen.
 
    #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
-     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein > lein
+     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
      chmod +x lein
 
      # lein self-install
@@ -775,6 +774,13 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
              --header "Authorization: Bearer $(cat ~/.tokens/dropbox.txt)" \
              --header "Dropbox-API-Arg: {\"path\": \"/$(basename ${f})\",\"mode\": \"overwrite\"}" \
              --header "Content-Type: application/octet-stream" \
-             --data-binary ${f}
+             --data-binary @${f}
      done
+   #+END_SRC
+
+   This pre-push hook can be safely added to any repo:
+
+   #+BEGIN_SRC shell :tangle ~/utils/bin/org_to_dropbox :tangle-mode (identity #o755)
+     #!/bin/sh
+     command -v org_to_dropbox &>/dev/null && org_to_dropbox
    #+END_SRC
