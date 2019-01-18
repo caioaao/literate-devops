@@ -784,3 +784,19 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      #!/bin/sh
      command -v org_to_dropbox &>/dev/null && org_to_dropbox
    #+END_SRC
+
+** PlantUML
+
+   It's a cool little tool to create diagrams. I use it basically for sequence
+   diagrams though.
+
+   #+BEGIN_SRC shell :dir ~/utils :results output silent :mkdirp yes
+     mkdir jars || true
+     cd jars
+     wget https://sourceforge.net/projects/plantuml/files/plantuml.1.2019.0.jar
+     ln -s plantuml.1.2019.0.jar plantuml.jar
+   #+END_SRC
+
+   Done! To call it directly, run ~java -jar ~/utils/jars/plantuml.jar file1
+   file2 file3~. Emacs should already be configured to find the jar in this
+   location.
