@@ -176,16 +176,25 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
    PS: explanation for disabling GSSApi, besides the slowness it causes in some
    cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
 
-   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling it's config file
-   to use Google's DNS:
+   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling the following
+   config file to use Google's DNS:
 
-   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
+     [Resolve]
      DNS=8.8.8.8
+   #+END_SRC
+
+   We /could/ use this to increase security a little bit, but the Ubuntu package
+   is a little behind this update :\
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
+     [Resolve]
+     DNSOverTLS=opportunistic
    #+END_SRC
 
    And restart the service
 
-   #+BEGIN_SRC shell :tangle /sudo:: results output silent
+   #+BEGIN_SRC shell :tangle /sudo:: :results output silent
      systemctl restart systemd-resolved.service
    #+END_SRC
 
