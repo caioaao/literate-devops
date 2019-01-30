@@ -167,6 +167,28 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      apt install -y gcr
    #+END_SRC
 
+   Also, tangle the ssh config.
+
+   #+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
+     GSSAPIAuthentication no
+   #+END_SRC
+
+   PS: explanation for disabling GSSApi, besides the slowness it causes in some
+   cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
+
+   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling it's config file
+   to use Google's DNS:
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf
+     DNS=8.8.8.8
+   #+END_SRC
+
+   And restart the service
+
+   #+BEGIN_SRC shell :tangle /sudo:: results output silent
+     systemctl restart systemd-resolved.service
+   #+END_SRC
+
 ** Git
 
    Basic configs
