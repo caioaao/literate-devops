@@ -519,11 +519,8 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
 
    #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj
      {:user {:plugins      [[lein-pprint "1.1.2"]
-                            [com.jakemccrary/lein-test-refresh "0.23.0" :exclusions [org.clojure/tools.namespace]]
-                            [refactor-nrepl "2.4.0"]
-                            [cider/cider-nrepl "0.19.0-SNAPSHOT"]]
-             :dependencies [[nrepl "0.4.5"]
-                            [spyscope "0.1.6"]]
+                            [com.jakemccrary/lein-test-refresh "0.23.0"]]
+             :dependencies [[spyscope "0.1.6"]]
              :injections   [(require 'spyscope.core)]
              :test-refresh {:notify-command ["notify-send" "-t" "1000"]
                             :quiet          true
