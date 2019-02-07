@@ -530,6 +530,17 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
                             :changes-only   true}}}
    #+END_SRC
 
+   And for clj CLI, download the installer:
+
+   #+BEGIN_SRC shell :dir /tmp :results output silent
+     curl -O https://download.clojure.org/install/linux-install-1.10.0.411.sh
+     chmod +x linux-install-1.10.0.411.sh
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir /sudo::/tmp :results output silent
+     ./linux-install-1.10.0.411.sh
+   #+END_SRC
+
 ** Python
 
 *** conda
