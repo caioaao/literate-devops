@@ -628,9 +628,38 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
      echo "RUST_SRC_PATH=${HOME}/.multirust/toolchains/${toolchain}/lib/rustlib/src/rust/src" >> ~/.localrc
    #+END_SRC
 
-** NVIDIA docker
+** Kubernetes (minikube)
 
-   Just run ~yaourt -S nvidia-docker~.
+   Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
+
+   First install a hypervisor
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt update && apt install -y linux-kvm
+   #+END_SRC
+
+   Now install ~kubectl~
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install -y apt-transport-https
+     echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+     apt-get update
+     apt-get install -y kubectl
+   #+END_SRC
+
+   If it fails when trying to acquire the lock just run again. It's the distro trying to check for updates *sigh*
+
+   And now download the static minikube binary and then move it to the bin dir.
+
+   #+BEGIN_SRC shell :dir /tmp :results output silent
+     curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+       && chmod +x minikube
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     mv /tmp/minikube /usr/local/bin
+   #+END_SRC
 
 * Other
 
