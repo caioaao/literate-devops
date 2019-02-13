@@ -173,6 +173,9 @@ Now we're all set!
 
    To create keys, see https://github.com/caioaao/YubiKey-Guide
 
+   We also need to import the keys for use. For that, run =gpg --card-edit= and
+   then =fetch= and exit.
+
 ** GnuPG / SSH
 
    Tangle the gpg-agent config.
@@ -187,11 +190,62 @@ Now we're all set!
      max-cache-ttl 120
    #+END_SRC
 
+   And the GPG config:
+
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
+     # https://github.com/drduh/config/blob/master/gpg.conf
+     # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+     # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
+     # Use AES256, 192, or 128 as cipher
+     personal-cipher-preferences AES256 AES192 AES
+     # Use SHA512, 384, or 256 as digest
+     personal-digest-preferences SHA512 SHA384 SHA256
+     # Use ZLIB, BZIP2, ZIP, or no compression
+     personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+     # Default preferences for new keys
+     default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+     # SHA512 as digest to sign keys
+     cert-digest-algo SHA512
+     # SHA512 as digest for symmetric ops
+     s2k-digest-algo SHA512
+     # AES256 as cipher for symmetric ops
+     s2k-cipher-algo AES256
+     # UTF-8 support for compatibility
+     charset utf-8
+     # Show Unix timestamps
+     fixed-list-mode
+     # No comments in signature
+     no-comments
+     # No version in signature
+     no-emit-version
+     # Long hexidecimal key format
+     keyid-format 0xlong
+     # Display UID validity
+     list-options show-uid-validity
+     verify-options show-uid-validity
+     # Display all keys and their fingerprints
+     with-fingerprint
+     # Display key origins and updates
+     #with-key-origin
+     # Cross-certify subkeys are present and valid
+     require-cross-certification
+     # Disable putting recipient key IDs into messages
+     throw-keyids
+     # Enable smartcard
+     use-agent
+   #+END_SRC
+
    Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
    installed together with it, for some reason.
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
      apt install -y gcr
+   #+END_SRC
+
+   We need to fix the DNS resolution:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     ln -sf /etc/resolv.conf /run/systemd/resolve/resolv.conf
    #+END_SRC
 
    Also, tangle the ssh config.
@@ -212,17 +266,23 @@ Now we're all set!
    #+END_SRC
 
    We /could/ use this to increase security a little bit, but the Ubuntu package
-   is a little behind this update :\
+   is a little behind this update :\ So don't try
 
-   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
-     [Resolve]
-     DNSOverTLS=opportunistic
-   #+END_SRC
+   # #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
+   #   [Resolve]
+   #   DNSOverTLS=opportunistic
+   # #+END_SRC
 
    And restart the service
 
-   #+BEGIN_SRC shell :tangle /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
      systemctl restart systemd-resolved.service
+   #+END_SRC
+
+   Also import the public key so we can use it:
+
+   #+BEGIN_SRC shell :results output silent
+     gpg --recv DD90B67479EFA704
    #+END_SRC
 
 ** Git
@@ -232,7 +292,7 @@ Now we're all set!
    #+BEGIN_SRC conf :tangle ~/.gitconfig
      [user]
      name="Caio Oliveira"
-     email=caio@braveno.com
+     email=caioaao@gmail.com
      signingKey=DD90B67479EFA704
 
      [core]
@@ -503,7 +563,13 @@ Now we're all set!
 
    (more info [[http://orgmode.org/manual/Installation.html][here]])
 
-   First, clone the repo
+   Install the dependencies:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install texinfo
+   #+END_SRC
+
+   Then clone the repo.
 
    #+BEGIN_SRC shell :dir ~/reps :results output silent
      [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
