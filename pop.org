@@ -30,6 +30,12 @@ After that, when on emacs 26, run:
    '((shell . t)))
 #+END_SRC
 
+Optionally, if you want to turn off the annoying confirmation prompts:
+
+#+begin_src emacs-lisp :results output silent
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
 Now we're all set!
 
 * Desktop
@@ -38,10 +44,9 @@ Now we're all set!
 
    First, install zsh and change the login shell:
 
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
      apt install -y zsh || true
-     chsh -s /bin/zsh caio
+     chsh -s /bin/zsh $user
    #+END_SRC
 
    Clone antigen repo:
@@ -530,11 +535,12 @@ Now we're all set!
 
    Install:
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/protonvpn-cli :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
+     cd ~${user}/reps/protonvpn-cli
      ./protonvpn-cli.sh --install
    #+END_SRC
 
-   Run ~protonvpn-cli --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
+   Run ~sudo pvpn --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
 
 * Development
 
@@ -548,46 +554,15 @@ Now we're all set!
 
    Add user to docker group
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     usermod -aG docker caio
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
+     usermod -aG docker ${user}
    #+END_SRC
 
-   And create the docker bridge:
+   And create the docker bridge if it doesn't already exist:
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
      ip link add name docker0 type bridge
      ip addr add dev docker0 172.17.0.1/16
-   #+END_SRC
-
-** Upgrade org-mode
-
-   (more info [[http://orgmode.org/manual/Installation.html][here]])
-
-   Install the dependencies:
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     apt install texinfo
-   #+END_SRC
-
-   Then clone the repo.
-
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
-     [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
-   #+END_SRC
-
-   Now update the repo and compile the project:
-
-   #+BEGIN_SRC shell :dir ~/reps/org-mode :results output silent
-     git checkout master && git pull
-
-     make autoloads
-     make
-   #+END_SRC
-
-   And install
-
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode :results output silent
-     make install
    #+END_SRC
 
 ** Clojure
@@ -961,3 +936,34 @@ Now we're all set!
    Done! To call it directly, run ~java -jar ~/utils/jars/plantuml.jar file1
    file2 file3~. Emacs should already be configured to find the jar in this
    location.
+** Upgrade org-mode
+
+   (more info [[http://orgmode.org/manual/Installation.html][here]])
+
+   Install the dependencies:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     apt install texinfo
+   #+END_SRC
+
+   Then clone the repo.
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
+   #+END_SRC
+
+   Now update the repo and compile the project:
+
+   #+BEGIN_SRC shell :dir ~/reps/org-mode :results output silent
+     git checkout master && git pull
+
+     make autoloads
+     make
+   #+END_SRC
+
+   And install
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode :results output silent
+     make install
+   #+END_SRC
+
