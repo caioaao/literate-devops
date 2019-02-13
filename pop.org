@@ -2,9 +2,35 @@
 
 Requirements: emacs (obviously), git
 
-In the current version of emacs, code execution is broken in org-mode (org-mode
-v9.2). The best is to [[*Upgrade org-mode][upgrade it manually]] and uninstall the broken
-org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
+Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of
+date packages. The buggy version of org-mode that comes with the
+default Emacs prevents us from using this file properly, so you'll
+have to update it before using. To do so, first load ~ob-sh~ and then
+run the update script:
+
+#+BEGIN_SRC emacs-lisp :results output silent
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((sh . t)))
+#+END_SRC
+
+#+BEGIN_SRC sh :dir /sudo:: :results output silent
+  add-apt-repository ppa:kelleyk/emacs
+  apt-get update
+  apt install -y emacs26
+  apt purge -y emacs25
+  apt autoremove -y
+#+END_SRC
+
+After that, when on emacs 26, run:
+
+#+BEGIN_SRC emacs-lisp :results output silent
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)))
+#+END_SRC
+
+Now we're all set!
 
 * Desktop
 
@@ -12,12 +38,13 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
 
    First, install zsh and change the login shell:
 
+
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
      apt install -y zsh || true
-     chsh -s /bin/zsh $USER
+     chsh -s /bin/zsh caio
    #+END_SRC
 
-   Create antigen repo:
+   Clone antigen repo:
 
    #+BEGIN_SRC shell :dir ~/ :results output silent
      mkdir reps || true
@@ -30,7 +57,7 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
    Let's create a directory for some useful commands.
 
    #+BEGIN_SRC shell :results output silent
-   mkdir -p ~/utils/bin || true
+     mkdir -p ~/utils/bin || true
    #+END_SRC
 
    And now some cool scripts:
@@ -124,7 +151,7 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
    (company notebook configs for instance).
 
    #+BEGIN_SRC shell :dir ~/ :results output silent
-   touch ~/.zsh.d/localrc
+     touch ~/.zsh.d/localrc
    #+END_SRC
 
 ** Yubikey
@@ -150,7 +177,7 @@ org-mode. Also run ~rm ~/.emacs.d/elpa/org-[org-version]/*.elc~.
 
    Tangle the gpg-agent config.
 
-   #+BEGIN_SRC text :tangle ~/.gnupg/gpg-agent.conf
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf
      enable-ssh-support
      log-file ~/.gnupg/gpg-agent.log
      allow-emacs-pinentry
