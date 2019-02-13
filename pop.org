@@ -703,7 +703,7 @@ Now we're all set!
    First install a hypervisor
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     apt update && apt install -y linux-kvm
+     apt update && apt install -y virtualbox
    #+END_SRC
 
    Now install ~kubectl~
