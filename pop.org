@@ -729,6 +729,15 @@ Now we're all set!
      mv /tmp/minikube /usr/local/bin
    #+END_SRC
 
+** linkerd CLI
+
+   Download, install it, and create a symlink to our local bin dir
+
+   #+BEGIN_SRC shell :results output silent
+     curl -sL https://run.linkerd.io/install | sh
+     ln -s ~/.linkerd2/bin/linkerd ~/utils/bin/linkerd
+   #+END_SRC
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
@@ -916,7 +925,7 @@ Now we're all set!
 
    This pre-push hook can be safely added to any repo:
 
-   #+BEGIN_SRC shell :tangle ~/utils/bin/org_to_dropbox :tangle-mode (identity #o755)
+   #+BEGIN_SRC shell :results output silent
      #!/bin/sh
      command -v org_to_dropbox &>/dev/null && org_to_dropbox
    #+END_SRC
