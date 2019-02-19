@@ -608,41 +608,18 @@ Now we're all set!
 
 ** Python
 
-*** conda
+   Install pip, python3, and pip3:
 
-    Download, install anaconda and add path to ~/.localrc
+   #+begin_src shell :dir /sudo:: :results output silent
+     apt install python-pip python3 python3-pip
+   #+end_src
 
-    #+BEGIN_SRC shell :dir /tmp :results output silent
-      wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh
-    #+END_SRC
+   Install some useful development stuff.
 
-    Run ~bash /tmp/Anaconda3-4.4.0-Linux-x86_64.sh~. It's an interactive script,
-    so it can't be run here :(
-
-    Add to path and set ~WORKON_HOME~.
-
-    #+BEGIN_SRC shell :results output silent
-      echo "export PATH=${HOME}/anaconda3/bin:\$PATH" >> ~/.localrc
-      echo "export WORKON_HOME=${HOME}/anaconda3/envs" >> ~/.localrc
-    #+END_SRC
-
-*** Emacs config
-
-    First install packages with python
-
-    #+BEGIN_SRC sh :dir /sudo:: :results output silent
-    pip install rope
-    pip install jedi
-    pip install flake8
-    pip install importmagic
-    #+END_SRC
-
-    Now, install elpy
-
-    #+BEGIN_SRC elisp :results output silent
-      (package-refresh-contents)
-      (package-install 'elpy)
-    #+END_SRC
+   #+begin_src shell :dir /sudo:: :results output silent
+     pip2 install epc jedi
+     pip3 install epc jedi
+   #+end_src
 
 ** R
 
