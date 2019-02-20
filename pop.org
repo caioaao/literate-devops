@@ -727,6 +727,7 @@ Now we're all set!
       cd /opt/istio
       curl -L https://github.com/istio/istio/releases/download/1.0.6/istio-1.0.6-linux.tar.gz | tar xz
       ln -sf /opt/istio/istio-1.0.6/bin/istioctl /usr/local/bin/istioctl
+      ln -sf /opt/istio/istio-1.0.6 /opt/istio/istio
     #+END_SRC
 
 *** Helm
