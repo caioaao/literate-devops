@@ -673,47 +673,61 @@ Now we're all set!
      echo "RUST_SRC_PATH=${HOME}/.multirust/toolchains/${toolchain}/lib/rustlib/src/rust/src" >> ~/.localrc
    #+END_SRC
 
-** Kubernetes (minikube)
+** Kubernetes
 
-   Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
+*** Minikube
 
-   First install a hypervisor
+    Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     apt update && apt install -y virtualbox
-   #+END_SRC
+    First install a hypervisor
 
-   Now install ~kubectl~
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+      apt update && apt install -y virtualbox
+    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     apt install -y apt-transport-https
-     echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-     apt-get update
-     apt-get install -y kubectl
-   #+END_SRC
+    Now install ~kubectl~
 
-   If it fails when trying to acquire the lock just run again. It's the distro trying to check for updates *sigh*
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+      apt install -y apt-transport-https
+      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+      apt-get update
+      apt-get install -y kubectl
+    #+END_SRC
 
-   And now download the static minikube binary and then move it to the bin dir.
+    If it fails when trying to acquire the lock just run again. It's the distro trying to check for updates *sigh*
 
-   #+BEGIN_SRC shell :dir /tmp :results output silent
-     curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
-       && chmod +x minikube
-   #+END_SRC
+    And now download the static minikube binary and then move it to the bin dir.
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-     mv /tmp/minikube /usr/local/bin
-   #+END_SRC
+    #+BEGIN_SRC shell :dir /tmp :results output silent
+      curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+        && chmod +x minikube
+    #+END_SRC
 
-** linkerd CLI
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+      mv /tmp/minikube /usr/local/bin
+    #+END_SRC
 
-   Download, install it, and create a symlink to our local bin dir
+*** Linkerd CLI
 
-   #+BEGIN_SRC shell :results output silent
-     curl -sL https://run.linkerd.io/install | sh
-     ln -s ~/.linkerd2/bin/linkerd ~/utils/bin/linkerd
-   #+END_SRC
+    Download, install it, and create a symlink to our local bin dir
+
+    #+BEGIN_SRC shell :results output silent
+      curl -sL https://run.linkerd.io/install | sh
+      ln -s ~/.linkerd2/bin/linkerd ~/utils/bin/linkerd
+    #+END_SRC
+
+*** Istio
+
+    Download and install:
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+      mkdir /opt/istio || true
+      chmod 0755 /opt/istio
+      cd /opt/istio
+      curl -L https://github.com/istio/istio/releases/download/1.0.6/istio-1.0.6-linux.tar.gz | tar xz
+      ln -sf /opt/istio/istio-1.0.6/bin/istioctl /usr/local/bin/istioctl
+    #+END_SRC
 
 * Other
 
