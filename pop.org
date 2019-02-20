@@ -98,6 +98,7 @@ Now we're all set!
      antigen bundle emacs
      antigen bundle archlinux
      antigen bundle common-aliases
+     antigen bundle kubectl
 
      # Syntax highlighting bundle.
      antigen bundle zsh-users/zsh-syntax-highlighting
