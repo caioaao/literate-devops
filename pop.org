@@ -745,6 +745,20 @@ Now we're all set!
       ln -sf /opt/helm/helm-2.12.3/tiller /usr/local/bin/tiller
     #+END_SRC
 
+** Terraform
+
+   Download, extract and then move to appropriate location.
+
+   #+begin_src shell :dir /tmp :results output silent
+     wget https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
+     unzip terraform_0.11.11_linux_amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :results output silent
+     mv /tmp/terraform /usr/local/bin/terraform-0.11.11
+     ln -sf /usr/local/bin/terraform-0.11.11 /usr/local/bin/terraform
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
