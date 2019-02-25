@@ -745,6 +745,24 @@ Now we're all set!
       ln -sf /opt/helm/helm-2.12.3/tiller /usr/local/bin/tiller
     #+END_SRC
 
+*** Kustomize
+
+    Just download the binary:
+
+    #+begin_src shell :dir /tmp :results output silent
+      wget https://github.com/kubernetes-sigs/kustomize/releases/download/v2.0.2/kustomize_2.0.2_linux_amd64
+    #+end_src
+
+    And configure it to be found:
+
+    #+begin_src shell :dir /sudo:: :results output silent
+      mkdir -p /opt/kustomize || true
+      mv /tmp/kustomize_2.0.2_linux_amd64 /opt/kustomize/kustomize-2.0.2
+      chmod -R 0755 /opt/kustomize
+      chmod +x /opt/kustomize/kustomize-2.0.2
+      ln -sf /opt/kustomize/kustomize-2.0.2 /usr/local/bin/kustomize
+    #+end_src
+
 ** Terraform
 
    Download, extract and then move to appropriate location.
