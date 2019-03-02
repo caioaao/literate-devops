@@ -1,4 +1,5 @@
 #+TITLE: Notebook setup (Pop OS)
+#+PROPERTY: header-args:shell :results output silent
 
 Requirements: emacs (obviously), git
 
@@ -8,13 +9,13 @@ default Emacs prevents us from using this file properly, so you'll
 have to update it before using. To do so, first load ~ob-sh~ and then
 run the update script:
 
-#+BEGIN_SRC emacs-lisp :results output silent
+#+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sh . t)))
 #+END_SRC
 
-#+BEGIN_SRC sh :dir /sudo:: :results output silent
+#+BEGIN_SRC sh :dir /sudo::
   add-apt-repository ppa:kelleyk/emacs
   apt-get update
   apt install -y emacs26
@@ -24,7 +25,7 @@ run the update script:
 
 After that, when on emacs 26, run:
 
-#+BEGIN_SRC emacs-lisp :results output silent
+#+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)))
@@ -32,7 +33,7 @@ After that, when on emacs 26, run:
 
 Optionally, if you want to turn off the annoying confirmation prompts:
 
-#+begin_src emacs-lisp :results output silent
+#+begin_src emacs-lisp
   (setq org-confirm-babel-evaluate nil)
 #+end_src
 
@@ -44,24 +45,14 @@ Now we're all set!
 
    First, install zsh and change the login shell:
 
-   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
      apt install -y zsh || true
      chsh -s /bin/zsh $user
    #+END_SRC
 
-   Clone antigen repo:
-
-   #+BEGIN_SRC shell :dir ~/ :results output silent
-     mkdir reps || true
-     cd reps
-     git clone https://github.com/zsh-users/antigen.git || true
-     cd antigen
-     git checkout master && git pull origin master
-   #+END_SRC
-
    Let's create a directory for some useful commands.
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      mkdir -p ~/utils/bin || true
    #+END_SRC
 
@@ -78,42 +69,45 @@ Now we're all set!
        (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
      #+END_SRC
 
+   Install oh-my-zsh. I used to use zsh-users/antigen but it was another
+   abstraction layer on top of the plugin management that didn't bring much
+   benefit to me. It tries to solve the monorepo issue with oh-my-zsh, but
+   that's not an issue for me.
+
+   #+begin_src shell
+     sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+     # installing it together to be sure `ZSH_CUSTOM` is set
+     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+   #+end_src
+
    Now, tangle the basic zshrc:
 
    #+BEGIN_SRC shell :tangle ~/.zshrc
      REPS_PATH=~/reps
 
-     source ${REPS_PATH}/antigen/antigen.zsh
+     export ZSH="$HOME/.oh-my-zsh"
+     ZSH_THEME="gallois"
 
-     # Load the oh-my-zsh's library.
-     antigen use oh-my-zsh
+     plugins=(git
+              heroku
+              pip
+              lein
+              command-not-found
+              autojump
+              emacs
+              archlinux
+              common-aliases
+              kubectl
+              zsh-syntax-highlighting)
 
-     # Bundles from the default repo (robbyrussell's oh-my-zsh).
-     antigen bundle git
-     antigen bundle heroku
-     antigen bundle pip
-     antigen bundle lein
-     antigen bundle command-not-found
-     antigen bundle autojump
-     antigen bundle emacs
-     antigen bundle archlinux
-     antigen bundle common-aliases
-     antigen bundle kubectl
-
-     # Syntax highlighting bundle.
-     antigen bundle zsh-users/zsh-syntax-highlighting
-
-     # Load the theme.
-     antigen theme gallois
-
-     # Tell antigen that you're done.
-     antigen apply
+     source "$ZSH/oh-my-zsh.sh"
 
      # Export zsh config dir path and import base config
-     export ZSH_CONFIG=~/.zsh.d
-     source $ZSH_CONFIG/base # base config
-     source $ZSH_CONFIG/apps # apps config
-     source $ZSH_CONFIG/localrc # local dotfile
+     export MY_ZSH_CONFIG=~/.zsh.d
+     source $MY_ZSH_CONFIG/base # base config
+     source $MY_ZSH_CONFIG/apps # apps config
+     source $MY_ZSH_CONFIG/localrc # local dotfile
    #+END_SRC
 
    Now, let's tangle the base zsh config:
@@ -156,7 +150,7 @@ Now we're all set!
    Also create the ~localrc~ file. This should be the place to add local configs
    (company notebook configs for instance).
 
-   #+BEGIN_SRC shell :dir ~/ :results output silent
+   #+BEGIN_SRC shell :dir ~/
      touch ~/.zsh.d/localrc
    #+END_SRC
 
@@ -164,7 +158,7 @@ Now we're all set!
 
    Install the manager and dependencies
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt-add-repository ppa:yubico/stable
      apt update
      apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
@@ -172,7 +166,7 @@ Now we're all set!
 
    Start and enable the appropriate service
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      systemctl enable pcscd.service
      systemctl start pcscd.service
    #+END_SRC
@@ -244,13 +238,13 @@ Now we're all set!
    Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
    installed together with it, for some reason.
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y gcr
    #+END_SRC
 
    We need to fix the DNS resolution:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      ln -sf /etc/resolv.conf /run/systemd/resolve/resolv.conf
    #+END_SRC
 
@@ -281,13 +275,13 @@ Now we're all set!
 
    And restart the service
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      systemctl restart systemd-resolved.service
    #+END_SRC
 
    Also import the public key so we can use it:
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      gpg --recv DD90B67479EFA704
    #+END_SRC
 
@@ -312,19 +306,19 @@ Now we're all set!
 
    Set system language:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      localectl set-locale LANG=en_US.UTF-8
    #+END_SRC
 
    Keyboard config:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
    #+END_SRC
 
    Installing aspell:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y aspell aspell-en
    #+END_SRC
 
@@ -332,26 +326,26 @@ Now we're all set!
 
    Make sure we have sbcl and build tools.
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y sbcl autoconf
    #+END_SRC
 
    To install the lisp packages we need, first we need to make sure quicklisp is
    installed:
 
-   #+BEGIN_SRC emacs-lisp :results output silent
+   #+BEGIN_SRC emacs-lisp
      (install-quicklisp)
    #+END_SRC
 
    Now fire a SLIME REPL:
 
-   #+BEGIN_SRC emacs-lisp :results output silent
+   #+BEGIN_SRC emacs-lisp
      (slime)
    #+END_SRC
 
    And install the CL dependencies for StumpWM.
 
-   #+BEGIN_SRC lisp :results output silent
+   #+BEGIN_SRC lisp
      (ql:quickload "clx-truetype")
      (ql:quickload "clx")
      (ql:quickload "cl-ppcre")
@@ -360,13 +354,13 @@ Now we're all set!
 
    Now clone the project.
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      git clone git@github.com:stumpwm/stumpwm.git
    #+END_SRC
 
    And build it:
 
-   #+BEGIN_SRC shell :dir ~/reps/stumpwm :results output silent
+   #+BEGIN_SRC shell :dir ~/reps/stumpwm
      autoconf
      ./configure
      make clean && make stumpwm
@@ -374,13 +368,13 @@ Now we're all set!
 
    Finally, install.
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm :results output silent
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm
      make install
    #+END_SRC
 
    Clone the config and create a symlink to it so stumpwm can find it.
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      git clone git@github.com:caioaao/stumpwm.d.git
      ln -s ~/reps/stumpwm.d ~/.stumpwm.d
    #+END_SRC
@@ -403,7 +397,7 @@ Now we're all set!
 
     Install dependencies:
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
      # twmn dependencies
      pacman --noconfirm -Sy boost boost-libs
      pacman --noconfirm -Sy qt5-base qt5-x11extras
@@ -411,7 +405,7 @@ Now we're all set!
 
     Now clone and build.
 
-    #+BEGIN_SRC shell :dir ~/reps :results output silent
+    #+BEGIN_SRC shell :dir ~/reps
       git clone git@github.com:sboli/twmn.git || true
       cd twmn
       git checkout master && git pull origin master
@@ -421,7 +415,7 @@ Now we're all set!
 
     And install.
 
-    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn :results output silent
+    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn
       make install
     #+END_SRC
 
@@ -429,7 +423,7 @@ Now we're all set!
 
    Install it
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y redshift
    #+END_SRC
 
@@ -510,13 +504,13 @@ Now we're all set!
 
    Enable the service:
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      systemctl --user enable redshift.service
    #+END_SRC
 
    Optionally, start the service:
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      systemctl --user start redshift.service
    #+END_SRC
 
@@ -524,19 +518,19 @@ Now we're all set!
 
    First install the requirements
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y openvpn dialog wget resolvconf
    #+END_SRC
 
    Clone the CLI project:
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      [ -d protonvpn-cli ] || git clone git@github.com:ProtonVPN/protonvpn-cli.git
    #+END_SRC
 
    Install:
 
-   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
      cd ~${user}/reps/protonvpn-cli
      ./protonvpn-cli.sh --install
    #+END_SRC
@@ -549,19 +543,19 @@ Now we're all set!
 
    Install stuff
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y docker docker-compose
    #+END_SRC
 
    Add user to docker group
 
-   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name) :results output silent
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
      usermod -aG docker ${user}
    #+END_SRC
 
    And create the docker bridge if it doesn't already exist:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      ip link add name docker0 type bridge
      ip addr add dev docker0 172.17.0.1/16
    #+END_SRC
@@ -570,13 +564,13 @@ Now we're all set!
 
    Install the Clojure package
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y clojure
    #+END_SRC
 
    Download leiningen.
 
-   #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
+   #+BEGIN_SRC shell :dir ~/utils/bin
      curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
      chmod +x lein
 
@@ -598,12 +592,12 @@ Now we're all set!
 
    And for clj CLI, download the installer:
 
-   #+BEGIN_SRC shell :dir /tmp :results output silent
+   #+BEGIN_SRC shell :dir /tmp
      curl -O https://download.clojure.org/install/linux-install-1.10.0.411.sh
      chmod +x linux-install-1.10.0.411.sh
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /sudo::/tmp :results output silent
+   #+BEGIN_SRC shell :dir /sudo::/tmp
      ./linux-install-1.10.0.411.sh
    #+END_SRC
 
@@ -611,13 +605,13 @@ Now we're all set!
 
    Install pip, python3, and pip3:
 
-   #+begin_src shell :dir /sudo:: :results output silent
+   #+begin_src shell :dir /sudo::
      apt install python-pip python3 python3-pip
    #+end_src
 
    Install some useful development stuff.
 
-   #+begin_src shell :dir /sudo:: :results output silent
+   #+begin_src shell :dir /sudo::
      pip2 install epc jedi
      pip3 install epc jedi
    #+end_src
@@ -626,7 +620,7 @@ Now we're all set!
 
    First, some dependencies.
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
    pacman -S R tcl tk
    #+END_SRC
 
@@ -638,7 +632,7 @@ Now we're all set!
 
    Now, useful libraries:
 
-   #+BEGIN_SRC R :results output silent
+   #+BEGIN_SRC R
      install.packages("tidyverse",
                       dependencies=TRUE)
    #+END_SRC
@@ -655,21 +649,21 @@ Now we're all set!
 
    First, racer.
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      source ~/.cargo/env
      cargo install racer
    #+END_SRC
 
    For racer to work, we need rust source code.
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      source ~/.cargo/env
      rustup component add rust-src
    #+END_SRC
 
    Now, let's set the src env var:
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      toolchain=`rustup toolchain list | sed 's/\(.*\) .*/\1/'`
      echo "RUST_SRC_PATH=${HOME}/.multirust/toolchains/${toolchain}/lib/rustlib/src/rust/src" >> ~/.localrc
    #+END_SRC
@@ -682,13 +676,13 @@ Now we're all set!
 
     First install a hypervisor
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
       apt update && apt install -y virtualbox
     #+END_SRC
 
     Now install ~kubectl~
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
       apt install -y apt-transport-https
       echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
       curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -700,12 +694,12 @@ Now we're all set!
 
     And now download the static minikube binary and then move it to the bin dir.
 
-    #+BEGIN_SRC shell :dir /tmp :results output silent
+    #+BEGIN_SRC shell :dir /tmp
       curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
         && chmod +x minikube
     #+END_SRC
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
       mv /tmp/minikube /usr/local/bin
     #+END_SRC
 
@@ -713,7 +707,7 @@ Now we're all set!
 
     Download, install it, and create a symlink to our local bin dir
 
-    #+BEGIN_SRC shell :results output silent
+    #+BEGIN_SRC shell
       curl -sL https://run.linkerd.io/install | sh
       ln -s ~/.linkerd2/bin/linkerd ~/utils/bin/linkerd
     #+END_SRC
@@ -722,7 +716,7 @@ Now we're all set!
 
     Download and install:
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
       mkdir /opt/istio || true
       chmod 0755 /opt/istio
       cd /opt/istio
@@ -735,7 +729,7 @@ Now we're all set!
 
     Download and install:
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    #+BEGIN_SRC shell :dir /sudo::
       mkdir /opt/helm || true
       chmod 0755 /opt/helm
       cd /opt/helm
@@ -749,13 +743,13 @@ Now we're all set!
 
     Just download the binary:
 
-    #+begin_src shell :dir /tmp :results output silent
+    #+begin_src shell :dir /tmp
       wget https://github.com/kubernetes-sigs/kustomize/releases/download/v2.0.2/kustomize_2.0.2_linux_amd64
     #+end_src
 
     And configure it to be found:
 
-    #+begin_src shell :dir /sudo:: :results output silent
+    #+begin_src shell :dir /sudo::
       mkdir -p /opt/kustomize || true
       mv /tmp/kustomize_2.0.2_linux_amd64 /opt/kustomize/kustomize-2.0.2
       chmod -R 0755 /opt/kustomize
@@ -767,12 +761,12 @@ Now we're all set!
 
    Download, extract and then move to appropriate location.
 
-   #+begin_src shell :dir /tmp :results output silent
+   #+begin_src shell :dir /tmp
      wget https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
      unzip terraform_0.11.11_linux_amd64.zip
    #+end_src
 
-   #+begin_src shell :dir /sudo:: :results output silent
+   #+begin_src shell :dir /sudo::
      mv /tmp/terraform /usr/local/bin/terraform-0.11.11
      ln -sf /usr/local/bin/terraform-0.11.11 /usr/local/bin/terraform
    #+end_src
@@ -824,7 +818,7 @@ Now we're all set!
 
    After tangle, run this to enable the systemd unit and reload udev rules.
 
-   #+BEGIN_SRC sh :dir /sudo::/ :results output silent
+   #+BEGIN_SRC sh :dir /sudo::/
      udevadm control --reload
    #+END_SRC
 
@@ -832,7 +826,7 @@ Now we're all set!
 
    First, let's clone
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      if [ -d 'ledger' ]; then
          cd ledger
          git pull origin next
@@ -843,19 +837,19 @@ Now we're all set!
 
    Make sure CMake is present:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      pacman -Syy --noconfirm cmake
    #+END_SRC
 
    Now build. This is also the command for updating it.
 
-   #+BEGIN_SRC shell :dir ~/reps/ledger :results output silent
+   #+BEGIN_SRC shell :dir ~/reps/ledger
      ./acprep update
    #+END_SRC
 
    And install:
 
-   #+BEGIN_SRC shell :dir /sudo::~/reps/ledger :results output silent
+   #+BEGIN_SRC shell :dir /sudo::~/reps/ledger
    make install
    #+END_SRC
 
@@ -863,23 +857,23 @@ Now we're all set!
 
    Dependencies:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y ffmpeg imagemagick autoconf libx11-dev
    #+END_SRC
 
    And then install FFcast:
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      [ -d 'FFcast' ] || git clone --recursive git@github.com:lolilolicon/FFcast.git
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
+   #+BEGIN_SRC shell :dir ~/reps/FFcast
      ./bootstrap
      ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
      make
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast
      make install
    #+END_SRC
 
@@ -911,7 +905,7 @@ Now we're all set!
 
    Now install
 
-   #+BEGIN_SRC shell :dir /sudo::/tmp/xml-coreutils-0.8.1 :results output silent
+   #+BEGIN_SRC shell :dir /sudo::/tmp/xml-coreutils-0.8.1
      make install
    #+END_SRC
 
@@ -919,20 +913,20 @@ Now we're all set!
 
    Add Spotify repository signing keys to be able to verify downloaded packages:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
    #+END_SRC
 
    Then add the repository
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      echo deb http://repository.spotify.com stable non-free | tee /etc/apt/sources.list.d/spotify.list
      apt update
    #+END_SRC
 
    And install spotify
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install -y spotify-client
    #+END_SRC
 
@@ -964,7 +958,7 @@ Now we're all set!
 
    This pre-push hook can be safely added to any repo:
 
-   #+BEGIN_SRC shell :results output silent
+   #+BEGIN_SRC shell
      #!/bin/sh
      command -v org_to_dropbox &>/dev/null && org_to_dropbox
    #+END_SRC
@@ -974,7 +968,7 @@ Now we're all set!
    It's a cool little tool to create diagrams. I use it basically for sequence
    diagrams though.
 
-   #+BEGIN_SRC shell :dir ~/utils :results output silent :mkdirp yes
+   #+BEGIN_SRC shell :dir ~/utils :mkdirp yes
      mkdir jars || true
      cd jars
      wget https://sourceforge.net/projects/plantuml/files/plantuml.1.2019.0.jar
@@ -990,19 +984,19 @@ Now we're all set!
 
    Install the dependencies:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   #+BEGIN_SRC shell :dir /sudo::
      apt install texinfo
    #+END_SRC
 
    Then clone the repo.
 
-   #+BEGIN_SRC shell :dir ~/reps :results output silent
+   #+BEGIN_SRC shell :dir ~/reps
      [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
    #+END_SRC
 
    Now update the repo and compile the project:
 
-   #+BEGIN_SRC shell :dir ~/reps/org-mode :results output silent
+   #+BEGIN_SRC shell :dir ~/reps/org-mode
      git checkout master && git pull
 
      make autoloads
@@ -1011,7 +1005,7 @@ Now we're all set!
 
    And install
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode :results output silent
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode
      make install
    #+END_SRC
 
