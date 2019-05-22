@@ -718,7 +718,7 @@ Now we're all set!
     Download and install:
 
     #+BEGIN_SRC shell :dir /sudo::
-      ISTIO_VERSION=1.1.2
+      ISTIO_VERSION=1.1.7
       mkdir /opt/istio || true
       chmod 0755 /opt/istio
       cd /opt/istio
