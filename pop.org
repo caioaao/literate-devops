@@ -765,13 +765,13 @@ Now we're all set!
    Download, extract and then move to appropriate location.
 
    #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
-     unzip terraform_0.11.11_linux_amd64.zip
+     wget https://releases.hashicorp.com/terraform/0.12.1/terraform_0.12.1_linux_amd64.zip
+     unzip terraform_0.12.1_linux_amd64.zip
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.11.11
-     ln -sf /usr/local/bin/terraform-0.11.11 /usr/local/bin/terraform
+     mv /tmp/terraform /usr/local/bin/terraform-0.12.1
+     ln -sf /usr/local/bin/terraform-0.12.1 /usr/local/bin/terraform
    #+end_src
 
 * Other
