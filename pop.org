@@ -1,5 +1,6 @@
 #+TITLE: Notebook setup (Pop OS)
 #+PROPERTY: header-args:shell :results output silent
+#+PROPERTY: header-args:sh :results output silent
 
 Requirements: emacs (obviously), git
 
@@ -683,6 +684,17 @@ Now we're all set!
    #+END_SRC
 
 ** Kubernetes
+
+*** Kops
+
+    #+begin_src sh :dir /sudo::/tmp
+      KOPS_VERSION='1.12.1'
+
+      curl -LO https://github.com/kubernetes/kops/releases/download/${KOPS_VERSION}/kops-linux-amd64
+      chmod 0755 kops-linux-amd64
+      mv kops-linux-amd64 /usr/local/bin/kops-${KOPS_VERSION}
+      ln -sf /usr/local/bin/kops-${KOPS_VERSION} /usr/local/bin/kops
+    #+end_src
 
 *** Minikube
 
