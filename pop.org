@@ -539,6 +539,19 @@ Now we're all set!
 
 * Development
 
+** AWS's assume-role
+
+   Tiny helper to assume roles on CLI.
+
+   #+BEGIN_SRC sh :dir /sudo::
+     apt install -y jq
+   #+END_SRC
+
+   #+BEGIN_SRC sh :dir /sudo::
+     curl -L https://raw.githubusercontent.com/coinbase/assume-role/8458754982dce937f7cbb90c7da9560afe1b7210/assume-role --output /usr/local/bin/assume-role
+     chmod 0755 /usr/local/bin/assume-role
+   #+END_SRC
+
 ** Docker
 
    Install stuff
