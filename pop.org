@@ -146,6 +146,11 @@ Now we're all set!
          print -P "\033AnSiTu %n"
          print -P "\033AnSiTc %d"
      fi
+
+     # some nice terraform aliases
+     alias tfplan='terraform plan -out=plan.tfplan'
+     alias tfapply='terraform apply --refresh=false plan.tfplan'
+     alias tfrapply='terraform apply plan.tfplan'
    #+END_SRC
 
    Also create the ~localrc~ file. This should be the place to add local configs
