@@ -1055,4 +1055,22 @@ Now we're all set!
    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode
      make install
    #+END_SRC
+** SteelSeries Rival 100 configuration
 
+   First we need the CLI tool. For that, first install its dependencies:
+
+   #+begin_src sh :dir /sudo::
+     apt install -y build-essential python-dev libusb-1.0-0-dev libudev-dev
+   #+end_src
+
+   Now install rivalcfg
+
+   #+begin_src sh :dir /sudo::
+     pip install rivalcfg==3.6.0
+   #+end_src
+
+   Now, the configs:
+
+   #+begin_src sh
+   rivalcfg -s 1000 -S 1000 -c '#ff2019'
+   #+end_src
