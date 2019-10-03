@@ -580,7 +580,7 @@ Now we're all set!
 
    Also tangle the user ~profiles.clj~
 
-   #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj
+   #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj :mkdirp yes
      {:user {:plugins      [[lein-pprint "1.1.2"]
                             [com.jakemccrary/lein-test-refresh "0.23.0"]]
              :dependencies [[fipp "0.6.14"]
@@ -601,6 +601,13 @@ Now we're all set!
    #+BEGIN_SRC shell :dir /sudo::/tmp
      ./linux-install-1.10.0.411.sh
    #+END_SRC
+
+   We also need a different configuration file for clj cli:
+
+   #+begin_src clojure :tangle ~/.clojure/deps.edn :mkdirp yes
+     {:deps
+      {spyscope {:mvn/version "0.1.6"}}}
+   #+end_src
 
 ** Python
 
