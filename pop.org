@@ -808,13 +808,21 @@ Now we're all set!
    Download, extract and then move to appropriate location.
 
    #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.12.1/terraform_0.12.1_linux_amd64.zip
-     unzip terraform_0.12.1_linux_amd64.zip
+     wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip
+     unzip terraform_0.12.18_linux_amd64.zip
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.12.1
-     ln -sf /usr/local/bin/terraform-0.12.1 /usr/local/bin/terraform
+     mv /tmp/terraform /usr/local/bin/terraform-0.12.18
+     ln -sf /usr/local/bin/terraform-0.12.18 /usr/local/bin/terraform
+   #+end_src
+
+** golang
+
+   First install go:
+
+   #+begin_src shell :dir /sudo::
+     apt install -y golang
    #+end_src
 
 * Other
