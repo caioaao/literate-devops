@@ -151,6 +151,9 @@ Now we're all set!
      alias tfplan='terraform plan -out=plan.tfplan'
      alias tfapply='terraform apply --refresh=false plan.tfplan'
      alias tfrapply='terraform apply plan.tfplan'
+
+     # add go executables to path
+     export PATH=$PATH:~/go/bin
    #+END_SRC
 
    Also create the ~localrc~ file. This should be the place to add local configs
