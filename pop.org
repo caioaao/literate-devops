@@ -129,32 +129,43 @@ Now we're all set!
      fi
    #+END_SRC
 
-   And apps config:
+   And the main apps config:
 
    #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
      #!/usr/bin/env bash
 
-     bindkey -A emacs main # set emacs as default
+     # Ensure apps.d is created
+     mkdir ~/.zsh.d/apps.d/ &> /dev/null || true
+
+     for f in `ls ~/.zsh.d/apps.d/`; do
+         source ~/.zsh.d/apps.d/$f
+     done
+   #+END_SRC
+
+   Now let's already create some app specific configs here. First, browser config.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
+     #!/usr/bin/env bash
 
      export BROWSER=chromium-browser
+   #+end_src
+
+   Now emacs:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
+     #!/usr/bin/env bash
+
+     bindkey -A emacs main # set emacs as default
 
      # Configs for zsh to work nicelly inside emacs
-
      if [ -n "$INSIDE_EMACS" ]; then
          export TERM=vt100
          chpwd() { print -P "\033AnSiTc %d" }
          print -P "\033AnSiTu %n"
          print -P "\033AnSiTc %d"
      fi
+   #+end_src
 
-     # some nice terraform aliases
-     alias tfplan='terraform plan -out=plan.tfplan'
-     alias tfapply='terraform apply --refresh=false plan.tfplan'
-     alias tfrapply='terraform apply plan.tfplan'
-
-     # add go executables to path
-     export PATH=$PATH:~/go/bin
-   #+END_SRC
 
    Also create the ~localrc~ file. This should be the place to add local configs
    (company notebook configs for instance).
@@ -827,12 +838,29 @@ Now we're all set!
      ln -sf /usr/local/bin/terraform-0.12.18 /usr/local/bin/terraform
    #+end_src
 
+   Now let's add some aliases to our shell:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-terraform.sh
+     #!/usr/bin/env bash
+     alias tfplan='terraform plan -out=plan.tfplan'
+     alias tfapply='terraform apply --refresh=false plan.tfplan'
+     alias tfrapply='terraform apply plan.tfplan'
+   #+end_src
+
 ** golang
 
    First install go:
 
    #+begin_src shell :dir /sudo::
      apt install -y golang
+   #+end_src
+
+   And add go executables to our path:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+     #!/usr/bin/env bash
+
+     export PATH=$PATH:~/go/bin
    #+end_src
 
 * Other
