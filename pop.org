@@ -878,6 +878,25 @@ Now we're all set!
      export PATH=$PATH:~/go/bin
    #+end_src
 
+** protobuf
+
+   Download, extract and configure:
+
+   #+begin_src shell :dir /tmp
+     #curl -sL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz | tar zx
+     cd protobuf-3.11.2
+     ./configure
+     make
+     make check -j 13
+   #+end_src
+
+   Install and refresh shared library cache
+
+   #+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
+     make install
+     ldconfig
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
