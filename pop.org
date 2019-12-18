@@ -597,7 +597,7 @@ Now we're all set!
    Install stuff
 
    #+BEGIN_SRC shell :dir /sudo::
-     apt install -y docker docker-compose
+     apt install -y docker
    #+END_SRC
 
    Add user to docker group
@@ -612,6 +612,14 @@ Now we're all set!
      ip link add name docker0 type bridge
      ip addr add dev docker0 172.17.0.1/16
    #+END_SRC
+
+   Also install docker-compose (apt repository doesn't have the latest stable
+   version at the moment):
+
+   #+begin_src shell :dir /sudo::
+     curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+     chmod +x /usr/local/bin/docker-compose
+   #+end_src
 
 ** Clojure
 
