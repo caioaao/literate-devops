@@ -847,6 +847,13 @@ Now we're all set!
      alias tfrapply='terraform apply plan.tfplan'
    #+end_src
 
+** git-lfs
+
+   #+begin_src shell :dir /sudo::/tmp
+     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+     apt install -y git-lfs
+   #+end_src
+
 ** golang
 
    First install go:
