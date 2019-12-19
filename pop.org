@@ -878,6 +878,13 @@ Now we're all set!
      export PATH=$PATH:~/go/bin
    #+end_src
 
+   Now the goodies:
+
+   #+begin_src shell
+     go get github.com/rogpeppe/godef
+     go get golang.org/x/tools/cmd/goimports
+   #+end_src
+
 ** protobuf
 
    Download, extract and configure:
