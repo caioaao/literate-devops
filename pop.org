@@ -904,6 +904,35 @@ Now we're all set!
      ldconfig
    #+end_src
 
+** Flatbuffers
+
+   Install deps:
+
+   #+begin_src shell :dir /sudo::
+     apt install -y cmake
+   #+end_src
+
+   Clone repo, generate makefiles and build:
+
+   #+begin_src shell :dir /tmp
+     git clone --branch 1.11.0 git@github.com:google/flatbuffers.git
+   #+end_src
+
+   #+begin_src shell :dir /sudo::/opt
+     mv /tmp/flatbuffers /opt/flatbuffers-1.11.0
+   #+end_src
+
+   #+begin_src shell :dir /opt/flatbuffers-1.11.0
+     cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+     make
+   #+end_src
+
+   And install
+
+   #+begin_src shell :dir /sudo::/opt/flatbuffers-1.11.0
+     make install
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
