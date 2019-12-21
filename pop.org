@@ -384,13 +384,17 @@ Now we're all set!
 
    Now clone the project.
 
-   #+BEGIN_SRC shell :dir ~/reps
-     git clone git@github.com:stumpwm/stumpwm.git
+   #+BEGIN_SRC shell :dir /tmp
+     git clone --branch 18.11 git@github.com:stumpwm/stumpwm.git
    #+END_SRC
+
+   #+begin_src shell :dir /sudo::
+     mv /tmp/stumpwm /opt/stumpwm-18.11
+   #+end_src
 
    And build it:
 
-   #+BEGIN_SRC shell :dir ~/reps/stumpwm
+   #+BEGIN_SRC shell :dir /opt/stumpwm-18.11
      autoconf
      ./configure
      make clean && make stumpwm
@@ -398,7 +402,7 @@ Now we're all set!
 
    Finally, install.
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm
+   #+BEGIN_SRC shell :dir /sudo::/opt/stumpwm-18.11
      make install
    #+END_SRC
 
@@ -435,17 +439,23 @@ Now we're all set!
 
     Now clone and build.
 
-    #+BEGIN_SRC shell :dir ~/reps
-      git clone git@github.com:sboli/twmn.git || true
+    #+BEGIN_SRC shell :dir /tmp
+      git clone --branch 861a323229d34aa42c837bacb15a9d9f2cb9fa4f git@github.com:sboli/twmn.git
+    #+END_SRC
+
+    #+begin_src shell :dir /sudo::
+      mv /tmp/twmn /opt/twmn
+    #+end_src
+
+    #+begin_src shell :dir /opt/twmn
       cd twmn
-      git checkout master && git pull origin master
       qmake
       make
-    #+END_SRC
+    #+end_src
 
     And install.
 
-    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn
+    #+BEGIN_SRC shell :dir /sudo::/opt/twmn
       make install
     #+END_SRC
 
@@ -1025,17 +1035,21 @@ Now we're all set!
 
    And then install FFcast:
 
-   #+BEGIN_SRC shell :dir ~/reps
-     [ -d 'FFcast' ] || git clone --recursive git@github.com:lolilolicon/FFcast.git
+   #+BEGIN_SRC shell :dir /tmp
+     [ -d 'FFcast' ] || git clone --branch 2.5.0 --recursive git@github.com:lolilolicon/FFcast.git
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir ~/reps/FFcast
+   #+begin_src shell :dir /sudo::
+     mv /tmp/FFcast /opt/FFcast-2.5.0
+   #+end_src
+
+   #+BEGIN_SRC shell :dir /opt/FFcast-2.5.0
      ./bootstrap
      ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
      make
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast
+   #+BEGIN_SRC shell :dir /sudo::/opt/FFcast-2.5.0
      make install
    #+END_SRC
 
@@ -1144,36 +1158,6 @@ Now we're all set!
    Done! To call it directly, run ~java -jar ~/utils/jars/plantuml.jar file1
    file2 file3~. Emacs should already be configured to find the jar in this
    location.
-** Upgrade org-mode
-
-   (more info [[http://orgmode.org/manual/Installation.html][here]])
-
-   Install the dependencies:
-
-   #+BEGIN_SRC shell :dir /sudo::
-     apt install texinfo
-   #+END_SRC
-
-   Then clone the repo.
-
-   #+BEGIN_SRC shell :dir ~/reps
-     [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
-   #+END_SRC
-
-   Now update the repo and compile the project:
-
-   #+BEGIN_SRC shell :dir ~/reps/org-mode
-     git checkout master && git pull
-
-     make autoloads
-     make
-   #+END_SRC
-
-   And install
-
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode
-     make install
-   #+END_SRC
 ** SteelSeries Rival 100 configuration
 
    First we need the CLI tool. For that, first install its dependencies:
