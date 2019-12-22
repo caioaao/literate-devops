@@ -965,6 +965,37 @@ Now we're all set!
      make install
    #+end_src
 
+** Java
+
+   My editor of choice is Emacs, but even then we need Eclipse to work with
+   Java... We do this by using eclim. This setup is based on [[http://www.goldsborough.me/emacs,/java/2016/02/24/22-54-16-setting_up_emacs_for_java_development/][this blog post]].
+
+   Install Eclipse:
+
+   #+begin_src shell :dir /sudo::/opt
+     curl -sL http://ftp.osuosl.org/pub/eclipse/technology/epp/downloads/release/2019-12/R/eclipse-java-2019-12-R-linux-gtk-x86_64.tar.gz | tar xvz
+   #+end_src
+
+   Add Eclipse local dir to path.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/eclipse
+     #/usr/bin/env bash
+
+     export PATH="${PATH}:${HOME}/.eclipse/org.eclipse.platform_4.14.0_1473617060_linux_gtk_x86_64"
+   #+end_src
+
+   Install eclim:
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://github.com/ervandew/eclim/releases/download/2.8.0/eclim_2.8.0.bin > eclim_2.8.0.bin
+     chmod +x eclim_2.8.0.bin
+     ./eclim_2.8.0.bin \
+       --yes \
+       --eclipse=/opt/eclipse \
+       --plugins=jdt \
+       --vimfiles=skip
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
