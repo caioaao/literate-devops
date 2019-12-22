@@ -914,6 +914,28 @@ Now we're all set!
      ldconfig
    #+end_src
 
+** Gradle
+
+   Ubuntu's repo only has version 4, so we'll use sdkman to install and use newer versions. First install sdkman
+
+   #+begin_src shell
+     curl -s "https://get.sdkman.io" | bash
+   #+end_src
+
+   And add to the zsh app configs
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-sdkman.sh
+     #!usr/bin/env bash
+     source "$HOME/.sdkman/bin/sdkman-init.sh"
+   #+end_src
+
+   Now install Gradle:
+
+   #+begin_src shell
+     source "$HOME/.sdkman/bin/sdkman-init.sh"
+     sdk install gradle 6.0.1
+   #+end_src
+
 ** Flatbuffers
 
    Install deps:
