@@ -874,10 +874,15 @@ Now we're all set!
 
 ** golang
 
-   First install go:
+   First install go (Ubuntu has an old version only):
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://dl.google.com/go/go1.13.3.linux-amd64.tar.gz | tar xvz
+   #+end_src
 
    #+begin_src shell :dir /sudo::
-     apt install -y golang
+     mv /tmp/go /opt/go-1.13.3
+     ln -sf /opt/go-1.13.3 /opt/go
    #+end_src
 
    And add go executables to our path:
@@ -885,7 +890,7 @@ Now we're all set!
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
      #!/usr/bin/env bash
 
-     export PATH=$PATH:~/go/bin
+     export PATH="$PATH:/opt/go/bin:~/go/bin"
    #+end_src
 
    Now the goodies:
