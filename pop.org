@@ -890,14 +890,18 @@ Now we're all set!
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
      #!/usr/bin/env bash
 
-     export PATH="$PATH:/opt/go/bin:~/go/bin"
+     export GOROOT=/opt/go
+     export GOPATH=~/go
+     export PATH="$PATH:$GOROOT/bin"
+     export PATH="$PATH:$PATH/bin"
    #+end_src
 
    Now the goodies:
 
    #+begin_src shell
-     go get github.com/rogpeppe/godef
+     go get golang.org/x/tools/cmd/godoc
      go get golang.org/x/tools/cmd/goimports
+     go get github.com/rogpeppe/godef
    #+end_src
 
 ** protobuf
