@@ -305,6 +305,23 @@ Now we're all set!
      gpg --recv DD90B67479EFA704
    #+END_SRC
 
+** iptables
+
+   After some issues because of exposed ports, using iptables as a firewall
+   sounds like a good idea.
+
+   #+begin_src shell :dir /sudo::
+     iptables --flush
+     iptables --policy INPUT DROP
+     iptables --policy FORWARD DROP
+     iptables --policy OUTPUT ACCEPT
+     iptables --append INPUT -i lo -j ACCEPT
+     iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+     iptables --append INPUT --jump REJECT
+     iptables --append FORWARD --jump REJECT
+     iptables-save
+   #+end_src
+
 ** Update systemd-resolved
 
    Install the script:
@@ -578,6 +595,7 @@ Now we're all set!
    Run ~sudo pvpn --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
 
 * Development
+
 ** aws-iam-authenticator
 
    #+begin_src sh :dir /sudo::/tmp
