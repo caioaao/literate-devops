@@ -310,7 +310,7 @@ Now we're all set!
    After some issues because of exposed ports, using iptables as a firewall
    sounds like a good idea.
 
-   First create the systemd service:
+   First create the systemd service and the flush script:
 
    #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
      # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
@@ -323,10 +323,23 @@ Now we're all set!
      Type=oneshot
      ExecStart=/sbin/iptables-restore /etc/iptables/iptables.rules
      ExecReload=/sbin/iptables-restore /etc/iptables/iptables.rules
-     ExecStop=/etc/iptables/flush-iptables.sh
+     ExecStop=/etc/iptables/iptables-flush.sh
      RemainAfterExit=yes
      [Install]
      WantedBy=multi-user.target
+   #+end_src
+
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755)
+     #!/usr/bin/env bash
+     iptables -F
+     iptables -X
+     iptables -t nat -F
+     iptables -t nat -X
+     iptables -t mangle -F
+     iptables -t mangle -X
+     iptables -P INPUT ACCEPT
+     iptables -P FORWARD ACCEPT
+     iptables -P OUTPUT ACCEPT
    #+end_src
 
    Then generate the file containing the rules and enable the service:
