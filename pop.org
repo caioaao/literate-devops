@@ -310,6 +310,27 @@ Now we're all set!
    After some issues because of exposed ports, using iptables as a firewall
    sounds like a good idea.
 
+   First create the systemd service:
+
+   #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
+     # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
+     [Unit]
+     Description=Packet Filtering Framework
+     DefaultDependencies=no
+     After=systemd-sysctl.service
+     Before=sysinit.target
+     [Service]
+     Type=oneshot
+     ExecStart=/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecReload=/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecStop=/etc/iptables/flush-iptables.sh
+     RemainAfterExit=yes
+     [Install]
+     WantedBy=multi-user.target
+   #+end_src
+
+   Then generate the file containing the rules and enable the service:
+
    #+begin_src shell :dir /sudo::
      iptables --flush
      iptables --policy INPUT DROP
@@ -319,7 +340,14 @@ Now we're all set!
      iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
      iptables --append INPUT --jump REJECT
      iptables --append FORWARD --jump REJECT
-     iptables-save
+     iptables -N DOCKER-USER
+     iptables -I DOCKER-USER -i enp4s0 ! -s 127.0.0.1 -j DROP
+     iptables -I DOCKER-USER -i wlp3s0 ! -s 127.0.0.1 -j DROP
+     mkdir /etc/iptables || true
+     iptables-save > /etc/iptables/iptables.rules
+
+     systemctl enable iptables.service
+     systemctl start iptables.service
    #+end_src
 
 ** Update systemd-resolved
