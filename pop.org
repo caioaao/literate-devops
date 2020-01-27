@@ -714,8 +714,8 @@ Now we're all set!
      {:user {:plugins      [[lein-pprint "1.1.2"]
                             [com.jakemccrary/lein-test-refresh "0.23.0"]]
              :dependencies [[fipp "0.6.14"]
-                            [spyscope "0.1.6" :exclusions [fipp]]]
-             :injections   [(require 'spyscope.core)]
+                            [hashp "0.1.1"]]
+             :injections   [(require 'hashp.core)]
              :test-refresh {:notify-command ["notify-send" "-t" "1000"]
                             :quiet          true
                             :changes-only   true}}}
