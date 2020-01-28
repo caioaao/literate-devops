@@ -635,6 +635,14 @@ Now we're all set!
 
    Run ~sudo pvpn --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
 
+** tmux
+
+   #+begin_src conf :tangle ~/.tmux.conf
+     unbind-key C-b
+     set -g prefix 'C-space'
+     bind-key 'C-space' send-prefix
+   #+end_src
+
 * Development
 
 ** aws-iam-authenticator
