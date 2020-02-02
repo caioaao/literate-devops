@@ -740,10 +740,17 @@ Now we're all set!
 
    #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj :mkdirp yes
      {:user {:plugins      [[lein-pprint "1.1.2"]
-                            [com.jakemccrary/lein-test-refresh "0.23.0"]]
+                            [com.jakemccrary/lein-test-refresh "0.23.0"]
+                            [com.cemerick/pomegranate "0.4.0"]]
              :dependencies [[fipp "0.6.14"]
                             [hashp "0.1.1"]]
-             :injections   [(require 'hashp.core)]
+             :injections   [(require 'hashp.core)
+                            (defn add-dependency [dep-vec]
+                              (require 'cemerick.pomegranate)
+                              ((resolve 'cemerick.pomegranate/add-dependencies)
+                               :coordinates [dep-vec]
+                               :repositories (merge @(resolve 'cemerick.pomegranate.aether/maven-central)
+                                                    {"clojars" "https://clojars.org/repo"})))]
              :test-refresh {:notify-command ["notify-send" "-t" "1000"]
                             :quiet          true
                             :changes-only   true}}}
