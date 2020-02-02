@@ -539,6 +539,25 @@ Now we're all set!
 
 * Development
 
+** Fix emacs signature issues
+
+   Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
+
+   #+BEGIN_SRC elisp
+     (setq package-check-signature nil)
+     (package-install 'gnu-elpa-keyring-update)
+     (gnu-elpa-keyring-update)
+     (setq package-check-signature 'allow-unsigned)
+   #+END_SRC
+
+   And to verify it solved the issue, run:
+
+   #+BEGIN_SRC elisp
+     (package-refresh-contents)
+   #+END_SRC
+
+   If it runs without errors, then everything is back to normal.
+
 ** Docker
 
    Install stuff
