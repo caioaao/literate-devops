@@ -1,5 +1,7 @@
 #+TITLE: Notebook setup (Pop OS)
 #+PROPERTY: header-args:shell :results output silent
+#+PROPERTY: header-args:sh :results output silent
+#+PROPERTY: header-args:elisp :results output silent
 
 Requirements: emacs (obviously), git
 
@@ -25,7 +27,7 @@ run the update script:
 
 After that, when on emacs 26, run:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC elisp
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)))
@@ -128,24 +130,43 @@ Now we're all set!
      fi
    #+END_SRC
 
-   And apps config:
+   And the main apps config:
 
    #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
      #!/usr/bin/env bash
 
-     bindkey -A emacs main # set emacs as default
+     # Ensure apps.d is created
+     mkdir ~/.zsh.d/apps.d/ &> /dev/null || true
+
+     for f in `ls ~/.zsh.d/apps.d/`; do
+         source ~/.zsh.d/apps.d/$f
+     done
+   #+END_SRC
+
+   Now let's already create some app specific configs here. First, browser config.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
+     #!/usr/bin/env bash
 
      export BROWSER=chromium-browser
+   #+end_src
+
+   Now emacs:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
+     #!/usr/bin/env bash
+
+     bindkey -A emacs main # set emacs as default
 
      # Configs for zsh to work nicelly inside emacs
-
      if [ -n "$INSIDE_EMACS" ]; then
          export TERM=vt100
          chpwd() { print -P "\033AnSiTc %d" }
          print -P "\033AnSiTu %n"
          print -P "\033AnSiTc %d"
      fi
-   #+END_SRC
+   #+end_src
+
 
    Also create the ~localrc~ file. This should be the place to add local configs
    (company notebook configs for instance).
@@ -245,7 +266,7 @@ Now we're all set!
    We need to fix the DNS resolution:
 
    #+BEGIN_SRC shell :dir /sudo::
-     ln -sf /etc/resolv.conf /run/systemd/resolve/resolv.conf
+     ln -sf /etc/resolv.conf /run/systemd/resolve/stub-resolv.conf
    #+END_SRC
 
    Also, tangle the ssh config.
@@ -284,6 +305,74 @@ Now we're all set!
    #+BEGIN_SRC shell
      gpg --recv DD90B67479EFA704
    #+END_SRC
+
+** iptables
+
+   After some issues because of exposed ports, using iptables as a firewall
+   sounds like a good idea.
+
+   First create the systemd service and the flush script:
+
+   #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
+     # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
+     [Unit]
+     Description=Packet Filtering Framework
+     DefaultDependencies=no
+     After=systemd-sysctl.service
+     Before=sysinit.target
+     [Service]
+     Type=oneshot
+     ExecStart=/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecReload=/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecStop=/etc/iptables/iptables-flush.sh
+     RemainAfterExit=yes
+     [Install]
+     WantedBy=multi-user.target
+   #+end_src
+
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755)
+     #!/usr/bin/env bash
+     iptables -F
+     iptables -X
+     iptables -t nat -F
+     iptables -t nat -X
+     iptables -t mangle -F
+     iptables -t mangle -X
+     iptables -P INPUT ACCEPT
+     iptables -P FORWARD ACCEPT
+     iptables -P OUTPUT ACCEPT
+   #+end_src
+
+   Then generate the file containing the rules and enable the service:
+
+   #+begin_src shell :dir /sudo::
+     iptables --flush
+     iptables --policy INPUT DROP
+     iptables --policy FORWARD DROP
+     iptables --policy OUTPUT ACCEPT
+     iptables --append INPUT -i lo -j ACCEPT
+     iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+     iptables --append INPUT --jump REJECT
+     iptables --append FORWARD --jump REJECT
+     iptables -N DOCKER-USER
+     iptables -I DOCKER-USER -i enp4s0 ! -s 127.0.0.1 -j DROP
+     iptables -I DOCKER-USER -i wlp3s0 ! -s 127.0.0.1 -j DROP
+     mkdir /etc/iptables || true
+     iptables-save > /etc/iptables/iptables.rules
+
+     systemctl enable iptables.service
+     systemctl start iptables.service
+   #+end_src
+
+** Update systemd-resolved
+
+   Install the script:
+
+   #+begin_src sh :dir /sudo::/tmp
+     git clone https://github.com/jonathanio/update-systemd-resolved.git
+     cd update-systemd-resolved
+     make
+   #+end_src
 
 ** Git
 
@@ -354,13 +443,17 @@ Now we're all set!
 
    Now clone the project.
 
-   #+BEGIN_SRC shell :dir ~/reps
-     git clone git@github.com:stumpwm/stumpwm.git
+   #+BEGIN_SRC shell :dir /tmp
+     git clone --branch 18.11 git@github.com:stumpwm/stumpwm.git
    #+END_SRC
+
+   #+begin_src shell :dir /sudo::
+     mv /tmp/stumpwm /opt/stumpwm-18.11
+   #+end_src
 
    And build it:
 
-   #+BEGIN_SRC shell :dir ~/reps/stumpwm
+   #+BEGIN_SRC shell :dir /opt/stumpwm-18.11
      autoconf
      ./configure
      make clean && make stumpwm
@@ -368,7 +461,7 @@ Now we're all set!
 
    Finally, install.
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm
+   #+BEGIN_SRC shell :dir /sudo::/opt/stumpwm-18.11
      make install
    #+END_SRC
 
@@ -405,17 +498,23 @@ Now we're all set!
 
     Now clone and build.
 
-    #+BEGIN_SRC shell :dir ~/reps
-      git clone git@github.com:sboli/twmn.git || true
+    #+BEGIN_SRC shell :dir /tmp
+      git clone --branch 861a323229d34aa42c837bacb15a9d9f2cb9fa4f git@github.com:sboli/twmn.git
+    #+END_SRC
+
+    #+begin_src shell :dir /sudo::
+      mv /tmp/twmn /opt/twmn
+    #+end_src
+
+    #+begin_src shell :dir /opt/twmn
       cd twmn
-      git checkout master && git pull origin master
       qmake
       make
-    #+END_SRC
+    #+end_src
 
     And install.
 
-    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn
+    #+BEGIN_SRC shell :dir /sudo::/opt/twmn
       make install
     #+END_SRC
 
@@ -537,6 +636,14 @@ Now we're all set!
 
    Run ~sudo pvpn --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
 
+** tmux
+
+   #+begin_src conf :tangle ~/.tmux.conf
+     unbind-key C-b
+     set -g prefix 'C-space'
+     bind-key 'C-space' send-prefix
+   #+end_src
+
 * Development
 
 ** Fix emacs signature issues
@@ -558,12 +665,36 @@ Now we're all set!
 
    If it runs without errors, then everything is back to normal.
 
+** aws-iam-authenticator
+
+   #+begin_src sh :dir /sudo::/tmp
+     AUTHENTICATOR_VERSION=1.12.7
+
+     curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/${AUTHENTICATOR_VERSION}/2019-03-27/bin/linux/amd64/aws-iam-authenticator
+     mv aws-iam-authenticator /usr/local/bin/aws-iam-authenticator-${AUTHENTICATOR_VERSION}
+     chmod 0755 /usr/local/bin/aws-iam-authenticator-${AUTHENTICATOR_VERSION}
+     ln -sf /usr/local/bin/aws-iam-authenticator-${AUTHENTICATOR_VERSION} /usr/local/bin/aws-iam-authenticator
+   #+end_src
+
+** AWS's assume-role
+
+   Tiny helper to assume roles on CLI.
+
+   #+BEGIN_SRC sh :dir /sudo::
+     apt install -y jq
+   #+END_SRC
+
+   #+BEGIN_SRC sh :dir /sudo::
+     curl -L https://raw.githubusercontent.com/coinbase/assume-role/8458754982dce937f7cbb90c7da9560afe1b7210/assume-role --output /usr/local/bin/assume-role
+     chmod 0755 /usr/local/bin/assume-role
+   #+END_SRC
+
 ** Docker
 
    Install stuff
 
    #+BEGIN_SRC shell :dir /sudo::
-     apt install -y docker docker-compose
+     apt install -y docker
    #+END_SRC
 
    Add user to docker group
@@ -578,6 +709,14 @@ Now we're all set!
      ip link add name docker0 type bridge
      ip addr add dev docker0 172.17.0.1/16
    #+END_SRC
+
+   Also install docker-compose (apt repository doesn't have the latest stable
+   version at the moment):
+
+   #+begin_src shell :dir /sudo::
+     curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+     chmod +x /usr/local/bin/docker-compose
+   #+end_src
 
 ** Clojure
 
@@ -603,8 +742,8 @@ Now we're all set!
      {:user {:plugins      [[lein-pprint "1.1.2"]
                             [com.jakemccrary/lein-test-refresh "0.23.0"]]
              :dependencies [[fipp "0.6.14"]
-                            [spyscope "0.1.6" :exclusions [fipp]]]
-             :injections   [(require 'spyscope.core)]
+                            [hashp "0.1.1"]]
+             :injections   [(require 'hashp.core)]
              :test-refresh {:notify-command ["notify-send" "-t" "1000"]
                             :quiet          true
                             :changes-only   true}}}
@@ -697,6 +836,17 @@ Now we're all set!
 
 ** Kubernetes
 
+*** Kops
+
+    #+begin_src sh :dir /sudo::/tmp
+      KOPS_VERSION='1.12.1'
+
+      curl -LO https://github.com/kubernetes/kops/releases/download/${KOPS_VERSION}/kops-linux-amd64
+      chmod 0755 kops-linux-amd64
+      mv kops-linux-amd64 /usr/local/bin/kops-${KOPS_VERSION}
+      ln -sf /usr/local/bin/kops-${KOPS_VERSION} /usr/local/bin/kops
+    #+end_src
+
 *** Minikube
 
     Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
@@ -744,12 +894,13 @@ Now we're all set!
     Download and install:
 
     #+BEGIN_SRC shell :dir /sudo::
-      ISTIO_VERSION=1.1.2
+      ISTIO_VERSION=1.1.7
       mkdir /opt/istio || true
       chmod 0755 /opt/istio
       cd /opt/istio
       curl -L https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz | tar xz
       ln -sf /opt/istio/istio-${ISTIO_VERSION}/bin/istioctl /usr/local/bin/istioctl
+      rm -f /opt/istio/istio
       ln -sf /opt/istio/istio-${ISTIO_VERSION} /opt/istio/istio
     #+END_SRC
 
@@ -761,10 +912,9 @@ Now we're all set!
       mkdir /opt/helm || true
       chmod 0755 /opt/helm
       cd /opt/helm
-      curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.12.3-linux-amd64.tar.gz | tar xz
-      mv linux-amd64 helm-2.12.3
-      ln -sf /opt/helm/helm-2.12.3/helm /usr/local/bin/helm
-      ln -sf /opt/helm/helm-2.12.3/tiller /usr/local/bin/tiller
+      curl -L https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar xz
+      mv linux-amd64 helm-3.0.2
+      ln -sf /opt/helm/helm-3.0.2/helm /usr/local/bin/helm
     #+END_SRC
 
 *** Kustomize
@@ -790,13 +940,162 @@ Now we're all set!
    Download, extract and then move to appropriate location.
 
    #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
-     unzip terraform_0.11.11_linux_amd64.zip
+     wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip
+     unzip terraform_0.12.18_linux_amd64.zip
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.11.11
-     ln -sf /usr/local/bin/terraform-0.11.11 /usr/local/bin/terraform
+     mv /tmp/terraform /usr/local/bin/terraform-0.12.18
+     ln -sf /usr/local/bin/terraform-0.12.18 /usr/local/bin/terraform
+   #+end_src
+
+   Now let's add some aliases to our shell:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-terraform.sh
+     #!/usr/bin/env bash
+     alias tfplan='terraform plan -out=plan.tfplan'
+     alias tfapply='terraform apply --refresh=false plan.tfplan'
+     alias tfrapply='terraform apply plan.tfplan'
+   #+end_src
+
+** git-lfs
+
+   #+begin_src shell :dir /sudo::/tmp
+     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+     apt install -y git-lfs
+   #+end_src
+
+** golang
+
+   First install go (Ubuntu has an old version only):
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://dl.google.com/go/go1.13.3.linux-amd64.tar.gz | tar xvz
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+     mv /tmp/go /opt/go-1.13.3
+     ln -sf /opt/go-1.13.3 /opt/go
+   #+end_src
+
+   And add go executables to our path:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+     #!/usr/bin/env bash
+
+     export GOROOT=/opt/go
+     export GOPATH=~/go
+     export PATH="$PATH:$GOROOT/bin"
+     export PATH="$PATH:$PATH/bin"
+   #+end_src
+
+   Now the goodies:
+
+   #+begin_src shell
+     go get golang.org/x/tools/cmd/godoc
+     go get golang.org/x/tools/cmd/goimports
+     go get github.com/rogpeppe/godef
+   #+end_src
+
+** protobuf
+
+   Download, extract and configure:
+
+   #+begin_src shell :dir /tmp
+     #curl -sL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz | tar zx
+     cd protobuf-3.11.2
+     ./configure
+     make
+     make check -j 13
+   #+end_src
+
+   Install and refresh shared library cache
+
+   #+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
+     make install
+     ldconfig
+   #+end_src
+
+** Gradle
+
+   Ubuntu's repo only has version 4, so we'll use sdkman to install and use newer versions. First install sdkman
+
+   #+begin_src shell
+     curl -s "https://get.sdkman.io" | bash
+   #+end_src
+
+   And add to the zsh app configs
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-sdkman.sh
+     #!usr/bin/env bash
+     source "$HOME/.sdkman/bin/sdkman-init.sh"
+   #+end_src
+
+   Now install Gradle:
+
+   #+begin_src shell
+     source "$HOME/.sdkman/bin/sdkman-init.sh"
+     sdk install gradle 6.0.1
+   #+end_src
+
+** Flatbuffers
+
+   Install deps:
+
+   #+begin_src shell :dir /sudo::
+     apt install -y cmake
+   #+end_src
+
+   Clone repo, generate makefiles and build:
+
+   #+begin_src shell :dir /tmp
+     git clone --branch 1.11.0 git@github.com:google/flatbuffers.git
+   #+end_src
+
+   #+begin_src shell :dir /sudo::/opt
+     mv /tmp/flatbuffers /opt/flatbuffers-1.11.0
+   #+end_src
+
+   #+begin_src shell :dir /opt/flatbuffers-1.11.0
+     cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+     make
+   #+end_src
+
+   And install
+
+   #+begin_src shell :dir /sudo::/opt/flatbuffers-1.11.0
+     make install
+   #+end_src
+
+** Java
+
+   My editor of choice is Emacs, but even then we need Eclipse to work with
+   Java... We do this by using eclim. This setup is based on [[http://www.goldsborough.me/emacs,/java/2016/02/24/22-54-16-setting_up_emacs_for_java_development/][this blog post]].
+
+   Install Eclipse:
+
+   #+begin_src shell :dir /sudo::/opt
+     curl -sL http://ftp.osuosl.org/pub/eclipse/technology/epp/downloads/release/2019-12/R/eclipse-java-2019-12-R-linux-gtk-x86_64.tar.gz | tar xvz
+   #+end_src
+
+   Add Eclipse local dir to path.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/eclipse
+     #/usr/bin/env bash
+
+     export PATH="${PATH}:${HOME}/.eclipse/org.eclipse.platform_4.14.0_1473617060_linux_gtk_x86_64"
+   #+end_src
+
+   Install eclim:
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://github.com/ervandew/eclim/releases/download/2.8.0/eclim_2.8.0.bin > eclim_2.8.0.bin
+     chmod +x eclim_2.8.0.bin
+     ./eclim_2.8.0.bin \
+       --yes \
+       --eclipse=/opt/eclipse \
+       --plugins=jdt \
+       --vimfiles=skip
    #+end_src
 
 * Other
@@ -891,17 +1190,21 @@ Now we're all set!
 
    And then install FFcast:
 
-   #+BEGIN_SRC shell :dir ~/reps
-     [ -d 'FFcast' ] || git clone --recursive git@github.com:lolilolicon/FFcast.git
+   #+BEGIN_SRC shell :dir /tmp
+     [ -d 'FFcast' ] || git clone --branch 2.5.0 --recursive git@github.com:lolilolicon/FFcast.git
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir ~/reps/FFcast
+   #+begin_src shell :dir /sudo::
+     mv /tmp/FFcast /opt/FFcast-2.5.0
+   #+end_src
+
+   #+BEGIN_SRC shell :dir /opt/FFcast-2.5.0
      ./bootstrap
      ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
      make
    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast
+   #+BEGIN_SRC shell :dir /sudo::/opt/FFcast-2.5.0
      make install
    #+END_SRC
 
@@ -1010,34 +1313,22 @@ Now we're all set!
    Done! To call it directly, run ~java -jar ~/utils/jars/plantuml.jar file1
    file2 file3~. Emacs should already be configured to find the jar in this
    location.
-** Upgrade org-mode
+** SteelSeries Rival 100 configuration
 
-   (more info [[http://orgmode.org/manual/Installation.html][here]])
+   First we need the CLI tool. For that, first install its dependencies:
 
-   Install the dependencies:
+   #+begin_src sh :dir /sudo::
+     apt install -y build-essential python-dev libusb-1.0-0-dev libudev-dev
+   #+end_src
 
-   #+BEGIN_SRC shell :dir /sudo::
-     apt install texinfo
-   #+END_SRC
+   Now install rivalcfg
 
-   Then clone the repo.
+   #+begin_src sh :dir /sudo::
+     pip install rivalcfg==3.6.0
+   #+end_src
 
-   #+BEGIN_SRC shell :dir ~/reps
-     [ -d 'org-mode' ] || git clone https://code.orgmode.org/bzg/org-mode.git
-   #+END_SRC
+   Now, the configs:
 
-   Now update the repo and compile the project:
-
-   #+BEGIN_SRC shell :dir ~/reps/org-mode
-     git checkout master && git pull
-
-     make autoloads
-     make
-   #+END_SRC
-
-   And install
-
-   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode
-     make install
-   #+END_SRC
-
+   #+begin_src sh
+   rivalcfg -s 1000 -S 1000 -c '#ff2019'
+   #+end_src
