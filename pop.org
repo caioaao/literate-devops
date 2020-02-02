@@ -726,53 +726,58 @@ Now we're all set!
      apt install -y clojure
    #+END_SRC
 
-   Download leiningen.
+*** Lein
 
-   #+BEGIN_SRC shell :dir ~/utils/bin
-     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
-     chmod +x lein
+    Download leiningen.
 
-     # lein self-install
-     ./lein
-   #+END_SRC
+    #+BEGIN_SRC shell :dir ~/utils/bin
+      curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.3/bin/lein > lein
+      chmod +x lein
 
-   Also tangle the user ~profiles.clj~
+      # lein self-install
+      ./lein
+    #+END_SRC
 
-   #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj :mkdirp yes
-     {:user {:plugins      [[lein-pprint "1.1.2"]
-                            [com.jakemccrary/lein-test-refresh "0.23.0"]
-                            [com.cemerick/pomegranate "0.4.0"]]
-             :dependencies [[fipp "0.6.14"]
-                            [hashp "0.1.1"]]
-             :injections   [(require 'hashp.core)
-                            (defn add-dependency [dep-vec]
-                              (require 'cemerick.pomegranate)
-                              ((resolve 'cemerick.pomegranate/add-dependencies)
-                               :coordinates [dep-vec]
-                               :repositories (merge @(resolve 'cemerick.pomegranate.aether/maven-central)
-                                                    {"clojars" "https://clojars.org/repo"})))]
-             :test-refresh {:notify-command ["notify-send" "-t" "1000"]
-                            :quiet          true
-                            :changes-only   true}}}
-   #+END_SRC
+    Also tangle the user ~profiles.clj~
 
-   And for clj CLI, download the installer:
+    #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj :mkdirp yes
+      {:user {:plugins      [[lein-pprint "1.1.2"]
+                             [com.jakemccrary/lein-test-refresh "0.23.0"]
+                             [com.cemerick/pomegranate "0.4.0"]]
+              :dependencies [[fipp "0.6.14"]
+                             [hashp "0.1.1"]]
+              :injections   [(require 'hashp.core)
+                             (defn add-dependency [dep-vec]
+                               (require 'cemerick.pomegranate)
+                               ((resolve 'cemerick.pomegranate/add-dependencies)
+                                :coordinates [dep-vec]
+                                :repositories (merge @(resolve 'cemerick.pomegranate.aether/maven-central)
+                                                     {"clojars" "https://clojars.org/repo"})))]
+              :test-refresh {:notify-command ["notify-send" "-t" "1000"]
+                             :quiet          true
+                             :changes-only   true}}}
+    #+END_SRC
 
-   #+BEGIN_SRC shell :dir /tmp
-     curl -O https://download.clojure.org/install/linux-install-1.10.0.411.sh
-     chmod +x linux-install-1.10.0.411.sh
-   #+END_SRC
+*** clj cli
 
-   #+BEGIN_SRC shell :dir /sudo::/tmp
-     ./linux-install-1.10.0.411.sh
-   #+END_SRC
+    #+BEGIN_SRC shell :dir /tmp
+      curl -O https://download.clojure.org/install/linux-install-1.10.0.411.sh
+      chmod +x linux-install-1.10.0.411.sh
+    #+END_SRC
 
-   We also need a different configuration file for clj cli:
+    #+BEGIN_SRC shell :dir /sudo::/tmp
+      ./linux-install-1.10.0.411.sh
+    #+END_SRC
 
-   #+begin_src clojure :tangle ~/.clojure/deps.edn :mkdirp yes
-     {:deps
-      {spyscope {:mvn/version "0.1.6"}}}
-   #+end_src
+*** clojure-lsp
+
+    Download server:
+
+    #+begin_src shell :dir /sudo::/tmp
+      curl -fsSL https://github.com/snoe/clojure-lsp/releases/download/release-20200121T234305/clojure-lsp > clojure-lsp
+      chmod 0755 clojure-lsp
+      mv clojure-lsp /usr/bin
+    #+end_src
 
 ** Python
 
