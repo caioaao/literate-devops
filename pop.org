@@ -2,19 +2,20 @@
 #+PROPERTY: header-args:shell :results output silent
 #+PROPERTY: header-args:sh :results output silent
 #+PROPERTY: header-args:elisp :results output silent
+#+PROPERTY: header-args:emacs-lisp :results output silent
 
 Requirements: emacs (obviously), git
 
-Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of
-date packages. The buggy version of org-mode that comes with the
-default Emacs prevents us from using this file properly, so you'll
-have to update it before using. To do so, first load ~ob-sh~ and then
-run the update script:
+Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of date
+packages. The buggy version of org-mode that comes with the default Emacs
+prevents us from using this file properly, so you'll have to update it before
+using. To do so, first run the update script:
 
 #+BEGIN_SRC emacs-lisp
+  (require 'ob-sh)
   (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((sh . t)))
+      'org-babel-load-languages
+      '((sh . t)))
 #+END_SRC
 
 #+BEGIN_SRC sh :dir /sudo::
@@ -1108,6 +1109,13 @@ Now we're all set!
        --eclipse=/opt/eclipse \
        --plugins=jdt \
        --vimfiles=skip
+   #+end_src
+
+** NodeJS
+
+   #+begin_src shell :dir /sudo::
+     curl -sL https://deb.nodesource.com/setup_10.x | bash -
+     apt-get install -y nodejs
    #+end_src
 
 * Other
