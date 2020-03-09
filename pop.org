@@ -743,10 +743,10 @@ Now we're all set!
 
     #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj :mkdirp yes
       {:user {:plugins      [[lein-pprint "1.1.2"]
-                             [com.jakemccrary/lein-test-refresh "0.23.0"]
-                             [com.cemerick/pomegranate "0.4.0"]]
+                             [com.jakemccrary/lein-test-refresh "0.23.0"]]
               :dependencies [[fipp "0.6.14"]
-                             [hashp "0.1.1"]]
+                             [hashp "0.1.1"]
+                             [com.cemerick/pomegranate "0.4.0"]]
               :injections   [(require 'hashp.core)]
               :repl-options {:init
                              (defn add-dependency [dep-vec]
