@@ -1001,6 +1001,7 @@ Now we're all set!
      export GOPATH=~/go
      export PATH="$PATH:$GOROOT/bin"
      export PATH="$PATH:$PATH/bin"
+     export PATH="$PATH:$GOPATH/bin"
    #+end_src
 
    Now the goodies:
