@@ -643,6 +643,8 @@ Now we're all set!
      unbind-key C-b
      set -g prefix 'C-q'
      bind-key 'C-q' send-prefix
+     bind-key 'C-r' source-file ~/.tmux.conf \; display-message "~/.tmux.conf reloaded"
+     bind-key 'C-w' run -b "tmux show-buffer | xsel -i"
    #+end_src
 
 * Development
