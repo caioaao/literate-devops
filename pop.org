@@ -1146,9 +1146,36 @@ Now we're all set!
 
    Also, optionally, we can pre-download dev dependencies:
 
-   #+begin_src shell :dir /opt/flutter-v1.12.13
+   #+begin_src shell :dir /opt/flutter
      ./bin/flutter precache
    #+end_src
+
+   And disable analytics. ffs google...
+
+   #+begin_src shell :dir /opt/flutter
+     ./bin/flutter config --no-analytics
+   #+end_src
+
+** Android studio
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://redirector.gvt1.com/edgedl/android/studio/ide-zips/3.6.1.0/android-studio-ide-192.6241897-linux.tar.gz | tar -xvz
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+     mv /tmp/android-studio /opt/android-studio-192.6241897
+     ln -sf /opt/android-studio-192.6241897 /opt/android-studio
+   #+end_src
+
+   Add to path:
+
+      #+begin_src shell :tangle ~/.zsh.d/apps.d/10-android-studio.sh
+        #!/usr/bin/env bash
+
+        export PATH="$PATH:/opt/android-studio/bin"
+   #+end_src
+
+   Now run ~studio.sh~ to start the Setup Wizard.
 
 * Other
 
