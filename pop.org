@@ -1122,6 +1122,34 @@ Now we're all set!
      apt-get install -y nodejs
    #+end_src
 
+** Flutter
+
+   First install:
+
+   #+begin_src shell :dir /tmp
+     curl -sL https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_v1.12.13+hotfix.8-stable.tar.xz | tar xJ
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+     mv /tmp/flutter /opt/flutter-v1.12.13
+     ln -sf /opt/flutter-v1.12.13 /opt/flutter
+   #+end_src
+
+   And then add it to path:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-flutter.sh
+     #!/usr/bin/env bash
+
+     export FLUTTER_SDK=/opt/flutter
+     export PATH="$PATH:$FLUTTER_SDK/bin"
+   #+end_src
+
+   Also, optionally, we can pre-download dev dependencies:
+
+   #+begin_src shell :dir /opt/flutter-v1.12.13
+     ./bin/flutter precache
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
