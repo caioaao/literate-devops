@@ -778,7 +778,7 @@ Now we're all set!
     Download server:
 
     #+begin_src shell :dir /sudo::/tmp
-      curl -fsSL https://github.com/snoe/clojure-lsp/releases/download/release-20200121T234305/clojure-lsp > clojure-lsp
+      curl -fsSL https://github.com/snoe/clojure-lsp/releases/download/release-20200314T202821/clojure-lsp > clojure-lsp
       chmod 0755 clojure-lsp
       mv clojure-lsp /usr/bin
     #+end_src
