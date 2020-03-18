@@ -307,7 +307,7 @@ Now we're all set!
      gpg --recv DD90B67479EFA704
    #+END_SRC
 
-** iptables
+** iptables firewall
 
    After some issues because of exposed ports, using iptables as a firewall
    sounds like a good idea.
@@ -331,7 +331,7 @@ Now we're all set!
      WantedBy=multi-user.target
    #+end_src
 
-   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755)
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755) :dir /sudo::
      #!/usr/bin/env bash
      iptables -F
      iptables -X
@@ -347,17 +347,26 @@ Now we're all set!
    Then generate the file containing the rules and enable the service:
 
    #+begin_src shell :dir /sudo::
-     iptables --flush
+     # Flush all rules
+     /etc/iptables/iptables-flush.sh
+
+     # Default rule to drop incoming traffic
      iptables --policy INPUT DROP
      iptables --policy FORWARD DROP
      iptables --policy OUTPUT ACCEPT
+
+     # Rules to allow outgoing traffic
      iptables --append INPUT -i lo -j ACCEPT
      iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
      iptables --append INPUT --jump REJECT
      iptables --append FORWARD --jump REJECT
-     iptables -N DOCKER-USER
-     iptables -I DOCKER-USER -i enp4s0 ! -s 127.0.0.1 -j DROP
-     iptables -I DOCKER-USER -i wlp3s0 ! -s 127.0.0.1 -j DROP
+
+     # Rules to allow outgoing traffic to docker containers
+     iptables --append FORWARD -i docker+ -o enp+ -j ACCEPT
+     iptables --append FORWARD -i docker+ -o wlp+ -j ACCEPT
+     iptables --append FORWARD -i enp+ -o docker+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append FORWARD -i wlp+ -o docker+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+
      mkdir /etc/iptables || true
      iptables-save > /etc/iptables/iptables.rules
 
