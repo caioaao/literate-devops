@@ -359,13 +359,18 @@ Now we're all set!
      iptables --append INPUT -i lo -j ACCEPT
      iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
      iptables --append INPUT --jump REJECT
+
+     iptables --append FORWARD --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append FORWARD -o enp+ -j ACCEPT
+     iptables --append FORWARD -o wlp+ -j ACCEPT
      iptables --append FORWARD --jump REJECT
 
-     # Rules to allow outgoing traffic to docker containers
-     iptables --append FORWARD -i docker+ -o enp+ -j ACCEPT
-     iptables --append FORWARD -i docker+ -o wlp+ -j ACCEPT
-     iptables --append FORWARD -i enp+ -o docker+ --match state --state ESTABLISHED,RELATED -j ACCEPT
-     iptables --append FORWARD -i wlp+ -o docker+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     # Rules to allow outgoing traffic from docker containers
+     iptables -N DOCKER-USER
+     iptables --append DOCKER-USER -i enp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append DOCKER-USER -i wlp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append DOCKER-USER -i enp+ -j DROP
+     iptables --append DOCKER-USER -i wlp+ -j DROP
 
      mkdir /etc/iptables || true
      iptables-save > /etc/iptables/iptables.rules
@@ -965,13 +970,13 @@ Now we're all set!
    Download, extract and then move to appropriate location.
 
    #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip
-     unzip terraform_0.12.18_linux_amd64.zip
+     wget https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip
+     unzip terraform_0.12.21_linux_amd64.zip
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.12.18
-     ln -sf /usr/local/bin/terraform-0.12.18 /usr/local/bin/terraform
+     mv /tmp/terraform /usr/local/bin/terraform-0.12.21
+     ln -sf /usr/local/bin/terraform-0.12.21 /usr/local/bin/terraform
    #+end_src
 
    Now let's add some aliases to our shell:
