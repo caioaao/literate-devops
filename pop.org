@@ -663,6 +663,20 @@ Now we're all set!
 
 * Development
 
+** Javascript/Typescript
+
+   First install node:
+
+   #+begin_src sh :dir /sudo::
+     apt-get install -y node
+   #+end_src
+
+   Install TS repl:
+
+   #+begin_src sh :dir /sudo::
+     npm install -g tsun
+   #+end_src
+
 ** Fix emacs signature issues
 
    Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
