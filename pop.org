@@ -674,7 +674,9 @@ Now we're all set!
    Install TS repl:
 
    #+begin_src sh :dir /sudo::
-     npm install -g tsun
+     # TODO running this from org-mode messes with node_modules permissions for some
+     # reason
+     npm install -g typescript ts-node tsun
    #+end_src
 
 ** Fix emacs signature issues
@@ -883,9 +885,9 @@ Now we're all set!
 *** Kops
 
     #+begin_src sh :dir /sudo::/tmp
-      KOPS_VERSION='1.12.1'
+      KOPS_VERSION='1.16.0'
 
-      curl -LO https://github.com/kubernetes/kops/releases/download/${KOPS_VERSION}/kops-linux-amd64
+      curl -LO https://github.com/kubernetes/kops/releases/download/v${KOPS_VERSION}/kops-linux-amd64
       chmod 0755 kops-linux-amd64
       mv kops-linux-amd64 /usr/local/bin/kops-${KOPS_VERSION}
       ln -sf /usr/local/bin/kops-${KOPS_VERSION} /usr/local/bin/kops
@@ -938,9 +940,9 @@ Now we're all set!
     Download and install:
 
     #+BEGIN_SRC shell :dir /sudo::
-      ISTIO_VERSION=1.1.7
+      ISTIO_VERSION=1.5.1
       mkdir /opt/istio || true
-      chmod 0755 /opt/istio
+      chmod -R 0755 /opt/istio
       cd /opt/istio
       curl -L https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz | tar xz
       ln -sf /opt/istio/istio-${ISTIO_VERSION}/bin/istioctl /usr/local/bin/istioctl
@@ -984,13 +986,13 @@ Now we're all set!
    Download, extract and then move to appropriate location.
 
    #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip
-     unzip terraform_0.12.21_linux_amd64.zip
+     wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
+     unzip terraform_0.12.24_linux_amd64.zip
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.12.21
-     ln -sf /usr/local/bin/terraform-0.12.21 /usr/local/bin/terraform
+     mv /tmp/terraform /usr/local/bin/terraform-0.12.24
+     ln -sf /usr/local/bin/terraform-0.12.24 /usr/local/bin/terraform
    #+end_src
 
    Now let's add some aliases to our shell:
