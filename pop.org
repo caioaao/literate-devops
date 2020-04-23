@@ -1205,6 +1205,22 @@ Now we're all set!
         export PATH="$PATH:/opt/android-studio/bin"
    #+end_src
 
+   Create a launcher by tangling the following:
+
+   #+begin_src conf :tangle /sudo::/usr/share/applications/android-studio.desktop
+     [Desktop Entry]
+     Version=1.0
+     Name=Android Studio
+     Terminal=false
+     StartupWMClass=jetbrains-android-studio
+     Exec="/opt/android-studio/bin/studio.sh" %f
+     Icon=/opt/android-studio/bin/studio.png
+     Type=Application
+     StartupNotify=true
+     Categories=Development;IDE;
+     Name[en_GB]=android-studio.desktop
+   #+end_src
+
    Now run ~studio.sh~ to start the Setup Wizard.
 
 * Other
