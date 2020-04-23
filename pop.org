@@ -1441,3 +1441,34 @@ Now we're all set!
    #+begin_src sh
    rivalcfg -s 1000 -S 1000 -c '#ff2019'
    #+end_src
+
+** Audio settings
+
+   Better audio with pulseaudio.
+
+   #+begin_src conf :tangle ~/.config/pulse/daemon.conf
+     default-sample-format = float32le
+     default-sample-rate = 48000
+     alternate-sample-rate = 44100
+     default-sample-channels = 2
+     default-channel-map = front-left,front-right
+     default-fragments = 2
+     default-fragment-size-msec = 125
+     resample-method = soxr-vhq
+     enable-lfe-remixing = no
+     high-priority = yes
+     nice-level = -11
+     realtime-scheduling = yes
+     realtime-priority = 9
+     rlimit-rtprio = 9
+     daemonize = no
+   #+end_src
+
+   Configure ALSA to use PulseAudio hw plugin:
+
+   #+begin_src conf :tangle ~/.asoundrc
+     pcm.!default {
+        type plug
+        slave.pcm hw
+     }
+   #+end_src
