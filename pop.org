@@ -882,6 +882,16 @@ Now we're all set!
 
 ** Kubernetes
 
+*** kubectl
+
+    #+BEGIN_SRC shell :dir /sudo::
+      apt install -y apt-transport-https
+      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+      apt-get update
+      apt-get install -y kubectl
+    #+END_SRC
+
 *** Kops
 
     #+begin_src sh :dir /sudo::/tmp
@@ -897,33 +907,26 @@ Now we're all set!
 
     Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
 
+    #+NAME: minikube_version
+    : v1.10.1
+
+
     First install a hypervisor
 
     #+BEGIN_SRC shell :dir /sudo::
       apt update && apt install -y virtualbox
     #+END_SRC
 
-    Now install ~kubectl~
-
-    #+BEGIN_SRC shell :dir /sudo::
-      apt install -y apt-transport-https
-      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-      apt-get update
-      apt-get install -y kubectl
-    #+END_SRC
-
-    If it fails when trying to acquire the lock just run again. It's the distro trying to check for updates *sigh*
-
     And now download the static minikube binary and then move it to the bin dir.
 
-    #+BEGIN_SRC shell :dir /tmp
-      curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+    #+BEGIN_SRC shell :dir /tmp :var minikube_version=minikube_version
+      curl -Lo minikube "https://storage.googleapis.com/minikube/releases/${minikube_version}/minikube-linux-amd64" \
         && chmod +x minikube
     #+END_SRC
 
-    #+BEGIN_SRC shell :dir /sudo::
-      mv /tmp/minikube /usr/local/bin
+    #+BEGIN_SRC shell :dir /sudo:: :var minikube_version=minikube_version
+      mv /tmp/minikube "/usr/local/bin/minikube-${minikube_version}"
+      ln -sf "/usr/local/bin/minikube-${minikube_version}" /usr/local/bin/minikube
     #+END_SRC
 
 *** Linkerd CLI
