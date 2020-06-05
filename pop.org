@@ -661,6 +661,31 @@ Now we're all set!
      bind-key 'C-w' run -b "tmux show-buffer | xsel -i"
    #+end_src
 
+** Iosevka font
+
+   #+NAME: iosevka_font_version
+    : 3.1.1
+
+   Download font:
+
+   #+begin_src shell :var iosevka_font_version=iosevka_font_version
+     mkdir -p ~/.fonts 
+     cd ~/.fonts
+     curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
+   #+end_src
+
+   Update cache:
+
+   #+begin_src shell :dir /sudo::
+     fc-cache -f -v
+   #+end_src
+
+   Set system mono font to Iosevka:
+
+   #+begin_src sh
+     gsettings set org.gnome.desktop.interface monospace-font-name '"Iosevka Fixed SS12"'
+   #+end_src
+
 * Development
 
 ** Javascript/Typescript
