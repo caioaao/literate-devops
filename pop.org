@@ -688,6 +688,22 @@ Now we're all set!
 
 * Development
 
+** asdf
+
+   First clone the repo:
+
+   #+begin_src sh
+     git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
+   #+end_src
+
+   Now add the completions and the executable to dot files:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
+     #!/usr/bin/env bash
+     . $HOME/.asdf/asdf.sh
+     . $HOME/.asdf/completions/asdf.bash
+   #+end_src
+
 ** Javascript/Typescript
 
    First install node:
@@ -909,13 +925,27 @@ Now we're all set!
 
 *** kubectl
 
+    #+NAME: default_kubectl_version
+    : 1.15.11
+
+    First the deps:
+
     #+BEGIN_SRC shell :dir /sudo::
       apt install -y apt-transport-https
-      echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-      apt-get update
-      apt-get install -y kubectl
     #+END_SRC
+
+    Now add the plugin to asdf and install the default version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+      asdf plugin-add kubectl
+      asdf install kubectl ${kubectl_version}
+    #+end_src
+
+    Now setup kubectl global version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+      asdf global kubectl ${kubectl_version}
+    #+end_src
 
 *** Kops
 
@@ -1011,16 +1041,19 @@ Now we're all set!
 
 ** Terraform
 
+   #+NAME: terraform_version
+    : 0.12.25
+
    Download, extract and then move to appropriate location.
 
-   #+begin_src shell :dir /tmp
-     wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
-     unzip terraform_0.12.24_linux_amd64.zip
+   #+begin_src shell :dir /tmp :var version=terraform_version
+     wget https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip
+     unzip terraform_${version}_linux_amd64.zip
    #+end_src
 
-   #+begin_src shell :dir /sudo::
-     mv /tmp/terraform /usr/local/bin/terraform-0.12.24
-     ln -sf /usr/local/bin/terraform-0.12.24 /usr/local/bin/terraform
+   #+begin_src shell :dir /sudo:: :var version=terraform_version
+     mv /tmp/terraform /usr/local/bin/terraform-${version}
+     ln -sf /usr/local/bin/terraform-${version} /usr/local/bin/terraform
    #+end_src
 
    Now let's add some aliases to our shell:
