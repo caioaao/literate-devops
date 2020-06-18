@@ -661,6 +661,25 @@ Now we're all set!
      bind-key 'C-w' run -b "tmux show-buffer | xsel -i"
    #+end_src
 
+** TLP
+
+   To help reduce battery usage and temperature.
+
+   First install tlp and dependencies:
+
+   #+begin_src shell :dir /sudo::
+     apt install -y tlp
+   #+end_src
+
+   And tangle its configs. Most of the defaults are good enough
+
+   #+begin_src conf :tangle /sudo::/etc/tlp.d/10-cpu-underload.conf
+     CPU_MIN_PERF_ON_AC=0
+     CPU_MAX_PERF_ON_AC=80
+     CPU_MIN_PERF_ON_BAT=0
+     CPU_MAX_PERF_ON_BAT=25
+   #+end_src
+
 ** Iosevka font
 
    #+NAME: iosevka_font_version
