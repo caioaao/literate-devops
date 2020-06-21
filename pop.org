@@ -1303,6 +1303,12 @@ Now we're all set!
 
    Now run ~studio.sh~ to start the Setup Wizard.
 
+** OCaml
+
+   #+begin_src shell :dir /sudo::
+     apt install -y ocaml
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
