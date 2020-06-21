@@ -701,8 +701,10 @@ Now we're all set!
 
    Set system mono font to Iosevka:
 
-   #+begin_src sh
+   #+begin_src shell
      gsettings set org.gnome.desktop.interface monospace-font-name '"Iosevka Fixed SS12"'
+     gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$(gsettings get org.gnome.Terminal.ProfilesList default)/ use-system-font false
+     gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$(gsettings get org.gnome.Terminal.ProfilesList default)/ font '"Iosevka Fixed SS12"'
    #+end_src
 
 * Development
@@ -1307,6 +1309,45 @@ Now we're all set!
 
    #+begin_src shell :dir /sudo::
      apt install -y ocaml
+   #+end_src
+
+** Alacritty
+
+   #+begin_src shell :dir /sudo::
+     apt install -y alacritty
+   #+end_src
+
+   Tangle the config:
+
+   #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
+     font:
+       # The normal (roman) font face to use.
+       normal:
+         family: Iosevka Fixed SS12
+         style: Regular
+
+       # The bold font face
+       bold:
+         family: Iosevka Fixed SS12
+         style: Bold
+
+       # The italic font face
+       italic:
+         family: Iosevka Fixed SS12
+         style: Italic
+
+       # Point size of the font
+       size: 12.0
+
+     colors:
+       primary:
+         background: '#333333'
+
+     window:
+       decorations: none
+       padding:
+         x: 5
+         y: 10
    #+end_src
 
 * Other
