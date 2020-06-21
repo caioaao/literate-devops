@@ -1308,7 +1308,23 @@ Now we're all set!
 ** OCaml
 
    #+begin_src shell :dir /sudo::
-     apt install -y ocaml
+     apt install -y ocaml opam
+   #+end_src
+
+   Now init opam:
+
+   #+begin_src shell
+     touch ~/.zsh.d/apps.d/10-opam.sh
+     opam init -a --dot-profile ~/.zsh.d/apps.d/10-opam.sh \
+          --enable-shell-hook --enable-completion --shell=zsh --reinit
+     eval $(opam env)
+   #+end_src
+
+   Install LSP server:
+
+   #+begin_src shell
+     opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
+     opam install ocaml-lsp-server
    #+end_src
 
 ** Alacritty
