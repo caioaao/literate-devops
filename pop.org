@@ -688,7 +688,7 @@ Now we're all set!
    Download font:
 
    #+begin_src shell :var iosevka_font_version=iosevka_font_version
-     mkdir -p ~/.fonts 
+     mkdir -p ~/.fonts
      cd ~/.fonts
      curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
    #+end_src
@@ -1631,3 +1631,20 @@ Now we're all set!
         slave.pcm hw
      }
    #+end_src
+
+** exercism.io
+
+   #+NAME: exercism_cli_version
+    : 3.0.13
+
+
+   #+begin_src shell :dir /tmp :var release_version=exercism_cli_version
+     curl -L https://github.com/exercism/cli/releases/download/v${release_version}/exercism-${release_version}-linux-x86_64.tar.gz | tar xz
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var release_version=exercism_cli_version
+     mv /tmp/exercism /opt/exercism-${release_version}
+     ln -sf /opt/exercism-${release_version} /usr/local/bin/exercism
+   #+end_src
+
+   Now run ~exercism configure --token=<token> --workspace=~/exercism~, where ~<token>~ is available [[https://exercism.io/my/settings][here]].
