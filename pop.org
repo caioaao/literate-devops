@@ -741,6 +741,20 @@ Now we're all set!
      npm install -g typescript ts-node tsun
    #+end_src
 
+   Now install yarn:
+
+   #+begin_src shell :dir /sudo::
+     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+     apt update && apt install -y yarn
+   #+end_src
+
+   And add yarn's executables to path:
+
+   #+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
+     export PATH="$PATH:`yarn global bin`"
+   #+end_src
+
 ** Fix emacs signature issues
 
    Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
