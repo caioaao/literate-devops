@@ -1341,6 +1341,21 @@ Now we're all set!
      opam install ocaml-lsp-server
    #+end_src
 
+   Also install ReasonML LSP server:
+
+   #+NAME: reason_ls_version
+   : 1.7.9
+
+   #+begin_src shell :dir /tmp :var version=reason_ls_version
+     curl -fsSL https://github.com/jaredly/reason-language-server/releases/download/${version}/rls-linux.zip | busybox unzip -
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=reason_ls_version
+     mv /tmp/rls-linux /opt/reason-ls-${version}
+     chmod +x /opt/reason-ls-${version}/reason-language-server
+     ln -sf /opt/reason-ls-${version}/reason-language-server /usr/local/bin/reason-language-server
+   #+end_src
+
 ** Alacritty
 
    #+begin_src shell :dir /sudo::
