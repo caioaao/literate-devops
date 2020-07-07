@@ -1401,6 +1401,40 @@ Now we're all set!
          y: 10
    #+end_src
 
+* CAD/CAM
+
+** libfive
+
+   #+NAME: libfive_version
+   : e1da2fb6c2171a399c9a109e99e83d704310a6e2
+
+   #+begin_src sh :dir /sudo::
+     apt install -y cmake pkg-config libeigen3-dev libpng-dev libboost-all-dev qtbase5-dev guile-2.2-dev
+   #+end_src
+
+   #+begin_src sh  :dir /tmp
+     git clone git@github.com:libfive/libfive.git
+   #+end_src
+
+   #+begin_src sh :dir /sudo:: :var version=libfive_version
+     mv /tmp/libfive "/opt/libfive-${version}"
+     ln -sf "/opt/libfive-${version}" /opt/libfive
+   #+end_src
+
+   #+begin_src sh :var version=libfive_version :dir /opt/libfive
+     git checkout ${version}
+     rm -rf .git
+     mkdir -p build
+     cd build
+     cmake ..
+     make -j12
+   #+end_src
+
+   #+begin_src sh :dir /sudo::/opt/libfive/build
+     make install
+     ldconfig
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
