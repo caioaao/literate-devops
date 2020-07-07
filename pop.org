@@ -709,6 +709,12 @@ Now we're all set!
 
 * Development
 
+** Guile Scheme
+
+   #+begin_src sh :dir /sudo::
+     apt install -y guile-3.0
+   #+end_src
+
 ** asdf
 
    First clone the repo:
