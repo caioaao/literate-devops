@@ -1380,6 +1380,41 @@ Now we're all set!
          y: 10
    #+end_src
 
+* CAD/CAM
+
+** Candle (grbl)
+
+   #+NAME: grbl_candle_version
+   : 5709b4961b8e3494d4a5e040b7223b57a0d083db
+
+   A grbl controller / g-code visualizer
+
+   First install dependencies and create installation/build dir:
+
+   #+begin_src sh :dir /sudo:: :var version=grbl_candle_version
+     apt update -y && apt install -y libglib2.0-0 libqt5serialport5-dev
+     mkdir -p "/opt/grbl-candle-${version}"
+     ln -sf "/opt/grbl-candle-${version}" "/opt/grbl-candle"
+     chmod -R 0777 "/opt/grbl-candle-${version}"
+   #+end_src
+
+   Clone repo and start building:
+
+   #+begin_src sh :dir ~/reps :var commit_sha=grbl_candle_version
+     git clone git@github.com:Denvi/Candle.git
+     cd Candle && git checkout ${commit_sha}
+     cd /opt/grbl-candle
+     cmake ~/reps/Candle/src
+     make -j12
+   #+end_src
+
+   Now fix opt permissions and run install
+
+   #+begin_src sh :dir /sudo::/opt/grbl-candle
+     chmod -R 0755 .
+     ln -sf /opt/grbl-candle/Candle /usr/local/bin/grbl-candle
+   #+end_src
+
 * Other
 
 ** Setup ~udev~ rule for HDMI cable
