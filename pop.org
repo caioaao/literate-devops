@@ -1717,3 +1717,18 @@ Now we're all set!
    #+end_src
 
    Now run ~exercism configure --token=<token> --workspace=~/exercism~, where ~<token>~ is available [[https://exercism.io/my/settings][here]].
+
+** f3d - 3D visualizer
+
+   #+NAME: f3d_version
+   : 1.0.0
+
+   #+begin_src sh :dir /tmp :var version=f3d_version
+     curl -fsSL "https://gitlab.kitware.com/f3d/f3d/uploads/7f0f79cc2e6d4684bbf8f079d8ad84e9/f3d-${version}-Linux.tar.gz" | tar -xz
+   #+end_src
+
+   #+begin_src sh :dir /sudo:: :var version=f3d_version
+     mv /tmp/f3d-"${version}"-Linux/ /opt/f3d-"${version}"
+     ln -sf /opt/f3d-"${version}" /opt/f3d
+     ln -sf /opt/f3d/bin/f3d /usr/local/bin/f3d
+   #+end_src
