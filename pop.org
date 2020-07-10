@@ -149,7 +149,7 @@ Now we're all set!
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
      #!/usr/bin/env bash
 
-     export BROWSER=chromium-browser
+     export BROWSER=chromium
    #+end_src
 
    Now emacs:
