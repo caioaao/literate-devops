@@ -1752,6 +1752,7 @@ Now we're all set!
 
    #+begin_src sh
      arduino-cli core update-index
+     arduino-cli core install arduino:avr
      arduino-cli core install pololu-a-star:avr
      arduino-cli lib install Zumo32U4
    #+end_src
