@@ -1697,3 +1697,61 @@ Now we're all set!
    #+end_src
 
    Now run ~exercism configure --token=<token> --workspace=~/exercism~, where ~<token>~ is available [[https://exercism.io/my/settings][here]].
+
+** yq
+
+   #+begin_src sh :dir /tmp
+     curl -fsSL https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64 > yq
+   #+end_src
+
+   #+begin_src sh :dir /sudo::
+     mv /tmp/yq /usr/local/bin/yq
+     chown root:root /usr/local/bin/yq
+     chmod 0755 /usr/local/bin/yq
+   #+end_src
+
+* Robotics
+
+** Arduino
+
+   The package in ubuntu's repo is *drum rolls* really outdated, so let's build from the repo, again.
+
+   #+NAME: arduino_cli_version
+   : 0.11.0
+
+   Also I won't be using the IDE since I'll stick with emacs, so let's install just the CLI
+
+   #+begin_src sh :dir /tmp :var version=arduino_cli_version
+     curl -fsSL "https://github.com/arduino/arduino-cli/releases/download/${version}/arduino-cli_${version}_Linux_64bit.tar.gz" | tar -xz
+   #+end_src
+
+   #+begin_src sh :dir /sudo:: :var version=arduino_cli_version
+     mv /tmp/arduino-cli /usr/local/bin/arduino-cli-${version}
+     ln -sf /usr/local/bin/arduino-cli-${version} /usr/local/bin/arduino-cli
+     chown root:root /usr/local/bin/arduino-cli-${version}
+     chmod 0755 /usr/local/bin/arduino-cli-${version}
+     chmod 0755 /usr/local/bin/arduino-cli
+   #+end_src
+
+   Now init config and update cache index:
+
+   #+begin_src sh
+     arduino-cli config init
+     arduino-cli core update-index
+   #+end_src
+
+** Zumo 32U4
+
+   First add the additional board manager URL to arduino cli's config. If yq is installed, just run:
+
+   #+begin_src sh
+     yq w --inplace ~/.arduino15/arduino-cli.yaml 'board_manager.additional_urls[+]' 'https://files.pololu.com/arduino/package_pololu_index.json'
+   #+end_src
+
+   Install A-Star core and Zumo library:
+
+   #+begin_src sh
+     arduino-cli core update-index
+     arduino-cli core install pololu-a-star:avr
+     arduino-cli lib install Zumo32U4
+   #+end_src
