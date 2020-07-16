@@ -1380,6 +1380,12 @@ Now we're all set!
          y: 10
    #+end_src
 
+** clang/llvm
+
+   #+begin_src sh :dir /sudo::
+     apt update -y && apt install -y clang llvm
+   #+end_src
+
 * CAD/CAM
 
 ** Candle (grbl)
@@ -1755,4 +1761,20 @@ Now we're all set!
      arduino-cli core install arduino:avr
      arduino-cli core install pololu-a-star:avr
      arduino-cli lib install Zumo32U4
+   #+end_src
+
+** platformio
+
+   Install the cli:
+
+   #+begin_src sh :dir /tmp
+   curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py -o get-platformio.py
+   python3 get-platformio.py
+   #+end_src
+
+   And add the config to dotfiles:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-platformio.sh :mkdirp true
+   #!/usr/bin/env bash
+   PATH=${PATH}:~/.platformio/penv/bin/
    #+end_src
