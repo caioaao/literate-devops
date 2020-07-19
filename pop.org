@@ -1776,5 +1776,17 @@ Now we're all set!
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-platformio.sh :mkdirp true
    #!/usr/bin/env bash
-   PATH=${PATH}:~/.platformio/penv/bin/
+   PATH=${PATH}:~/.platformio/penv/bin
+   #+end_src
+
+** Processing IDE
+
+   #+begin_src shell :dir /tmp
+   curl -fsSL https://download.processing.org/processing-3.5.4-linux64.tgz | tar -xz
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+   mv /tmp/processing-3.5.4 /opt
+   ln -sf /opt/processing-3.5.4 /opt/processing
+   ln -sf /opt/processing/processing /usr/local/bin/processing-ide
    #+end_src
