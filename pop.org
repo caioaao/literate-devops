@@ -716,21 +716,63 @@ Now we're all set!
      gsettings set org.gnome.desktop.background picture-uri "file://$(pwd)/unsplash-cqbLg3lZEpk.jpg"
    #+end_src
 
-** Transparent topbar
+** Customize top bar
 
-   Yeah, gnome is pretty bad at that apparently. I just install an extension.
+   Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
 
    #+begin_src sh :dir ~/reps
      git clone git@github.com:ewlsh/dynamic-panel-transparency.git
      cd dynamic-panel-transparency && git checkout cd0e7ebbd0d8df3d871134a3a4b7cba16944c5e2
 
-     ln -sf `pwd`/dynamic-panel-transparency@rockon999.github.io ~/.local/share/gnome-shell/extensions/dynamic-panel-transparency@rockon999.github.io
+     EXTENSION_DIR=~/.local/share/gnome-shell/extensions/dynamic-panel-transparency@rockon999.github.io
+
+     ln -sf `pwd`/dynamic-panel-transparency@rockon999.github.io ${EXTENSION_DIR}
+
+     SCHEMADIR=${EXTENSION_DIR}/schemas
 
      gnome-extensions enable dynamic-panel-transparency@rockon999.github.io
-     gsettings --schemadir `pwd`/dynamic-panel-transparency@rockon999.github.io/schemas set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow true
-     gsettings --schemadir `pwd`/dynamic-panel-transparency@rockon999.github.io/schemas set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-position '(1, 1, 3)'
-     gsettings --schemadir `pwd`/dynamic-panel-transparency@rockon999.github.io/schemas set org.gnome.shell.extensions.dynamic-panel-transparency transition-windows-touch false
-     gsettings --schemadir `pwd`/dynamic-panel-transparency@rockon999.github.io/schemas set org.gnome.shell.extensions.dynamic-panel-transparency transition-with-overview false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-text-color false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency remove-panel-styling true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency maximized-opacity 0
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-opacity true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-with-overview true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-position '(1, 1, 3)'
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-color '(0, 0, 0, 1.0)'
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-theme-update false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency icon-shadow false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-type 1
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-windows-touch true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-overview-text-color false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-speed 0
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-background-color false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency hide-corners true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency unmaximized-opacity 0
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-animation false
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow true
+     gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-maximized-text-color false
+   #+end_src
+
+   And another for hiding it:
+
+   #+begin_src sh :dir /sudo::
+     apt install -y gnome-shell-extension-autohidetopbar
+     killall -3 gnome-shell
+   #+end_src
+
+   #+begin_src sh
+     gnome-extensions enable hidetopbar@mathieu.bidon.ca
+
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar hot-corner false
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-timeout 1000
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-autohide 0.2
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-intellihide false
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-active-window false
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive true
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar shortcut-delay 1.0
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-threshold 100
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-overview 0.4
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview false
+     gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window true
    #+end_src
 
 * Development
