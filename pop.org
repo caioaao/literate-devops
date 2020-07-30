@@ -707,6 +707,15 @@ Now we're all set!
      gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$(gsettings get org.gnome.Terminal.ProfilesList default)/ font '"Iosevka Fixed SS12"'
    #+end_src
 
+** Wallpaper
+
+   Let's download one from unsplash:
+
+   #+begin_src sh :dir ~/Pictures/wallpapers :mkdirp t
+     curl -o unsplash-cqbLg3lZEpk.jpg -fsSL https://unsplash.com/photos/cqbLg3lZEpk/download?force=true&w=2400
+     gsettings set org.gnome.desktop.background picture-uri "file://$(pwd)/unsplash-cqbLg3lZEpk.jpg"
+   #+end_src
+
 * Development
 
 ** Guile Scheme
