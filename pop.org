@@ -1383,6 +1383,12 @@ Now we're all set!
      ./bin/flutter config --no-analytics
    #+end_src
 
+*** DevTools
+
+    #+begin_src shell
+    flutter pub global activate devtools
+    #+end_src
+
 ** Android studio
 
    #+begin_src shell :dir /tmp
