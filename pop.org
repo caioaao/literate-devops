@@ -152,6 +152,12 @@ Now we're all set!
      export BROWSER=chromium
    #+end_src
 
+   Now it's a good time as any to set xdg default browser to chromium too:
+
+   #+begin_src sh
+   xdg-settings set default-web-browser chromium.desktop
+   #+end_src
+
    Now emacs:
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
@@ -1472,34 +1478,34 @@ Now we're all set!
    Tangle the config:
 
    #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
-     font:
-       # The normal (roman) font face to use.
-       normal:
-         family: Iosevka Fixed SS12
-         style: Regular
+   font:
+     # The normal (roman) font face to use.
+     normal:
+       family: Iosevka Fixed SS12
+       style: Regular
 
-       # The bold font face
-       bold:
-         family: Iosevka Fixed SS12
-         style: Bold
+     # The bold font face
+     bold:
+       family: Iosevka Fixed SS12
+       style: Bold
 
-       # The italic font face
-       italic:
-         family: Iosevka Fixed SS12
-         style: Italic
+     # The italic font face
+     italic:
+       family: Iosevka Fixed SS12
+       style: Italic
 
-       # Point size of the font
-       size: 12.0
+     # Point size of the font
+     size: 12.0
 
-     colors:
-       primary:
-         background: '#333333'
+   colors:
+     primary:
+       background: '#333333'
 
-     window:
-       decorations: none
-       padding:
-         x: 5
-         y: 10
+   window:
+     decorations: none
+     padding:
+       x: 5
+       y: 10
    #+end_src
 
 ** clang/llvm
