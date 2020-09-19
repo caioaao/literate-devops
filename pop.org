@@ -221,46 +221,48 @@ Now we're all set!
    And the GPG config:
 
    #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
-     # https://github.com/drduh/config/blob/master/gpg.conf
-     # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
-     # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
-     # Use AES256, 192, or 128 as cipher
-     personal-cipher-preferences AES256 AES192 AES
-     # Use SHA512, 384, or 256 as digest
-     personal-digest-preferences SHA512 SHA384 SHA256
-     # Use ZLIB, BZIP2, ZIP, or no compression
-     personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
-     # Default preferences for new keys
-     default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
-     # SHA512 as digest to sign keys
-     cert-digest-algo SHA512
-     # SHA512 as digest for symmetric ops
-     s2k-digest-algo SHA512
-     # AES256 as cipher for symmetric ops
-     s2k-cipher-algo AES256
-     # UTF-8 support for compatibility
-     charset utf-8
-     # Show Unix timestamps
-     fixed-list-mode
-     # No comments in signature
-     no-comments
-     # No version in signature
-     no-emit-version
-     # Long hexidecimal key format
-     keyid-format 0xlong
-     # Display UID validity
-     list-options show-uid-validity
-     verify-options show-uid-validity
-     # Display all keys and their fingerprints
-     with-fingerprint
-     # Display key origins and updates
-     #with-key-origin
-     # Cross-certify subkeys are present and valid
-     require-cross-certification
-     # Disable putting recipient key IDs into messages
-     throw-keyids
-     # Enable smartcard
-     use-agent
+   # https://github.com/drduh/config/blob/master/gpg.conf
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
+   # Use AES256, 192, or 128 as cipher
+   personal-cipher-preferences AES256 AES192 AES
+   # Use SHA512, 384, or 256 as digest
+   personal-digest-preferences SHA512 SHA384 SHA256
+   # Use ZLIB, BZIP2, ZIP, or no compression
+   personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+   # Default preferences for new keys
+   default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+   # SHA512 as digest to sign keys
+   cert-digest-algo SHA512
+   # SHA512 as digest for symmetric ops
+   s2k-digest-algo SHA512
+   # AES256 as cipher for symmetric ops
+   s2k-cipher-algo AES256
+   # UTF-8 support for compatibility
+   charset utf-8
+   # Show Unix timestamps
+   fixed-list-mode
+   # No comments in signature
+   no-comments
+   # No version in signature
+   no-emit-version
+   # Long hexidecimal key format
+   keyid-format 0xlong
+   # Display UID validity
+   list-options show-uid-validity
+   verify-options show-uid-validity
+   # Display all keys and their fingerprints
+   with-fingerprint
+   # Display key origins and updates
+   #with-key-origin
+   # Cross-certify subkeys are present and valid
+   require-cross-certification
+   # Disable putting recipient key IDs into messages
+   throw-keyids
+   # Enable smartcard
+   use-agent
+   # "SKS is dying" https://code.firstlook.media/the-death-of-sks-pgp-keyservers-and-how-first-look-media-is-handling-it
+   keyserver hkps://keys.openpgp.org
    #+END_SRC
 
    Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
@@ -310,7 +312,7 @@ Now we're all set!
    Also import the public key so we can use it:
 
    #+BEGIN_SRC shell
-     gpg --recv DD90B67479EFA704
+   gpg --keyserver hkps://keys.openpgp.org --recv DD90B67479EFA704
    #+END_SRC
 
 ** iptables firewall
@@ -634,29 +636,6 @@ Now we're all set!
      systemctl --user start redshift.service
    #+END_SRC
 
-** ProtonVPN
-
-   First install the requirements
-
-   #+BEGIN_SRC shell :dir /sudo::
-     apt install -y openvpn dialog wget resolvconf
-   #+END_SRC
-
-   Clone the CLI project:
-
-   #+BEGIN_SRC shell :dir ~/reps
-     [ -d protonvpn-cli ] || git clone git@github.com:ProtonVPN/protonvpn-cli.git
-   #+END_SRC
-
-   Install:
-
-   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
-     cd ~${user}/reps/protonvpn-cli
-     ./protonvpn-cli.sh --install
-   #+END_SRC
-
-   Run ~sudo pvpn --init~. Use credentials from [[https://account.protonvpn.com/settings][here]]
-
 ** tmux
 
    #+begin_src conf :tangle ~/.tmux.conf
@@ -728,7 +707,7 @@ Now we're all set!
    Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
 
    #+begin_src sh :dir ~/reps
-   git clone git@github.com:ewlsh/dynamic-panel-transparency.git
+   # git clone git@github.com:ewlsh/dynamic-panel-transparency.git
    cd dynamic-panel-transparency && git checkout cd0e7ebbd0d8df3d871134a3a4b7cba16944c5e2
 
    mkdir -p ~/.local/share/gnome-shell/extensions
@@ -791,7 +770,6 @@ Now we're all set!
       #+begin_src sh :dir /sudo::
      killall -3 gnome-shell
    #+end_src
-
 
 * Development
 
