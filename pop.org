@@ -44,6 +44,14 @@ Now we're all set!
 
 * Desktop
 
+** Emacs
+
+   We need to disable the active-menu shortcut (clashes with ~M-SPC~).
+
+   #+begin_src sh
+   gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
+   #+end_src
+
 ** Setup dotfiles
 
    First, install zsh and change the login shell:
