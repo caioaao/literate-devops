@@ -1492,6 +1492,30 @@ Now we're all set!
      apt update -y && apt install -y clang llvm
    #+end_src
 
+** gcloud
+
+   #+NAME: gcloud_sdk_version
+   : 310.0.0
+
+   #+begin_src shell :dir /tmp :var version=gcloud_sdk_version
+   curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
+   mv /tmp/google-cloud-sdk /opt/google-cloud-sdk-${version}
+   ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
+   #+end_src
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
+   if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
+   if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
+
+   #+end_src
+
+   #+begin_src shell
+   gcloud config set disable_usage_reporting true
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
