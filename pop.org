@@ -1216,9 +1216,10 @@ Now we're all set!
    Now the goodies:
 
    #+begin_src shell
-     go get golang.org/x/tools/cmd/godoc
-     go get golang.org/x/tools/cmd/goimports
-     go get github.com/rogpeppe/godef
+   go get golang.org/x/tools/cmd/godoc
+   go get golang.org/x/tools/cmd/goimports
+   go get github.com/rogpeppe/godef
+   go get golang.org/x/tools/gopls
    #+end_src
 
 ** protobuf
@@ -1509,12 +1510,22 @@ Now we're all set!
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
    if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
    if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
-
    #+end_src
 
    #+begin_src shell
    gcloud config set disable_usage_reporting true
    #+end_src
+
+*** SQL Proxy
+
+    #+begin_src shell :dir /tmp
+    curl -fsSL https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 > gcloud-sql-proxy
+    chmod +x gcloud-sql-proxy
+    #+end_src
+
+    #+begin_src shell :dir /sudo::
+    mv /tmp/gcloud-sql-proxy /usr/bin
+    #+end_src
 
 * CAD/CAM
 
