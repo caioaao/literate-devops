@@ -1535,6 +1535,18 @@ Now we're all set!
     mv /tmp/gcloud-sql-proxy /usr/bin
     #+end_src
 
+** nix
+
+   the install script prompts for password, so you have to run it on the shell :sad:
+
+   ~sh <(curl -L https://nixos.org/nix/install) --daemon~
+
+   After the multi-user install, tangle this (for some reason nixos is not updating zshrc):
+
+   #+begin_src sh :tangle ~/.zsh.d/apps.d/10-nix.sh
+   . /etc/profile.d/nix.sh
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
