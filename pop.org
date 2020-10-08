@@ -779,6 +779,22 @@ Now we're all set!
      killall -3 gnome-shell
    #+end_src
 
+** direnv
+
+   Install it:
+
+   #+begin_src sh :dir /sudo::
+   apt install -y direnv
+   #+end_src
+
+   Hook it to shell:
+
+   #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh
+   #!/usr/bin/env bash
+
+   eval "$(direnv hook zsh)"
+   #+end_src
+
 * Development
 
 ** Guile Scheme
