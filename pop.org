@@ -1587,6 +1587,16 @@ Now we're all set!
    . /etc/profile.d/nix.sh
    #+end_src
 
+** direnv
+
+   #+begin_src sh :dir /sudo::
+   apt install -y direnv
+   #+end_src
+
+   #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh
+   eval "$(direnv hook zsh)"
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
