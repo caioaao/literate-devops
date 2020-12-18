@@ -2095,6 +2095,14 @@ Now we're all set!
      chmod 0755 /usr/local/bin/yq
    #+end_src
 
+** inkscape 1.0
+
+   #+begin_src sh :dir /sudo::
+   add-apt-repository ppa:inkscape.dev/stable
+   apt update -y
+   apt install inkscape -y
+   #+end_src
+
 * Robotics
 
 ** Arduino
