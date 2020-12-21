@@ -894,11 +894,35 @@ Now we're all set!
 
 ** Docker
 
-   Install stuff
+   Install the dependencies
 
    #+BEGIN_SRC shell :dir /sudo::
-     apt install -y docker
+   apt update -y
+
+   apt install -y \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg-agent \
+        software-properties-common
    #+END_SRC
+
+   And add the GPG key and PPA repository:
+
+   #+begin_src shell :dir /sudo::
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+   add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) \
+      stable"
+   #+end_src
+
+   Finally install:
+
+   #+begin_src shell :dir /sudo::
+    apt update -y
+    apt install -y docker-ce docker-ce-cli containerd.io
+   #+end_src
 
    Add user to docker group
 
