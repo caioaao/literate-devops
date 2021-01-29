@@ -2104,6 +2104,23 @@ Now we're all set!
    alsactl kill rescan
    #+end_src
 
+*** PulseEffects
+
+    #+begin_src shell :dir /sudo::
+    apt update -y
+    apt install -y pulseeffects --install-recommends
+    apt install -y lsp-plugins
+    #+end_src
+
+    Now download the preset and load it:
+
+    #+begin_src shell :dir ~/.config/PulseEffects/output
+    curl -fsSL https://gist.githubusercontent.com/caioaao/59e907bb3250feed5b99424f0769b1c2/raw/f70a7c2493ff8307ae88204cc5dc36ddcf3e8786/Audio-Technica%2520ATH-M40x%2520ParametricEQ.json > 'Audio-Technica ATH-M40x ParametricEQ.json'
+    pulseeffects -p 'Audio-Technica ATH-M40x ParametricEQ'
+    #+end_src
+
+    PS: the preset is based on the config found here: https://github.com/jaakkopasanen/AutoEq
+
 ** exercism.io
 
    #+NAME: exercism_cli_version
