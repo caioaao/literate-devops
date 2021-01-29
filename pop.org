@@ -155,9 +155,9 @@ Now we're all set!
    Now let's already create some app specific configs here. First, browser config.
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
-     #!/usr/bin/env bash
+   #!/usr/bin/env bash
 
-     export BROWSER=chromium
+   export BROWSER=chromium
    #+end_src
 
    Now it's a good time as any to set xdg default browser to chromium too:
@@ -813,7 +813,7 @@ Now we're all set!
 
    Now add the completions and the executable to dot files:
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp true
      #!/usr/bin/env bash
      . $HOME/.asdf/asdf.sh
      . $HOME/.asdf/completions/asdf.bash
@@ -1597,6 +1597,18 @@ Now we're all set!
    eval "$(direnv hook zsh)"
    #+end_src
 
+** pulumi
+
+   First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp true
+   export PATH=$PATH:$HOME/.pulumi/bin
+   #+end_src
+
+   #+begin_src sh
+   curl -fsSL https://get.pulumi.com | sh
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
@@ -2085,6 +2097,13 @@ Now we're all set!
      }
    #+end_src
 
+   Now restart alsa and pulseaudio
+
+   #+begin_src shell
+   pulseaudio -k
+   alsactl kill rescan
+   #+end_src
+
 ** exercism.io
 
    #+NAME: exercism_cli_version
@@ -2120,7 +2139,7 @@ Now we're all set!
 ** yq
 
    #+begin_src sh :dir /tmp
-     curl -fsSL https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64 > yq
+     curl -fsSL https://github.com/mikefarah/yq/releases/download/v4.3.1/yq_linux_amd64 > yq
    #+end_src
 
    #+begin_src sh :dir /sudo::
