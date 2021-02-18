@@ -1609,6 +1609,22 @@ Now we're all set!
    curl -fsSL https://get.pulumi.com | sh
    #+end_src
 
+*** crd2pulumi
+
+    #+NAME: crd2pulumi_version
+    : 1.0.5
+
+    Tool to convert Kubernetes' CRD to source code for use with pulumi.
+
+    #+begin_src shell :dir /tmp :var version=crd2pulumi_version
+    curl -fsSL https://github.com/pulumi/crd2pulumi/releases/download/v${version}/crd2pulumi-v${version}-linux-amd64.tar.gz | tar -xz
+    #+end_src
+
+    #+begin_src shell :dir /sudo:: :var version=crd2pulumi_version
+    mv /tmp/crd2pulumi /usr/local/bin/crd2pulumi-${version}
+    ln -sf /usr/local/bin/crd2pulumi-${version} /usr/local/bin/crd2pulumi
+    #+end_src
+
 * CAD/CAM
 
 ** libfive
