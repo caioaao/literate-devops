@@ -1244,8 +1244,9 @@ Now we're all set!
    #+end_src
 
    #+begin_src shell :dir /sudo::
-     mv /tmp/go /opt/go-1.15.6
-     ln -sf /opt/go-1.15.6 /opt/go
+   mv /tmp/go /opt/go-1.15.6
+   rm -rf /opt/go || true
+   ln -sf /opt/go-1.15.6 /opt/go
    #+end_src
 
    And add go executables to our path:
