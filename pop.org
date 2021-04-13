@@ -1423,13 +1423,20 @@ Now we're all set!
 
 ** Android studio
 
-   #+begin_src shell :dir /tmp
-     curl -sL https://redirector.gvt1.com/edgedl/android/studio/ide-zips/3.6.1.0/android-studio-ide-192.6241897-linux.tar.gz | tar -xvz
+   #+NAME: android-studio-version
+   : 4.1.3.0
+
+   #+NAME: android-studio-build
+   : 201.7199119
+
+   #+begin_src shell :dir /tmp :var version=android-studio-version build=android-studio-build
+   curl -sL https://redirector.gvt1.com/edgedl/android/studio/ide-zips/${version}/android-studio-ide-${build}-linux.tar.gz | tar -xvz
    #+end_src
 
-   #+begin_src shell :dir /sudo::
-     mv /tmp/android-studio /opt/android-studio-192.6241897
-     ln -sf /opt/android-studio-192.6241897 /opt/android-studio
+   #+begin_src shell :dir /sudo:: :var build=android-studio-build
+   mv /tmp/android-studio /opt/android-studio-${build}
+   rm -f /opt/android-studio
+   ln -sf /opt/android-studio-${build} /opt/android-studio
    #+end_src
 
    Add to path:
