@@ -156,8 +156,7 @@ Now we're all set!
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
    #!/usr/bin/env bash
-
-   export BROWSER=chromium
+   export BROWSER=google-chrome
    #+end_src
 
    Now it's a good time as any to set xdg default browser to chromium too:
@@ -1381,7 +1380,7 @@ Now we're all set!
 ** Flutter
 
    #+NAME: flutter_version
-   : 1.20.0-stable
+   : 2.0.3-stable
 
    First install:
 
@@ -1678,18 +1677,19 @@ Now we're all set!
    Clone repo and start building:
 
    #+begin_src sh :dir ~/reps :var commit_sha=grbl_candle_version
-     git clone git@github.com:Denvi/Candle.git
-     cd Candle && git checkout ${commit_sha}
-     cd /opt/grbl-candle
-     cmake ~/reps/Candle/src
-     make -j12
+   git clone git@github.com:Denvi/Candle.git
+   cd Candle && git checkout ${commit_sha}
+   mkdir build
+   cmake -S ./src -B ./build
+   cd build
+   make -j12
    #+end_src
 
    Now fix opt permissions and run install
 
    #+begin_src sh :dir /sudo::/opt/grbl-candle
-     chmod -R 0755 .
-     ln -sf /opt/grbl-candle/Candle /usr/local/bin/grbl-candle
+   chmod -R 0755 .
+   ln -sf /opt/grbl-candle/Candle /usr/local/bin/grbl-candle
    #+end_src
 
 * Other
