@@ -1659,6 +1659,25 @@ Now we're all set!
    ln -sf /usr/local/bin/bosh-cli-${version} /usr/local/bin/bosh-cli
    #+end_src
 
+** control-tower
+
+   #+NAME: control-tower-version
+   : 0.16.2
+
+   Download the CLI:
+
+   #+begin_src shell :dir /tmp :var version=control-tower-version
+   wget https://github.com/EngineerBetter/control-tower/releases/download/${version}/control-tower-linux-amd64
+   #+end_src
+
+   And move it:
+
+   #+begin_src shell :dir /sudo:: :var version=control-tower-version
+   mv /tmp/control-tower-linux-amd64 /usr/local/bin/control-tower-${version}
+   chmod +x /usr/local/bin/control-tower-${version}
+   ln -sf /usr/local/bin/control-tower-${version} /usr/local/bin/control-tower
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
