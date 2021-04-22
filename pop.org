@@ -152,21 +152,7 @@ Now we're all set!
      done
    #+END_SRC
 
-   Now let's already create some app specific configs here. First, browser config.
-
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
-   #!/usr/bin/env bash
-
-   export BROWSER=google-chrome
-   #+end_src
-
-   Now it's a good time as any to set xdg default browser to chromium too:
-
-   #+begin_src sh
-   xdg-settings set default-web-browser chromium.desktop
-   #+end_src
-
-   Now emacs:
+   Now let's already create some app specific configs here. First, emacs:
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
      #!/usr/bin/env bash
@@ -793,6 +779,36 @@ Now we're all set!
    #!/usr/bin/env bash
 
    eval "$(direnv hook zsh)"
+   #+end_src
+
+** Brave Browser
+
+   Download the signing keys
+
+   #+begin_src shell :dir /sudo::
+   apt install -y apt-transport-https curl
+   curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+   echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee /etc/apt/sources.list.d/brave-browser-release.list
+   #+end_src
+
+   Update repos and install
+
+   #+begin_src shell :dir /sudo::
+   apt install -y brave-browser
+   #+end_src
+
+   Set it as default:
+
+      #+begin_src shell :tangle ~/.zsh.d/apps.d/10-browser.sh :mkdirp true
+   #!/usr/bin/env bash
+
+   export BROWSER=brave-browser
+   #+end_src
+
+   Now it's a good time as any to set xdg default browser to chromium too:
+
+   #+begin_src sh
+   xdg-settings set default-web-browser brave-browser.desktop
    #+end_src
 
 * Development
