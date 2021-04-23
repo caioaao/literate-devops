@@ -1390,9 +1390,31 @@ Now we're all set!
 
 ** NodeJS
 
-   #+begin_src shell :dir /sudo::
-     curl -sL https://deb.nodesource.com/setup_10.x | bash -
-     apt-get install -y nodejs
+   #+NAME: node-nvm-version
+   : v0.38.0
+
+   #+NAME: default-nodejs-version
+   : 16.0.0
+
+   Installing NVM
+
+   #+begin_src shell :var version=node-nvm-version
+   git clone git@github.com:nvm-sh/nvm.git ${HOME}/.nvm
+   cd .nvm
+   git checkout v0.38.0
+   #+end_src
+
+   Now tangle this to add it to zsh:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp true
+   export NVM_DIR="$HOME/.nvm"
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  --no-use
+   #+end_src
+
+   We can now install nodejs
+
+   #+begin_src shell
+   nvm install 16.0.0
    #+end_src
 
 ** Flutter
