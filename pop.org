@@ -2000,6 +2000,14 @@ Now we're all set!
    Done! To call it directly, run ~java -jar ~/utils/jars/plantuml.jar file1
    file2 file3~. Emacs should already be configured to find the jar in this
    location.
+
+   Let's create an alias for that:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-plantuml.sh
+   #!/usr/bin/env bash
+   alias plantuml="java -jar ${HOME}/utils/jars/plantuml.jar"
+   #+end_src
+
 ** SteelSeries Rival 100 configuration
 
    First we need the CLI tool. For that, first install its dependencies:
