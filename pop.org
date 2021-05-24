@@ -633,11 +633,13 @@ Now we're all set!
 ** tmux
 
    #+begin_src conf :tangle ~/.tmux.conf
-     unbind-key C-b
-     set -g prefix 'C-q'
-     bind-key 'C-q' send-prefix
-     bind-key 'C-r' source-file ~/.tmux.conf \; display-message "~/.tmux.conf reloaded"
-     bind-key 'C-w' run -b "tmux show-buffer | xsel -i"
+   unbind-key C-b
+   set -g prefix 'C-q'
+   bind-key 'C-q' send-prefix
+   set-window-option -g mode-keys vi
+   bind-key -T copy-mode-vi v send -X begin-selection
+   bind-key -T copy-mode-vi V send -X select-line
+   bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
    #+end_src
 
 ** TLP
