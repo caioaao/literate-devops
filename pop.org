@@ -2292,6 +2292,14 @@ Now we're all set!
    apt install inkscape -y
    #+end_src
 
+** obs-studio
+
+   #+begin_src shell :dir /sudo::
+   add-apt-repository -y ppa:obsproject/obs-studio
+   apt-get update
+   apt install -y obs-studio
+   #+end_src
+
 * Robotics
 
 ** Arduino
