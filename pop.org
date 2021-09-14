@@ -1735,6 +1735,22 @@ Now we're all set!
    mv /tmp/nats-${version}-linux-amd64 /opt/nats-cli/nats-${version}
    ln -sf /opt/nats-cli/nats-${version}/nats /usr/local/bin/nats
    #+end_src
+
+** ngrok
+
+   #+begin_src sh :dir /tmp
+   wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+   mkdir -p /opt/ngrok
+   cd /opt/ngrok
+   unzip /tmp/ngrok-stable-linux-amd64.zip
+   chmod -R 0755 /opt/ngrok
+   chmod +x /opt/ngrok
+   ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
+   #+end_src
+
 * CAD/CAM
 
 ** libfive
