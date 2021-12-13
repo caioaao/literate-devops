@@ -1258,14 +1258,17 @@ Now we're all set!
 
    First install go (Ubuntu has an old version only):
 
-   #+begin_src shell :dir /tmp
-     curl -sL https://dl.google.com/go/go1.15.6.linux-amd64.tar.gz | tar xvz
+   #+NAME: go_version
+    : 1.16.12
+
+   #+begin_src shell :dir /tmp :var GO_VERSION=go_version
+     curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
    #+end_src
 
    #+begin_src shell :dir /sudo::
-   mv /tmp/go /opt/go-1.15.6
+   mv /tmp/go /opt/go-${GO_VERSION}
    rm -rf /opt/go || true
-   ln -sf /opt/go-1.15.6 /opt/go
+   ln -sf /opt/go-${GO_VERSION} /opt/go
    #+end_src
 
    And add go executables to our path:
