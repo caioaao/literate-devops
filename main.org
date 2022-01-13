@@ -1,0 +1,1039 @@
+#+TITLE: Notebook setup
+#+PROPERTY: header-args:shell :results output silent
+#+PROPERTY: header-args:sh :results output silent
+#+PROPERTY: header-args:elisp :results output silent
+#+PROPERTY: header-args:emacs-lisp :results output silent
+
+#+NAME: gpg-key-id
+: DD90B67479EFA704
+
+* Prelude
+
+  Requirements: emacs (obviously), git
+
+  Add permission to run shell script blocks:
+
+  #+BEGIN_SRC elisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)))
+  #+END_SRC
+
+  And disable the babel-evaluate thingy that's super annoying:
+
+  #+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+  #+end_src
+
+** Pop-OS
+
+   Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of date
+   packages. The buggy version of org-mode that comes with the default Emacs
+   prevents us from using this file properly, so you'll have to update it before
+   using. To do so, first run the update script:
+
+   #+BEGIN_SRC emacs-lisp
+   (require 'ob-sh)
+   (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((sh . t)))
+   #+END_SRC
+
+   #+BEGIN_SRC sh :dir /sudo::
+   add-apt-repository ppa:kelleyk/emacs
+   apt-get update
+   apt install -y emacs26
+   apt purge -y emacs25
+   apt autoremove -y
+   #+END_SRC
+
+** Emacs
+
+*** Gnome
+
+    We need to disable the active-menu shortcut (clashes with ~M-SPC~).
+
+    #+begin_src sh
+    gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
+    #+end_src
+
+** Setup dotfiles
+
+*** Installing dependencies
+
+    First, install zsh and its dependencies and change the login shell:
+
+**** Arch-linux
+
+     #+BEGIN_SRC shell :dir /sudo::
+     pacman --noconfirm -Sy zsh
+     #+END_SRC
+
+     Install autojump manually running ~pamac build autojump~
+
+**** Pop-OS
+
+     #+BEGIN_SRC shell :dir /sudo::
+     apt install -y zsh || true
+     #+END_SRC
+
+*** Configuring
+
+    Set user's shell:
+
+    #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
+    chsh -s /bin/zsh $user
+    #+END_SRC
+
+    Let's create a directory for some useful commands.
+
+    #+BEGIN_SRC shell
+    mkdir -p ~/utils/bin || true
+    #+END_SRC
+
+    And now some cool scripts:
+
+    - Notify when an execution ends.
+
+      #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
+      #!/usr/bin/env bash
+
+      # Notify when execution finishes. First arg is the success message, second arg
+      # is the failure message and the rest is the command to run
+
+      (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
+      #+END_SRC
+
+    Install oh-my-zsh. I used to use zsh-users/antigen but it was another
+    abstraction layer on top of the plugin management that didn't bring much
+    benefit to me. It tries to solve the monorepo issue with oh-my-zsh, but
+    that's not an issue for me.
+
+    #+begin_src shell
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+    # installing it together to be sure `ZSH_CUSTOM` is set
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+    #+end_src
+
+    Now, tangle the basic zshrc:
+
+    #+BEGIN_SRC shell :tangle ~/.zshrc
+    REPS_PATH=~/reps
+
+    export ZSH="$HOME/.oh-my-zsh"
+    ZSH_THEME="gallois"
+
+    plugins=(git
+             heroku
+             pip
+             lein
+             command-not-found
+             autojump
+             emacs
+             archlinux
+             common-aliases
+             kubectl
+             zsh-syntax-highlighting)
+
+    source "$ZSH/oh-my-zsh.sh"
+
+    # Export zsh config dir path and import base config
+    export MY_ZSH_CONFIG=~/.zsh.d
+    source $MY_ZSH_CONFIG/base # base config
+    source $MY_ZSH_CONFIG/apps # apps config
+    source $MY_ZSH_CONFIG/localrc # local dotfile
+    #+END_SRC
+
+    Now, let's tangle the base zsh config:
+
+    #+BEGIN_SRC shell :tangle ~/.zsh.d/base :mkdirp yes
+    #!/usr/bin/env bash
+
+    # add useful scripts to the path
+    export PATH=$PATH:~/utils/bin
+
+    # gpg-agent configuration
+    export GPG_TTY=$(tty)
+    gpg-connect-agent updatestartuptty /bye >/dev/null
+
+    unset SSH_AGENT_PID
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+    fi
+    #+END_SRC
+
+    And the main apps config:
+
+    #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
+    #!/usr/bin/env bash
+
+    # Ensure apps.d is created
+    mkdir ~/.zsh.d/apps.d/ &> /dev/null || true
+
+    for f in `ls ~/.zsh.d/apps.d/`; do
+        source ~/.zsh.d/apps.d/$f
+    done
+    #+END_SRC
+
+    Now let's already create some app specific configs here. First, emacs:
+
+    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
+    #!/usr/bin/env bash
+
+    bindkey -A emacs main # set emacs as default
+
+    # Configs for zsh to work nicelly inside emacs
+    if [ -n "$INSIDE_EMACS" ]; then
+        export TERM=vt100
+        chpwd() { print -P "\033AnSiTc %d" }
+        print -P "\033AnSiTu %n"
+        print -P "\033AnSiTc %d"
+    fi
+    #+end_src
+
+
+    Also create the ~localrc~ file. This should be the place to add local configs
+    (company notebook configs for instance).
+
+    #+BEGIN_SRC shell :dir ~/
+    touch ~/.zsh.d/localrc
+    #+END_SRC
+
+** Locale
+
+   Set system language:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   localectl set-locale LANG=en_US.UTF-8
+   #+END_SRC
+
+   Keyboard config:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   setxkbmap -option ctrl:swapcaps
+   #+END_SRC
+
+** Aspell
+
+*** Arch linux
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    pacman --noconfirm -Sy aspell aspell-en
+    #+END_SRC
+
+*** Ubuntu/Pop-OS
+
+    #+BEGIN_SRC shell :dir /sudo::
+    apt install -y aspell aspell-en
+    #+END_SRC
+** Git
+
+   Add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
+
+   #+begin_src shell
+   ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+   #+end_src
+
+* Security
+** Yubikey
+
+*** Installing manager and dependencies
+
+**** Arch Linux
+
+     #+BEGIN_SRC shell :dir /sudo::
+     pacman --noconfirm -Sy yubikey-manager libfido2 pcsclite ccid
+     #+END_SRC
+
+**** Pop OS
+
+     #+BEGIN_SRC shell :dir /sudo::
+     apt-add-repository ppa:yubico/stable
+     apt update
+     apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
+     #+END_SRC
+
+*** Configuring
+
+    Start and enable the appropriate service
+
+    #+BEGIN_SRC shell :dir /sudo::
+    systemctl enable pcscd.service
+    systemctl start pcscd.service
+    #+END_SRC
+
+    To create keys, see https://github.com/caioaao/YubiKey-Guide
+
+    We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com card-edit= and
+    then =fetch= and exit.
+
+** GnuPG / SSH
+
+   Tangle the gpg-agent config.
+
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf
+   enable-ssh-support
+   log-file ~/.gnupg/gpg-agent.log
+   allow-emacs-pinentry
+   allow-loopback-pinentry
+   pinentry-program /usr/bin/pinentry-gnome3
+   default-cache-ttl 60
+   max-cache-ttl 120
+   #+END_SRC
+
+   And the GPG config:
+
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
+   # https://github.com/drduh/config/blob/master/gpg.conf
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
+   # Use AES256, 192, or 128 as cipher
+   personal-cipher-preferences AES256 AES192 AES
+   # Use SHA512, 384, or 256 as digest
+   personal-digest-preferences SHA512 SHA384 SHA256
+   # Use ZLIB, BZIP2, ZIP, or no compression
+   personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+   # Default preferences for new keys
+   default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+   # SHA512 as digest to sign keys
+   cert-digest-algo SHA512
+   # SHA512 as digest for symmetric ops
+   s2k-digest-algo SHA512
+   # AES256 as cipher for symmetric ops
+   s2k-cipher-algo AES256
+   # UTF-8 support for compatibility
+   charset utf-8
+   # Show Unix timestamps
+   fixed-list-mode
+   # No comments in signature
+   no-comments
+   # No version in signature
+   no-emit-version
+   # Long hexidecimal key format
+   keyid-format 0xlong
+   # Display UID validity
+   list-options show-uid-validity
+   verify-options show-uid-validity
+   # Display all keys and their fingerprints
+   with-fingerprint
+   # Display key origins and updates
+   #with-key-origin
+   # Cross-certify subkeys are present and valid
+   require-cross-certification
+   # Disable putting recipient key IDs into messages
+   throw-keyids
+   # Enable smartcard
+   use-agent
+   # "SKS is dying" https://code.firstlook.media/the-death-of-sks-pgp-keyservers-and-how-first-look-media-is-handling-it
+   keyserver hkps://keys.openpgp.org
+   #+END_SRC
+
+   Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
+   installed together with it, for some reason.
+
+   #+BEGIN_SRC shell :dir /sudo::
+   pacman --noconfirm -Sy gcr
+   #+END_SRC
+
+   We need to fix the DNS resolution:
+
+   #+BEGIN_SRC shell :dir /sudo::
+   ln -sf /etc/resolv.conf /run/systemd/resolve/stub-resolv.conf
+   #+END_SRC
+
+   Also, tangle the ssh config.
+
+   #+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
+   GSSAPIAuthentication no
+   #+END_SRC
+
+   PS: explanation for disabling GSSApi, besides the slowness it causes in some
+   cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
+
+   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling the following
+   config file to use Google's DNS:
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
+   [Resolve]
+   DNS=8.8.8.8
+   #+END_SRC
+
+   Added security with DNS over TLS. *WARNING:* do not use with ubuntu since
+   systemd-resolved's is old and doesn't support it.
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
+   [Resolve]
+   DNSOverTLS=opportunistic
+   #+END_SRC
+
+   And restart the service
+
+   #+BEGIN_SRC shell :dir /sudo::
+   systemctl restart systemd-resolved.service
+   #+END_SRC
+
+   Also import the public key so we can use it:
+
+   #+BEGIN_SRC shell :var keyid=gpg-key-id
+   gpg --keyserver hkps://keyserver.ubuntu.com --recv ${keyid}
+   #+END_SRC
+
+** iptables firewall
+
+   After some issues because of exposed ports, using iptables as a firewall
+   sounds like a good idea.
+
+   First create the systemd service and the flush script:
+
+   #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
+   # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
+   [Unit]
+   Description=Packet Filtering Framework
+   DefaultDependencies=no
+   After=systemd-sysctl.service
+   Before=sysinit.target
+   [Service]
+   Type=oneshot
+   ExecStart=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+   ExecReload=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+   ExecStop=/etc/iptables/iptables-flush.sh
+   RemainAfterExit=yes
+   [Install]
+   WantedBy=multi-user.target
+   #+end_src
+
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755) :dir /sudo::
+   #!/usr/bin/env bash
+   iptables -F
+   iptables -X
+   iptables -t nat -F
+   iptables -t nat -X
+   iptables -t mangle -F
+   iptables -t mangle -X
+   iptables -P INPUT ACCEPT
+   iptables -P FORWARD ACCEPT
+   iptables -P OUTPUT ACCEPT
+   #+end_src
+
+   Then generate the file containing the rules and enable the service:
+
+   #+begin_src shell :dir /sudo::
+   # Flush all rules
+   /etc/iptables/iptables-flush.sh
+
+   # Default rule to drop incoming traffic
+   iptables --policy INPUT DROP
+   iptables --policy FORWARD DROP
+   iptables --policy OUTPUT ACCEPT
+
+   # Rules to allow outgoing traffic
+   iptables --append INPUT -i lo -j ACCEPT
+   iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+   iptables --append INPUT --jump REJECT
+
+   iptables --append FORWARD --match state --state ESTABLISHED,RELATED -j ACCEPT
+   iptables --append FORWARD -o enp+ -j ACCEPT
+   iptables --append FORWARD -o wlp+ -j ACCEPT
+   iptables --append FORWARD --jump REJECT
+
+   # Rules to allow outgoing traffic from docker containers
+   iptables -N DOCKER-USER
+   iptables --append DOCKER-USER -i enp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+   iptables --append DOCKER-USER -i wlp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+   iptables --append DOCKER-USER -i enp+ -j DROP
+   iptables --append DOCKER-USER -i wlp+ -j DROP
+
+   mkdir -p /etc/iptables || true
+   iptables-save > /etc/iptables/iptables.rules
+
+   systemctl enable iptables.service
+   systemctl start iptables.service
+   #+end_src
+
+* Development
+** tmux
+
+*** Installing
+
+**** Arch-linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm tmux
+     #+end_src
+
+**** Pop-OS
+
+     #+begin_src shell :dir /sudo::
+     apt install -y tmux
+     #+end_src
+
+*** Configuring
+
+    #+begin_src conf :tangle ~/.tmux.conf
+    unbind-key C-b
+    set -g prefix 'C-q'
+    bind-key 'C-q' send-prefix
+    set-window-option -g mode-keys vi
+    bind-key -T copy-mode-vi v send -X begin-selection
+    bind-key -T copy-mode-vi V send -X select-line
+    bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+    #+end_src
+
+** direnv
+
+*** Install
+
+**** Arch-Linux
+
+     #+begin_src sh :dir /sudo::
+     pamac install --no-confirm direnv
+     #+end_src
+
+**** Pop-OS
+
+     #+begin_src sh :dir /sudo::
+     apt install -y direnv
+     #+end_src
+
+*** Configure
+
+    #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh
+    #!/usr/bin/env bash
+
+    eval "$(direnv hook zsh)"
+    #+end_src
+
+** asdf
+
+   First clone the repo:
+
+   #+begin_src sh
+   git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
+   #+end_src
+
+   Now add the completions and the executable to dot files:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp true
+   #!/usr/bin/env bash
+   . $HOME/.asdf/asdf.sh
+   . $HOME/.asdf/completions/asdf.bash
+   #+end_src
+
+** Git
+
+   Basic configs
+
+   #+BEGIN_SRC conf :tangle ~/.gitconfig
+   [user]
+   name="Caio Oliveira"
+   email=caioaao@gmail.com
+   signingKey=DD90B67479EFA704
+
+   [core]
+   editor=emacs
+
+   [commit]
+   gpgsign=true
+   #+END_SRC
+
+** Git-LFS
+
+*** Pop OS
+
+    #+begin_src shell :dir /sudo::/tmp
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+    apt install -y git-lfs
+    #+end_src
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pamac install --no-confirm git-lfs
+    #+end_src
+
+** NodeJS
+
+   #+NAME: node-nvm-version
+   : v0.38.0
+
+   #+NAME: default-nodejs-version
+   : 17.3.0
+
+   Installing NVM
+
+   #+begin_src shell :var version=node-nvm-version
+   git clone git@github.com:nvm-sh/nvm.git ${HOME}/.nvm
+   cd ${HOME}/.nvm
+   git checkout ${version}
+   chmod +x nvm.sh
+   #+end_src
+
+   Now tangle this to add it to zsh:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp true
+   export NVM_DIR="$HOME/.nvm"
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  --no-use
+   #+end_src
+
+   We can now install nodejs
+
+   #+begin_src shell :var node_version=default-nodejs-version
+   \. "$HOME/.nvm/nvm.sh"  --no-use
+   nvm install ${node_version}
+   #+end_src
+
+** Yarn
+
+*** Install
+
+**** Arch linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm yarn
+     #+end_src
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+     apt update && apt install -y yarn
+     #+end_src
+
+*** Configure
+
+    #+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
+    export PATH="$PATH:`yarn global bin`"
+    #+end_src
+
+** Kubernetes
+
+*** kubectl
+
+    #+NAME: default_kubectl_version
+    : 1.15.11
+
+    Add the plugin to asdf and install the default version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+    asdf plugin-add kubectl
+    asdf install kubectl ${kubectl_version}
+    #+end_src
+
+    Now setup kubectl global version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+    asdf global kubectl ${kubectl_version}
+    #+end_src
+
+** golang
+
+*** Install
+
+**** Pop OS
+
+     Ubuntu has an old version only:
+
+     #+NAME: go_version
+     : 1.16.12
+
+     #+begin_src shell :dir /tmp :var GO_VERSION=go_version
+     curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
+     #+end_src
+
+     #+begin_src shell :dir /sudo::
+     mv /tmp/go /opt/go-${GO_VERSION}
+     rm -rf /opt/go || true
+     ln -sf /opt/go-${GO_VERSION} /opt/go
+     #+end_src
+
+**** Arch Linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm go
+     #+end_src
+
+*** Configure
+
+    And add go executables to our path:
+
+    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+    #!/usr/bin/env bash
+
+    export GOPATH=~/go
+    export PATH="$PATH:$PATH/bin"
+    export PATH="$PATH:$GOPATH/bin"
+    #+end_src
+
+    Now the goodies:
+
+    #+begin_src shell
+    go get golang.org/x/tools/cmd/godoc
+    go get golang.org/x/tools/cmd/goimports
+    go get github.com/rogpeppe/godef
+    go get golang.org/x/tools/gopls
+    #+end_src
+
+** protobuf
+
+*** Pop OS
+
+    Download, extract and configure:
+
+    #+begin_src shell :dir /tmp
+    #curl -sL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz | tar zx
+    cd protobuf-3.11.2
+    ./configure
+    make
+    make check -j 13
+    #+end_src
+
+    Install and refresh shared library cache
+
+    #+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
+    make install
+    ldconfig
+    #+end_src
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pamac install --no-confirm protobuf
+    #+end_src
+
+** Alacritty
+
+*** Install
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+     apt install -y alacritty
+     #+end_src
+
+**** Arch Linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm alacritty
+     #+end_src
+
+*** Configure
+
+    #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
+    font:
+      # The normal (roman) font face to use.
+      normal:
+        family: Iosevka Fixed SS12
+        style: Regular
+
+      # The bold font face
+      bold:
+        family: Iosevka Fixed SS12
+        style: Bold
+
+      # The italic font face
+      italic:
+        family: Iosevka Fixed SS12
+        style: Italic
+
+      # Point size of the font
+      size: 12.0
+
+    colors:
+      primary:
+        background: '#333333'
+
+    window:
+      decorations: none
+      padding:
+        x: 5
+        y: 10
+    #+end_src
+
+** gcloud
+
+   #+NAME: gcloud_sdk_version
+   : 368.0.0
+
+   First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
+
+   #+begin_src shell
+   asdf install python 3.9.9
+   #+end_src
+
+   #+begin_src shell :dir /tmp :var version=gcloud_sdk_version
+   curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
+   mv /tmp/google-cloud-sdk /opt/google-cloud-sdk-${version}
+   rm -rf /opt/google-cloud-sdk || true
+   ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
+   #+end_src
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
+   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+   if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
+   if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
+   #+end_src
+
+   #+begin_src shell
+   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+   . '/opt/google-cloud-sdk/path.zsh.inc'
+   gcloud config set disable_usage_reporting true
+   #+end_src
+
+** pulumi
+
+   First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp true
+   export PATH=$PATH:$HOME/.pulumi/bin
+   #+end_src
+
+   #+begin_src shell
+   export PATH=$PATH:$HOME/.pulumi/bin
+   curl -fsSL https://get.pulumi.com | sh
+   #+end_src
+
+** ngrok
+
+   #+begin_src sh :dir /tmp
+   wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+   mkdir -p /opt/ngrok
+   cd /opt/ngrok
+   unzip /tmp/ngrok-stable-linux-amd64.zip
+   chmod -R 0755 /opt/ngrok
+   chmod +x /opt/ngrok
+   ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
+   #+end_src
+
+* Cosmetics
+** Make fonts great again
+
+   #+NAME: iosevka_font_version
+   : 3.4.6
+
+   Download iosevka:
+
+   #+begin_src shell :var iosevka_font_version=iosevka_font_version
+   mkdir -p ~/.fonts
+   cd ~/.fonts
+   curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
+   #+end_src
+
+
+   Update cache:
+
+   #+BEGIN_SRC shell :results output silent
+   fc-cache -fv
+   #+END_SRC
+
+   Now tangle the fonts configuration.
+
+   #+BEGIN_SRC xml :tangle ~/.config/fontconfig/fonts.conf :mkdirp yes
+   <?xml version='1.0'?>
+   <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+   <fontconfig>
+     <match target="pattern">
+       <test qual="any" name="family"><string>SFMono</string></test>
+       <edit name="family" mode="assign" binding="same">
+         <string>Monaco</string>
+       </edit>
+     </match>
+     <match target="pattern">
+       <test qual="any" name="family"><string>Consolas</string></test>
+       <edit name="family" mode="assign" binding="same">
+         <string>Iosevka Fixed SS12</string>
+       </edit>
+     </match>
+     <match target="pattern">
+       <test qual="any" name="family"><string>monospace</string></test>
+       <edit name="family" mode="assign" binding="same">
+         <string>Iosevka Fixed SS12</string>
+       </edit>
+     </match>
+   </fontconfig>
+   #+END_SRC
+
+*** Arch Linux
+
+    Install packages ~ttf-hanazono~, a japanese font needed for /shrugging/.
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    pacman --noconfirm -Sy ttf-hanazono
+    #+END_SRC
+
+
+    Run this
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+    pacman -Sy --noconfirm freetype2 || true
+
+    echo 'export FREETYPE_PROPERTIES="truetype:interpreter-version=38"' >> /etc/profile.d/freetype2.sh
+
+    ln -s /etc/fonts/conf.avail/10-hinting-slight.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf         || true
+    ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf          || true
+    ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d/11-lcdfilter-default.conf  || true
+    #+END_SRC
+
+** Gnome top bar
+
+   Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
+
+   #+begin_src sh :dir ~/reps
+   # git clone git@github.com:ewlsh/dynamic-panel-transparency.git
+   cd dynamic-panel-transparency && git checkout cd0e7ebbd0d8df3d871134a3a4b7cba16944c5e2
+
+   mkdir -p ~/.local/share/gnome-shell/extensions
+
+   EXTENSION_DIR=~/.local/share/gnome-shell/extensions/dynamic-panel-transparency@rockon999.github.io
+
+   ln -sf `pwd`/dynamic-panel-transparency@rockon999.github.io ${EXTENSION_DIR}
+
+   SCHEMADIR=${EXTENSION_DIR}/schemas
+
+   gnome-extensions enable dynamic-panel-transparency@rockon999.github.io
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-text-color false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency remove-panel-styling true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency maximized-opacity 0
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-opacity true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-with-overview true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-position '(1, 1, 3)'
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-color '(0, 0, 0, 1.0)'
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-theme-update false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency icon-shadow false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-type 1
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-windows-touch true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-overview-text-color false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-speed 0
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-background-color false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency hide-corners true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency unmaximized-opacity 0
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-animation false
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow true
+   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-maximized-text-color false
+   #+end_src
+
+   And another for hiding it. Install:
+
+   #+begin_src sh :dir /sudo::
+   apt update -y
+   apt install -y gnome-shell-extension-autohidetopbar
+   #+end_src
+
+   And enable/configure it:
+
+   #+begin_src sh
+   gnome-extensions enable hidetopbar@mathieu.bidon.ca
+
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar hot-corner false
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-timeout 1000
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-autohide 0.2
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-intellihide false
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-active-window false
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive true
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar shortcut-delay 1.0
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-threshold 100
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-overview 0.4
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview false
+   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window true
+   #+end_src
+
+   And restart gnome to have everything updated:
+
+   #+begin_src sh :dir /sudo::
+   killall -3 gnome-shell
+   #+end_src
+
+** Wallpaper
+
+   Let's download one from unsplash:
+
+   #+begin_src sh :dir ~/Pictures
+   mkdir -p wallpapers && cd wallpapers
+   curl -o mountain1.jpg -fsSL https://unsplash.com/photos/1527pjeb6jg/download?force=true&w=2400
+   #+end_src
+
+*** XFCE
+
+    #+begin_src shell
+    xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitorHDMI-1-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+    xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitoreDP-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+    #+end_src
+
+*** Gnome
+
+    #+begin_src shell
+    gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/wallpapers/mountain1.jpg"
+    #+end_src
+
+* Other
+
+** Command for gif recording
+
+*** Install dependencies
+
+**** Pop OS
+
+     #+BEGIN_SRC shell :dir /sudo::
+       apt install -y ffmpeg imagemagick autoconf libx11-dev
+     #+END_SRC
+
+**** Arch Linux
+
+     #+BEGIN_SRC shell :dir /sudo:: :results output silent
+       pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
+     #+END_SRC
+
+*** Finish installation
+
+    And then install FFcast:
+
+    #+BEGIN_SRC shell :dir ~/reps :results output silent
+      [ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
+    #+END_SRC
+
+    #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
+      ./bootstrap
+      ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+      make
+    #+END_SRC
+
+    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
+      make install
+    #+END_SRC
+
+    #+BEGIN_SRC shell :tangle /sudo::/usr/bin/gifrecord :tangle-mode (identity #o755)
+      #!/bin/bash
+      TMP_AVI=$(mktemp /tmp/outXXXXXXXXXX.avi)
+      ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
+             -video_size %s -i %D+%c -codec:v huffyuv               \
+             -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
+          && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
+    #+END_SRC
+
+* Playbooks
+
+** Fix emacs signature issues
+
+   Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
+
+   #+BEGIN_SRC elisp
+     (setq package-check-signature nil)
+     (package-install 'gnu-elpa-keyring-update)
+     (gnu-elpa-keyring-update)
+     (setq package-check-signature 'allow-unsigned)
+   #+END_SRC
+
+   And to verify it solved the issue, run:
+
+   #+BEGIN_SRC elisp
+     (package-refresh-contents)
+   #+END_SRC
+
+   If it runs without errors, then everything is back to normal.

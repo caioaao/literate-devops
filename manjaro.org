@@ -1417,12 +1417,12 @@ And disable the babel-evaluate thingy that's super annoying:
    #+begin_src shell :dir /sudo::
    pamac install --no-confirm go
    #+end_src
+
    And add go executables to our path:
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
      #!/usr/bin/env bash
 
-     export GOROOT=/opt/go
      export GOPATH=~/go
      export PATH="$PATH:$GOROOT/bin"
      export PATH="$PATH:$PATH/bin"
