@@ -1,0 +1,1663 @@
+#+TITLE: Notebook setup
+#+PROPERTY: header-args:shell :results output silent
+#+PROPERTY: header-args:sh :results output silent
+#+PROPERTY: header-args:elisp :results output silent
+#+PROPERTY: header-args:emacs-lisp :results output silent
+
+Requirements: emacs (obviously), git
+
+Add permission to run shell script blocks:
+
+#+BEGIN_SRC elisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)))
+#+END_SRC
+
+And disable the babel-evaluate thingy that's super annoying:
+
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+
+* Desktop
+
+** Setup dotfiles
+
+   First, install zsh and its dependencies and change the login shell:
+
+   #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
+     pacman --noconfirm -Sy zsh autojump || true
+     chsh -s /bin/zsh $user
+   #+END_SRC
+
+   Let's create a directory for some useful commands.
+
+   #+BEGIN_SRC shell
+     mkdir -p ~/utils/bin || true
+   #+END_SRC
+
+   And now some cool scripts:
+
+   - Notify when an execution ends.
+
+     #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
+       #!/usr/bin/env bash
+
+       # Notify when execution finishes. First arg is the success message, second arg
+       # is the failure message and the rest is the command to run
+
+       (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
+     #+END_SRC
+
+   Install oh-my-zsh. I used to use zsh-users/antigen but it was another
+   abstraction layer on top of the plugin management that didn't bring much
+   benefit to me. It tries to solve the monorepo issue with oh-my-zsh, but
+   that's not an issue for me.
+
+   #+begin_src shell
+     sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+     # installing it together to be sure `ZSH_CUSTOM` is set
+     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+   #+end_src
+
+   Now, tangle the basic zshrc:
+
+   #+BEGIN_SRC shell :tangle ~/.zshrc
+     REPS_PATH=~/reps
+
+     export ZSH="$HOME/.oh-my-zsh"
+     ZSH_THEME="gallois"
+
+     plugins=(git
+              heroku
+              pip
+              lein
+              command-not-found
+              autojump
+              emacs
+              archlinux
+              common-aliases
+              kubectl
+              zsh-syntax-highlighting)
+
+     source "$ZSH/oh-my-zsh.sh"
+
+     # Export zsh config dir path and import base config
+     export MY_ZSH_CONFIG=~/.zsh.d
+     source $MY_ZSH_CONFIG/base # base config
+     source $MY_ZSH_CONFIG/apps # apps config
+     source $MY_ZSH_CONFIG/localrc # local dotfile
+   #+END_SRC
+
+   Now, let's tangle the base zsh config:
+
+   #+BEGIN_SRC shell :tangle ~/.zsh.d/base :mkdirp yes
+     #!/usr/bin/env bash
+
+     # add useful scripts to the path
+     export PATH=$PATH:~/utils/bin
+
+     # gpg-agent configuration
+     export GPG_TTY=$(tty)
+     gpg-connect-agent updatestartuptty /bye >/dev/null
+
+     unset SSH_AGENT_PID
+     if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+       export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+     fi
+   #+END_SRC
+
+   And the main apps config:
+
+   #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
+     #!/usr/bin/env bash
+
+     # Ensure apps.d is created
+     mkdir ~/.zsh.d/apps.d/ &> /dev/null || true
+
+     for f in `ls ~/.zsh.d/apps.d/`; do
+         source ~/.zsh.d/apps.d/$f
+     done
+   #+END_SRC
+
+   Now let's already create some app specific configs here. First, emacs:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
+     #!/usr/bin/env bash
+
+     bindkey -A emacs main # set emacs as default
+
+     # Configs for zsh to work nicelly inside emacs
+     if [ -n "$INSIDE_EMACS" ]; then
+         export TERM=vt100
+         chpwd() { print -P "\033AnSiTc %d" }
+         print -P "\033AnSiTu %n"
+         print -P "\033AnSiTc %d"
+     fi
+   #+end_src
+
+
+   Also create the ~localrc~ file. This should be the place to add local configs
+   (company notebook configs for instance).
+
+   #+BEGIN_SRC shell :dir ~/
+     touch ~/.zsh.d/localrc
+   #+END_SRC
+
+** Yubikey
+
+   Install the manager and dependencies
+
+   #+BEGIN_SRC shell :dir /sudo::
+     pacman --noconfirm -Sy yubikey-manager libfido2 pcsclite ccid
+   #+END_SRC
+
+   Start and enable the appropriate service
+
+   #+BEGIN_SRC shell :dir /sudo::
+     systemctl enable pcscd.service
+     systemctl start pcscd.service
+   #+END_SRC
+
+   To create keys, see https://github.com/caioaao/YubiKey-Guide
+
+   We also need to import the keys for use. For that, run =gpg --card-edit= and
+   then =fetch= and exit.
+
+** GnuPG / SSH
+
+   Tangle the gpg-agent config.
+
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf
+     enable-ssh-support
+     log-file ~/.gnupg/gpg-agent.log
+     allow-emacs-pinentry
+     allow-loopback-pinentry
+     pinentry-program /usr/bin/pinentry-gnome3
+     default-cache-ttl 60
+     max-cache-ttl 120
+   #+END_SRC
+
+   And the GPG config:
+
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
+   # https://github.com/drduh/config/blob/master/gpg.conf
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
+   # Use AES256, 192, or 128 as cipher
+   personal-cipher-preferences AES256 AES192 AES
+   # Use SHA512, 384, or 256 as digest
+   personal-digest-preferences SHA512 SHA384 SHA256
+   # Use ZLIB, BZIP2, ZIP, or no compression
+   personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+   # Default preferences for new keys
+   default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+   # SHA512 as digest to sign keys
+   cert-digest-algo SHA512
+   # SHA512 as digest for symmetric ops
+   s2k-digest-algo SHA512
+   # AES256 as cipher for symmetric ops
+   s2k-cipher-algo AES256
+   # UTF-8 support for compatibility
+   charset utf-8
+   # Show Unix timestamps
+   fixed-list-mode
+   # No comments in signature
+   no-comments
+   # No version in signature
+   no-emit-version
+   # Long hexidecimal key format
+   keyid-format 0xlong
+   # Display UID validity
+   list-options show-uid-validity
+   verify-options show-uid-validity
+   # Display all keys and their fingerprints
+   with-fingerprint
+   # Display key origins and updates
+   #with-key-origin
+   # Cross-certify subkeys are present and valid
+   require-cross-certification
+   # Disable putting recipient key IDs into messages
+   throw-keyids
+   # Enable smartcard
+   use-agent
+   # "SKS is dying" https://code.firstlook.media/the-death-of-sks-pgp-keyservers-and-how-first-look-media-is-handling-it
+   keyserver hkps://keys.openpgp.org
+   #+END_SRC
+
+   Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
+   installed together with it, for some reason.
+
+   #+BEGIN_SRC shell :dir /sudo::
+     pacman --noconfirm -Sy gcr
+   #+END_SRC
+
+   We need to fix the DNS resolution:
+
+   #+BEGIN_SRC shell :dir /sudo::
+     ln -sf /etc/resolv.conf /run/systemd/resolve/stub-resolv.conf
+   #+END_SRC
+
+   Also, tangle the ssh config.
+
+   #+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
+     GSSAPIAuthentication no
+   #+END_SRC
+
+   PS: explanation for disabling GSSApi, besides the slowness it causes in some
+   cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
+
+   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling the following
+   config file to use Google's DNS:
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
+     [Resolve]
+     DNS=8.8.8.8
+   #+END_SRC
+
+   Added security with DNS over TLS
+
+   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
+     [Resolve]
+     DNSOverTLS=opportunistic
+   #+END_SRC
+
+   And restart the service
+
+   #+BEGIN_SRC shell :dir /sudo::
+     systemctl restart systemd-resolved.service
+   #+END_SRC
+
+   Also import the public key so we can use it:
+
+   #+BEGIN_SRC shell
+   gpg --keyserver hkps://keyserver.ubuntu.com --recv DD90B67479EFA704
+   #+END_SRC
+
+** iptables firewall
+
+   After some issues because of exposed ports, using iptables as a firewall
+   sounds like a good idea.
+
+   First create the systemd service and the flush script:
+
+   #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
+     # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
+     [Unit]
+     Description=Packet Filtering Framework
+     DefaultDependencies=no
+     After=systemd-sysctl.service
+     Before=sysinit.target
+     [Service]
+     Type=oneshot
+     ExecStart=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecReload=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+     ExecStop=/etc/iptables/iptables-flush.sh
+     RemainAfterExit=yes
+     [Install]
+     WantedBy=multi-user.target
+   #+end_src
+
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755) :dir /sudo::
+     #!/usr/bin/env bash
+     iptables -F
+     iptables -X
+     iptables -t nat -F
+     iptables -t nat -X
+     iptables -t mangle -F
+     iptables -t mangle -X
+     iptables -P INPUT ACCEPT
+     iptables -P FORWARD ACCEPT
+     iptables -P OUTPUT ACCEPT
+   #+end_src
+
+   Then generate the file containing the rules and enable the service:
+
+   #+begin_src shell :dir /sudo::
+     # Flush all rules
+     /etc/iptables/iptables-flush.sh
+
+     # Default rule to drop incoming traffic
+     iptables --policy INPUT DROP
+     iptables --policy FORWARD DROP
+     iptables --policy OUTPUT ACCEPT
+
+     # Rules to allow outgoing traffic
+     iptables --append INPUT -i lo -j ACCEPT
+     iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+     iptables --append INPUT --jump REJECT
+
+     iptables --append FORWARD --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append FORWARD -o enp+ -j ACCEPT
+     iptables --append FORWARD -o wlp+ -j ACCEPT
+     iptables --append FORWARD --jump REJECT
+
+     # Rules to allow outgoing traffic from docker containers
+     iptables -N DOCKER-USER
+     iptables --append DOCKER-USER -i enp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append DOCKER-USER -i wlp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+     iptables --append DOCKER-USER -i enp+ -j DROP
+     iptables --append DOCKER-USER -i wlp+ -j DROP
+
+     mkdir -p /etc/iptables || true
+     iptables-save > /etc/iptables/iptables.rules
+
+     systemctl enable iptables.service
+     systemctl start iptables.service
+   #+end_src
+
+** Make fonts great again
+
+   #+NAME: iosevka_font_version
+    : 3.4.6
+
+   Download iosevka:
+
+   #+begin_src shell :var iosevka_font_version=iosevka_font_version
+     mkdir -p ~/.fonts
+     cd ~/.fonts
+     curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
+   #+end_src
+
+   Install packages ~ttf-hanazono~, a japanese font needed for
+   /shrugging/.
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman --noconfirm -Sy ttf-hanazono
+   #+END_SRC
+
+   Update cache:
+
+   #+BEGIN_SRC shell :results output silent
+     fc-cache -fv
+   #+END_SRC
+
+   Now tangle the fonts configuration.
+
+   #+BEGIN_SRC xml :tangle ~/.config/fontconfig/fonts.conf :mkdirp yes
+   <?xml version='1.0'?>
+   <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+   <fontconfig>
+   <match target="pattern">
+     <test qual="any" name="family"><string>SFMono</string></test>
+     <edit name="family" mode="assign" binding="same">
+       <string>Monaco</string>
+     </edit>
+   </match>
+   <match target="pattern">
+     <test qual="any" name="family"><string>Consolas</string></test>
+     <edit name="family" mode="assign" binding="same">
+       <string>Iosevka Fixed SS12</string>
+     </edit>
+   </match>
+   <match target="pattern">
+     <test qual="any" name="family"><string>monospace</string></test>
+     <edit name="family" mode="assign" binding="same">
+       <string>Iosevka Fixed SS12</string>
+     </edit>
+   </match>
+   </fontconfig>
+   #+END_SRC
+
+   Run this
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -Sy --noconfirm freetype2 || true
+
+     echo 'export FREETYPE_PROPERTIES="truetype:interpreter-version=38"' >> /etc/profile.d/freetype2.sh
+
+     ln -s /etc/fonts/conf.avail/10-hinting-slight.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf         || true
+     ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf          || true
+     ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d/11-lcdfilter-default.conf  || true
+   #+END_SRC
+
+** Setup X
+
+   Tangle Xresources:
+
+   #+BEGIN_SRC conf :tangle ~/.Xresources
+     ! Every shell is a login shell by default (for inclusion of all necessary environment variables)
+     xterm*loginshell: true
+
+     ! I like a LOT of scrollback...
+     xterm*savelines: 16384
+
+     ! double-click to select whole URLs :D
+     xterm*charClass: 33:48,36-47:48,58-59:48,61:48,63-64:48,95:48,126:48
+
+     ! DOS-box colours...
+     xterm*foreground: rgb:a8/a8/a8
+     xterm*background: rgb:00/00/00
+     xterm*color0: rgb:00/00/00
+     xterm*color1: rgb:a8/00/00
+     xterm*color2: rgb:00/a8/00
+     xterm*color3: rgb:a8/54/00
+     xterm*color4: rgb:00/00/a8
+     xterm*color5: rgb:a8/00/a8
+     xterm*color6: rgb:00/a8/a8
+     xterm*color7: rgb:a8/a8/a8
+     xterm*color8: rgb:54/54/54
+     xterm*color9: rgb:fc/54/54
+     xterm*color10: rgb:54/fc/54
+     xterm*color11: rgb:fc/fc/54
+     xterm*color12: rgb:54/54/fc
+     xterm*color13: rgb:fc/54/fc
+     xterm*color14: rgb:54/fc/fc
+     xterm*color15: rgb:fc/fc/fc
+
+     ! right hand side scrollbar...
+     xterm*rightScrollBar: true
+     xterm*ScrollBar: true
+
+     ! remove stupid characters
+     XTerm*metaSendsEscape: true
+
+     Xterm*locale: true
+     Xterm*utf8: 1
+
+     Xcursor.size: 16
+
+     ! URxvt
+
+     ! General settings
+     URxvt.saveLines: 2000
+     URxvt.scrollBar: False
+     URxvt.scrollstyle: rxvt
+     URxvt.urgentOnBell: True
+     URxvt.cursorBlink: False
+     URxvt.iso14755: False
+     URxvt.iso14755_52: False
+
+     ! Extensions
+     URxvt.perl-ext-common: default,clipboard,keyboard-select,url-select
+     URxvt.urlLauncher: xdg-open
+     URxvt.urlButton: 1
+     URxvt.underlineURLs: True
+
+     URxvt.copyCommand:  xclip -i -selection clipboard
+     URxvt.pasteCommand: xclip -o -selection clipboard
+
+     ! Keybindings
+     URxvt.keysym.Mod4-c: perl:clipboard:copy
+     URxvt.keysym.Mod4-v: perl:clipboard:paste
+     URxvt.keysym.Mod4-C-v: perl:clipboard:paste_escaped
+     URxvt.keysym.M-c: perl:clipboard:copy
+     URxvt.keysym.M-v: perl:clipboard:paste
+     URxvt.keysym.M-C-v: perl:clipboard:paste_escaped
+     URxvt.keysym.M-Escape: perl:keyboard-select:activate
+     URxvt.keysym.C-Escape: perl:keyboard-select:activate
+     URxvt.keysym.M-u: perl:url-select:select_next
+
+     ! Tango theme
+
+     URxvt.background: #1C1C1C
+     URxvt.foreground: #DEDEDE
+
+     ! black
+     URxvt.color0  : #2E3436
+     URxvt.color8  : #555753
+     ! red
+     URxvt.color1  : #CC0000
+     URxvt.color9  : #EF2929
+     ! green
+     URxvt.color2  : #4E9A06
+     URxvt.color10 : #8AE234
+     ! yellow
+     URxvt.color3  : #C4A000
+     URxvt.color11 : #FCE94F
+     ! blue
+     URxvt.color4  : #3465A4
+     URxvt.color12 : #729FCF
+     ! magenta
+     URxvt.color5  : #75507B
+     URxvt.color13 : #AD7FA8
+     ! cyan
+     URxvt.color6  : #06989A
+     URxvt.color14 : #34E2E2
+     ! white
+     URxvt.color7  : #D3D7CF
+     URxvt.color15 : #EEEEEC
+   #+END_SRC
+
+** Setup stumpwm
+
+   Make sure we have sbcl and build tools.
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman --noconfirm -Sy sbcl base-devel
+   #+END_SRC
+
+   Make sure quicklisp is installed and install the CL dependencies for stumpwm:
+
+   - clx-truetype
+   - clx
+   - cl-ppcre
+   - alexandria
+
+   Now clone the project.
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     git clone git@github.com:stumpwm/stumpwm.git
+   #+END_SRC
+
+   And build it:
+
+   #+BEGIN_SRC shell :dir ~/reps/stumpwm :results output silent
+     autoconf
+     ./configure
+     make clean && make stumpwm
+   #+END_SRC
+
+   Finally, install.
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/stumpwm :results output silent
+     make install
+   #+END_SRC
+
+   Clone the config and create a symlink to it so stumpwm can find it.
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     git clone git@github.com:caioaao/stumpwm.d.git
+     ln -s ~/reps/stumpwm.d ~/.stumpwm.d
+   #+END_SRC
+
+*** twmn
+
+    Install dependencies:
+
+    #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     # twmn dependencies
+     pacman --noconfirm -Sy boost boost-libs
+     pacman --noconfirm -Sy qt5-base qt5-x11extras
+   #+END_SRC
+
+    Now clone and build.
+
+    #+BEGIN_SRC shell :dir ~/reps :results output silent
+      git clone git@github.com:sboli/twmn.git || true
+      cd twmn
+      git checkout master && git pull origin master
+      qmake
+      make
+    #+END_SRC
+
+    And install.
+
+    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/twmn :results output silent
+      make install
+    #+END_SRC
+
+** Locale and aspell
+
+   Set system language:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     localectl set-locale LANG=en_US.UTF-8
+   #+END_SRC
+
+   Keyboard config:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   setxkbmap -option ctrl:swapcaps
+   #+END_SRC
+
+   Installing aspell:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman --noconfirm -Sy aspell aspell-en
+   #+END_SRC
+
+** tmux
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm tmux
+   #+end_src
+
+   #+begin_src conf :tangle ~/.tmux.conf
+   unbind-key C-b
+   set -g prefix 'C-q'
+   bind-key 'C-q' send-prefix
+   set-window-option -g mode-keys vi
+   bind-key -T copy-mode-vi v send -X begin-selection
+   bind-key -T copy-mode-vi V send -X select-line
+   bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+   #+end_src
+
+** Redshift (screen temperature)
+
+   Install it
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman --noconfirm -Sy redshift
+   #+END_SRC
+
+   Create the config dir
+
+   #+BEGIN_SRC shell :results output silent
+     mkdir ~/.config/redshift
+   #+END_SRC
+
+   Tangle the config
+
+   #+BEGIN_SRC conf :tangle ~/.config/redshift/redshift.conf
+     ; Global settings for redshift
+     [redshift]
+     ; Set the day and night screen temperatures
+     temp-day=5700
+     temp-night=3500
+
+     ; Disable the smooth fade between temperatures when Redshift starts and stops.
+     ; 0 will cause an immediate change between screen temperatures.
+     ; 1 will gradually apply the new screen temperature over a couple of seconds.
+     fade=1
+
+     ; Solar elevation thresholds.
+     ; By default, Redshift will use the current elevation of the sun to determine
+     ; whether it is daytime, night or in transition (dawn/dusk). When the sun is
+     ; above the degrees specified with elevation-high it is considered daytime and
+     ; below elevation-low it is considered night.
+     ;elevation-high=3
+     ;elevation-low=-6
+
+     ; Custom dawn/dusk intervals.
+     ; Instead of using the solar elevation, the time intervals of dawn and dusk
+     ; can be specified manually. The times must be specified as HH:MM in 24-hour
+     ; format.
+     ;dawn-time=6:00-7:45
+     ;dusk-time=18:35-20:15
+
+     ; Set the screen brightness. Default is 1.0.
+     ;brightness=0.9
+     ; It is also possible to use different settings for day and night
+     ; since version 1.8.
+     ;brightness-day=0.7
+     ;brightness-night=0.4
+     ; Set the screen gamma (for all colors, or each color channel
+     ; individually)
+     gamma=0.8
+     ;gamma=0.8:0.7:0.8
+     ; This can also be set individually for day and night since
+     ; version 1.10.
+     ;gamma-day=0.8:0.7:0.8
+     ;gamma-night=0.6
+
+     ; Set the location-provider: 'geoclue2', 'manual'
+     ; type 'redshift -l list' to see possible values.
+     ; The location provider settings are in a different section.
+     location-provider=manual
+
+     ; Set the adjustment-method: 'randr', 'vidmode'
+     ; type 'redshift -m list' to see all possible values.
+     ; 'randr' is the preferred method, 'vidmode' is an older API.
+     ; but works in some cases when 'randr' does not.
+     ; The adjustment method settings are in a different section.
+     adjustment-method=randr
+
+     ; Configuration of the location-provider:
+     ; type 'redshift -l PROVIDER:help' to see the settings.
+     ; ex: 'redshift -l manual:help'
+     ; Keep in mind that longitudes west of Greenwich (e.g. the Americas)
+     ; are negative numbers.
+     [manual]
+     lat=-23.5475
+     lon=-46.63611
+
+     ; Configuration of the adjustment-method
+     ; type 'redshift -m METHOD:help' to see the settings.
+     ; ex: 'redshift -m randr:help'
+     ; In this example, randr is configured to adjust only screen 0.
+     ; Note that the numbering starts from 0, so this is actually the first screen.
+     ; If this option is not specified, Redshift will try to adjust _all_ screens.
+     [randr]
+     screen=0
+   #+END_SRC
+
+   Enable the service:
+
+   #+BEGIN_SRC shell :results output silent
+     systemctl --user enable redshift.service
+   #+END_SRC
+
+   Optionally, start the service:
+
+   #+BEGIN_SRC shell :results output silent
+     systemctl --user start redshift.service
+   #+END_SRC
+
+** Wallpaper
+
+   Let's download one from unsplash:
+
+   #+begin_src sh :dir ~/Pictures
+   mkdir -p wallpapers && cd wallpapers
+   curl -o mountain1.jpg -fsSL https://unsplash.com/photos/1527pjeb6jg/download?force=true&w=2400
+   #+end_src
+
+   Now we can set it:
+
+   #+begin_src shell
+   xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitorHDMI-1-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+   xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitoreDP-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+   #+end_src
+
+** Web browser
+
+   I want to experiment with Vivaldi.
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm vivaldi
+   #+end_src
+
+** Audio settings
+
+   Better audio with pulseaudio.
+
+   Let's configure the daemon:
+
+   #+begin_src conf :tangle ~/.config/pulse/daemon.conf
+     default-sample-format = float32le
+     default-sample-rate = 48000
+     alternate-sample-rate = 44100
+     default-sample-channels = 2
+     default-channel-map = front-left,front-right
+     default-fragments = 2
+     default-fragment-size-msec = 125
+     resample-method = soxr-vhq
+     enable-lfe-remixing = no
+     high-priority = yes
+     nice-level = -11
+     realtime-scheduling = yes
+     realtime-priority = 9
+     rlimit-rtprio = 9
+     daemonize = no
+   #+end_src
+
+   Now the default profile:
+
+   #+begin_src conf :tangle ~/.config/pulse/default.pa
+   #!/usr/bin/pulseaudio -nF
+   #
+   # This file is part of PulseAudio.
+   #
+   # PulseAudio is free software; you can redistribute it and/or modify it
+   # under the terms of the GNU Lesser General Public License as published by
+   # the Free Software Foundation; either version 2 of the License, or
+   # (at your option) any later version.
+   #
+   # PulseAudio is distributed in the hope that it will be useful, but
+   # WITHOUT ANY WARRANTY; without even the implied warranty of
+   # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   # General Public License for more details.
+   #
+   # You should have received a copy of the GNU Lesser General Public License
+   # along with PulseAudio; if not, see <http://www.gnu.org/licenses/>.
+
+   # This startup script is used only if PulseAudio is started per-user
+   # (i.e. not in system mode)
+
+   .fail
+
+   ### Automatically restore the volume of streams and devices
+   load-module module-device-restore
+   load-module module-stream-restore
+   load-module module-card-restore
+
+   ### Automatically augment property information from .desktop files
+   ### stored in /usr/share/application
+   load-module module-augment-properties
+
+   ### Should be after module-*-restore but before module-*-detect
+   load-module module-switch-on-port-available
+
+   ### Use hot-plugged devices like Bluetooth or USB automatically (LP: #1702794)
+   # .ifexists module-switch-on-connect.so
+   # load-module module-switch-on-connect
+   # .endif
+
+   ### Load audio drivers statically
+   ### (it's probably better to not load these drivers manually, but instead
+   ### use module-udev-detect -- see below -- for doing this automatically)
+   #load-module module-alsa-sink
+   #load-module module-alsa-source device=hw:1,0
+   #load-module module-oss device="/dev/dsp" sink_name=output source_name=input
+   #load-module module-oss-mmap device="/dev/dsp" sink_name=output source_name=input
+   #load-module module-null-sink
+   #load-module module-pipe-sink
+
+   ### Automatically load driver modules depending on the hardware available
+   .ifexists module-udev-detect.so
+   load-module module-udev-detect
+   .else
+   ### Use the static hardware detection module (for systems that lack udev support)
+   load-module module-detect
+   .endif
+
+   ### Automatically connect sink and source if JACK server is present
+   .ifexists module-jackdbus-detect.so
+   .nofail
+   load-module module-jackdbus-detect channels=2
+   .fail
+   .endif
+
+   ### Automatically load driver modules for Bluetooth hardware
+   .ifexists module-bluetooth-policy.so
+   load-module module-bluetooth-policy
+   .endif
+
+   .ifexists module-bluetooth-discover.so
+   load-module module-bluetooth-discover
+   .endif
+
+   ### Load several protocols
+   .ifexists module-esound-protocol-unix.so
+   load-module module-esound-protocol-unix
+   .endif
+   load-module module-native-protocol-unix
+
+   ### Network access (may be configured with paprefs, so leave this commented
+   ### here if you plan to use paprefs)
+   #load-module module-esound-protocol-tcp
+   #load-module module-native-protocol-tcp
+   #load-module module-zeroconf-publish
+
+   ### Load the RTP receiver module (also configured via paprefs, see above)
+   #load-module module-rtp-recv
+
+   ### Load the RTP sender module (also configured via paprefs, see above)
+   #load-module module-null-sink sink_name=rtp format=s16be channels=2 rate=44100 sink_properties="device.description='RTP Multicast Sink'"
+   #load-module module-rtp-send source=rtp.monitor
+
+   ### Load additional modules from GSettings. This can be configured with the paprefs tool.
+   ### Please keep in mind that the modules configured by paprefs might conflict with manually
+   ### loaded modules.
+   .ifexists module-gsettings.so
+   .nofail
+   load-module module-gsettings
+   .fail
+   .endif
+
+
+   ### Automatically restore the default sink/source when changed by the user
+   ### during runtime
+   ### NOTE: This should be loaded as early as possible so that subsequent modules
+   ### that look up the default sink/source get the right value
+   load-module module-default-device-restore
+
+   ### Make sure we always have a sink around, even if it is a null sink.
+   load-module module-always-sink
+
+   ### Honour intended role device property
+   load-module module-intended-roles
+
+   ### Automatically suspend sinks/sources that become idle for too long
+   load-module module-suspend-on-idle
+
+   ### If autoexit on idle is enabled we want to make sure we only quit
+   ### when no local session needs us anymore.
+   .ifexists module-console-kit.so
+   load-module module-console-kit
+   .endif
+   .ifexists module-systemd-login.so
+   load-module module-systemd-login
+   .endif
+
+   ### Enable positioned event sounds
+   load-module module-position-event-sounds
+
+   ### Cork music/video streams when a phone stream is active
+   load-module module-role-cork
+
+   ### Block audio recording for snap confined packages unless they have
+   ### the "pulseaudio" or "audio-record" interfaces plugged.
+   .ifexists module-snap-policy.so
+   load-module module-snap-policy
+   .endif
+
+   ### Modules to allow autoloading of filters (such as echo cancellation)
+   ### on demand. module-filter-heuristics tries to determine what filters
+   ### make sense, and module-filter-apply does the heavy-lifting of
+   ### loading modules and rerouting streams.
+   load-module module-filter-heuristics
+   load-module module-filter-apply
+
+   ### Make some devices default
+   set-default-sink alsa_output.pci-0000_00_1f.3.analog-stereo
+   #set-default-source input
+   #+end_src
+
+   Configure ALSA to use PulseAudio hw plugin:
+
+   #+begin_src conf :tangle ~/.asoundrc
+     pcm.!default {
+        type plug
+        slave.pcm hw
+     }
+   #+end_src
+
+   Now restart alsa and pulseaudio
+
+   #+begin_src shell
+   pulseaudio -k
+   alsactl kill rescan
+   #+end_src
+
+*** EasyEffects
+
+    #+begin_src shell :dir /sudo::
+    pamac install --no-confirm easyeffects
+    #+end_src
+
+    Now download the preset and load it:
+
+    #+begin_src shell :dir ~/.config/easyeffects/output
+    curl -fsSL https://gist.githubusercontent.com/caioaao/59e907bb3250feed5b99424f0769b1c2/raw/f70a7c2493ff8307ae88204cc5dc36ddcf3e8786/Audio-Technica%2520ATH-M40x%2520ParametricEQ.json > 'Audio-Technica ATH-M40x ParametricEQ.json'
+    easyeffects -p 'Audio-Technica ATH-M40x ParametricEQ'
+    #+end_src
+
+    PS: the preset is based on the config found here: https://github.com/jaakkopasanen/AutoEq
+
+** Spotify
+
+   First updated the GPG key:
+
+   #+begin_src shell
+   curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | gpg --import -
+   #+end_src
+
+   Now run the ~pamac build spotify~ on the shell.
+
+* Development
+
+** direnv
+
+   Install it:
+
+   #+begin_src sh :dir /sudo::
+   pamac install --no-confirm direnv
+   #+end_src
+
+   Hook it to shell:
+
+   #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh
+   #!/usr/bin/env bash
+
+   eval "$(direnv hook zsh)"
+   #+end_src
+
+** Git
+
+   Basic configs
+
+   #+BEGIN_SRC conf :tangle ~/.gitconfig
+     [user]
+     name="Caio Oliveira"
+     email=caioaao@gmail.com
+     signingKey=DD90B67479EFA704
+
+     [core]
+     editor=emacs
+
+     [commit]
+     gpgsign=true
+   #+END_SRC
+
+   Also add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
+
+   #+begin_src shell
+   ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+   #+end_src
+
+** asdf
+
+   asdf is a tool to manage runtimes.
+
+   First clone the repo:
+
+   #+begin_src sh
+     git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0
+   #+end_src
+
+   Now add the completions and the executable to dot files:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp true
+     #!/usr/bin/env bash
+     . $HOME/.asdf/asdf.sh
+     . $HOME/.asdf/completions/asdf.bash
+   #+end_src
+
+   And let's add some plugins:
+
+   #+begin_src shell
+   . $HOME/.asdf/asdf.sh
+   asdf plugin-add python
+   #+end_src
+
+** Upgrade org-mode
+
+   (more info [[http://orgmode.org/manual/Installation.html][here]])
+
+   First, clone the repo
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d 'org-mode' ] || git clone git://orgmode.org/org-mode.git
+   #+END_SRC
+
+   Now update the repo and compile the project:
+
+   #+BEGIN_SRC shell :dir ~/reps/org-mode :results output silent
+     git checkout master && git pull
+
+     make autoloads
+     make
+   #+END_SRC
+
+   And install
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/org-mode :results output silent
+     make install
+   #+END_SRC
+
+** Clojure
+
+   Install the Clojure package
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -Sy --noconfirm clojure
+   #+END_SRC
+
+   Download leiningen
+
+   #+BEGIN_SRC shell :dir ~/utils/bin :results output silent
+     curl https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein > lein
+     chmod +x lein
+
+     # lein self-install
+     lein
+   #+END_SRC
+
+   Also tangle the user ~profiles.clj~
+
+   #+BEGIN_SRC clojure :tangle ~/.lein/profiles.clj
+     {:user {:plugins      [[lein-pprint "1.1.2"]
+                            [com.jakemccrary/lein-test-refresh "0.23.0" :exclusions [org.clojure/tools.namespace]]
+                            [refactor-nrepl "2.4.0"]
+                            [cider/cider-nrepl "0.19.0-SNAPSHOT"]]
+             :dependencies [[nrepl "0.4.5"]
+                            [spyscope "0.1.6"]]
+             :injections   [(require 'spyscope.core)]
+             :test-refresh {:notify-command ["notify-send" "-t" "1000"]
+                            :quiet          true
+                            :changes-only   true}}}
+   #+END_SRC
+
+** Python
+
+*** conda
+
+    Download, install anaconda and add path to ~/.localrc
+
+    #+BEGIN_SRC shell :dir /tmp :results output silent
+      wget https://repo.continuum.io/archive/Anaconda3-4.4.0-Linux-x86_64.sh
+    #+END_SRC
+
+    Run ~bash /tmp/Anaconda3-4.4.0-Linux-x86_64.sh~. It's an interactive script,
+    so it can't be run here :(
+
+    Add to path and set ~WORKON_HOME~.
+
+    #+BEGIN_SRC shell :results output silent
+      echo "export PATH=${HOME}/anaconda3/bin:\$PATH" >> ~/.localrc
+      echo "export WORKON_HOME=${HOME}/anaconda3/envs" >> ~/.localrc
+    #+END_SRC
+
+*** Emacs config
+
+    First install packages with python
+
+    #+BEGIN_SRC sh :dir /sudo:: :results output silent
+    pip install rope
+    pip install jedi
+    pip install flake8
+    pip install importmagic
+    #+END_SRC
+
+    Now, install elpy
+
+    #+BEGIN_SRC elisp :results output silent
+      (package-refresh-contents)
+      (package-install 'elpy)
+    #+END_SRC
+
+** NodeJS
+
+   #+NAME: node-nvm-version
+   : v0.38.0
+
+   #+NAME: default-nodejs-version
+   : 17.3.0
+
+   Installing NVM
+
+   #+begin_src shell :var version=node-nvm-version
+   git clone git@github.com:nvm-sh/nvm.git ${HOME}/.nvm
+   cd ${HOME}/.nvm
+   git checkout ${version}
+   chmod +x nvm.sh
+   #+end_src
+
+   Now tangle this to add it to zsh:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp true
+   export NVM_DIR="$HOME/.nvm"
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  --no-use
+   #+end_src
+
+   We can now install nodejs
+
+   #+begin_src shell :var node_version=default-nodejs-version
+   \. "$HOME/.nvm/nvm.sh"  --no-use
+   nvm install ${node_version}
+   #+end_src
+
+   Now let's install yarn
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm yarn
+   #+end_src
+
+   And add yarn's executables to path:
+
+   #+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
+     export PATH="$PATH:`yarn global bin`"
+   #+end_src
+
+** R
+
+   First, some dependencies.
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   pacman -S R tcl tk
+   #+END_SRC
+
+   Setup config:
+
+   #+BEGIN_SRC R :tangle ~/.Rprofile
+     options(repos=structure(c(CRAN="https://vps.fmvz.usp.br/CRAN/")))
+   #+END_SRC
+
+   Now, useful libraries:
+
+   #+BEGIN_SRC R :results output silent
+     install.packages("tidyverse",
+                      dependencies=TRUE)
+   #+END_SRC
+
+** Rust
+
+   Unfortunatelly, the first command is interactive, so run this on the
+   terminal: ~curl https://sh.rustup.rs -sSf | sh~. It should install everything
+   and add the cargo binary directory to the ~PATH~ env in ~~/.bash_profile~.
+
+   Let's install useful stuff for developing now. We'll be running ~source
+   ~/.cargo/env~ because, as the ~PATH~ was altered in ~~/.bash_profile~, it
+   will only take effect on the next login :\.
+
+   First, racer.
+
+   #+BEGIN_SRC shell :results output silent
+     source ~/.cargo/env
+     cargo install racer
+   #+END_SRC
+
+   For racer to work, we need rust source code.
+
+   #+BEGIN_SRC shell :results output silent
+     source ~/.cargo/env
+     rustup component add rust-src
+   #+END_SRC
+
+   Now, let's set the src env var:
+
+   #+BEGIN_SRC shell :results output silent
+     toolchain=`rustup toolchain list | sed 's/\(.*\) .*/\1/'`
+     echo "RUST_SRC_PATH=${HOME}/.multirust/toolchains/${toolchain}/lib/rustlib/src/rust/src" >> ~/.localrc
+   #+END_SRC
+
+** NVIDIA docker
+
+   Just run ~yaourt -S nvidia-docker~.
+
+** Kubernetes
+
+*** kubectl
+
+    #+NAME: default_kubectl_version
+    : 1.15.11
+
+    Add the plugin to asdf and install the default version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+    asdf plugin-add kubectl
+    asdf install kubectl ${kubectl_version}
+    #+end_src
+
+    Now setup kubectl global version:
+
+    #+begin_src shell :var kubectl_version=default_kubectl_version
+      asdf global kubectl ${kubectl_version}
+    #+end_src
+
+*** Kops
+
+    #+begin_src sh :dir /sudo::/tmp
+      KOPS_VERSION='1.16.0'
+
+      curl -LO https://github.com/kubernetes/kops/releases/download/v${KOPS_VERSION}/kops-linux-amd64
+      chmod 0755 kops-linux-amd64
+      mv kops-linux-amd64 /usr/local/bin/kops-${KOPS_VERSION}
+      ln -sf /usr/local/bin/kops-${KOPS_VERSION} /usr/local/bin/kops
+    #+end_src
+
+*** Minikube
+
+    Taken from [[https://kubernetes.io/docs/tasks/tools/install-minikube/][here]]
+
+    #+NAME: minikube_version
+    : v1.10.1
+
+
+    First install a hypervisor
+
+    #+BEGIN_SRC shell :dir /sudo::
+      apt update && apt install -y virtualbox
+    #+END_SRC
+
+    And now download the static minikube binary and then move it to the bin dir.
+
+    #+BEGIN_SRC shell :dir /tmp :var minikube_version=minikube_version
+      curl -Lo minikube "https://storage.googleapis.com/minikube/releases/${minikube_version}/minikube-linux-amd64" \
+        && chmod +x minikube
+    #+END_SRC
+
+    #+BEGIN_SRC shell :dir /sudo:: :var minikube_version=minikube_version
+      mv /tmp/minikube "/usr/local/bin/minikube-${minikube_version}"
+      ln -sf "/usr/local/bin/minikube-${minikube_version}" /usr/local/bin/minikube
+    #+END_SRC
+
+*** Linkerd CLI
+
+    Download, install it, and create a symlink to our local bin dir
+
+    #+BEGIN_SRC shell
+      curl -sL https://run.linkerd.io/install | sh
+      ln -s ~/.linkerd2/bin/linkerd ~/utils/bin/linkerd
+    #+END_SRC
+
+*** Istio
+
+    Download and install:
+
+    #+BEGIN_SRC shell :dir /sudo::
+      ISTIO_VERSION=1.5.1
+      mkdir /opt/istio || true
+      chmod -R 0755 /opt/istio
+      cd /opt/istio
+      curl -L https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz | tar xz
+      ln -sf /opt/istio/istio-${ISTIO_VERSION}/bin/istioctl /usr/local/bin/istioctl
+      rm -f /opt/istio/istio
+      ln -sf /opt/istio/istio-${ISTIO_VERSION} /opt/istio/istio
+    #+END_SRC
+
+*** Helm
+
+    Download and install:
+
+    #+BEGIN_SRC shell :dir /sudo::
+      mkdir /opt/helm || true
+      chmod 0755 /opt/helm
+      cd /opt/helm
+      curl -L https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar xz
+      mv linux-amd64 helm-3.0.2
+      ln -sf /opt/helm/helm-3.0.2/helm /usr/local/bin/helm
+    #+END_SRC
+
+*** Kustomize
+
+    Just download the binary:
+
+    #+begin_src shell :dir /tmp
+      wget https://github.com/kubernetes-sigs/kustomize/releases/download/v2.0.2/kustomize_2.0.2_linux_amd64
+    #+end_src
+
+    And configure it to be found:
+
+    #+begin_src shell :dir /sudo::
+      mkdir -p /opt/kustomize || true
+      mv /tmp/kustomize_2.0.2_linux_amd64 /opt/kustomize/kustomize-2.0.2
+      chmod -R 0755 /opt/kustomize
+      chmod +x /opt/kustomize/kustomize-2.0.2
+      ln -sf /opt/kustomize/kustomize-2.0.2 /usr/local/bin/kustomize
+    #+end_src
+
+*** kube-capacity
+
+    #+begin_src sh :dir /tmp
+      curl -fsSL https://github.com/robscott/kube-capacity/releases/download/0.4.0/kube-capacity_0.4.0_Linux_x86_64.tar.gz | tar -xz
+    #+end_src
+
+    #+begin_src sh :dir /sudo::
+      mv /tmp/kube-capacity /usr/local/bin
+      chown root:root /usr/local/bin/kube-capacity
+    #+end_src
+
+** Terraform
+
+   #+NAME: terraform_version
+    : 0.12.25
+
+   Download, extract and then move to appropriate location.
+
+   #+begin_src shell :dir /tmp :var version=terraform_version
+     wget https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip
+     unzip terraform_${version}_linux_amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=terraform_version
+     mv /tmp/terraform /usr/local/bin/terraform-${version}
+     ln -sf /usr/local/bin/terraform-${version} /usr/local/bin/terraform
+   #+end_src
+
+   Now let's add some aliases to our shell:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-terraform.sh
+     #!/usr/bin/env bash
+     alias tfplan='terraform plan -out=plan.tfplan'
+     alias tfapply='terraform apply --refresh=false plan.tfplan'
+     alias tfrapply='terraform apply plan.tfplan'
+   #+end_src
+
+** git-lfs
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm git-lfs
+   #+end_src
+
+** golang
+
+   First install go
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm go
+   #+end_src
+   And add go executables to our path:
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+     #!/usr/bin/env bash
+
+     export GOROOT=/opt/go
+     export GOPATH=~/go
+     export PATH="$PATH:$GOROOT/bin"
+     export PATH="$PATH:$PATH/bin"
+     export PATH="$PATH:$GOPATH/bin"
+   #+end_src
+
+   Now the goodies:
+
+   #+begin_src shell
+   go get golang.org/x/tools/cmd/godoc
+   go get golang.org/x/tools/cmd/goimports
+   go get github.com/rogpeppe/godef
+   go get golang.org/x/tools/gopls
+   #+end_src
+
+** protobuf
+
+   Download, extract and configure:
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm protobuf
+   #+end_src
+
+** Alacritty
+
+   #+begin_src shell :dir /sudo::
+     pamac install --no-confirm alacritty
+   #+end_src
+
+   Tangle the config:
+
+   #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
+   font:
+     # The normal (roman) font face to use.
+     normal:
+       family: Iosevka Fixed SS12
+       style: Regular
+
+     # The bold font face
+     bold:
+       family: Iosevka Fixed SS12
+       style: Bold
+
+     # The italic font face
+     italic:
+       family: Iosevka Fixed SS12
+       style: Italic
+
+     # Point size of the font
+     size: 12.0
+
+   colors:
+     primary:
+       background: '#333333'
+
+   window:
+     decorations: none
+     padding:
+       x: 5
+       y: 10
+   #+end_src
+
+** gcloud
+
+   #+NAME: gcloud_sdk_version
+   : 368.0.0
+
+   First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
+
+   #+begin_src shell
+   asdf install python 3.9.9
+   #+end_src
+
+   #+begin_src shell :dir /tmp :var version=gcloud_sdk_version
+   curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
+   mv /tmp/google-cloud-sdk /opt/google-cloud-sdk-${version}
+   rm -rf /opt/google-cloud-sdk || true
+   ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
+   #+end_src
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
+   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+   if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
+   if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
+   #+end_src
+
+   #+begin_src shell
+   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+   . '/opt/google-cloud-sdk/path.zsh.inc'
+   gcloud config set disable_usage_reporting true
+   #+end_src
+
+** pulumi
+
+   First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
+
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp true
+   export PATH=$PATH:$HOME/.pulumi/bin
+   #+end_src
+
+   #+begin_src shell
+   export PATH=$PATH:$HOME/.pulumi/bin
+   curl -fsSL https://get.pulumi.com | sh
+   #+end_src
+
+** ngrok
+
+   #+begin_src sh :dir /tmp
+   wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo::
+   mkdir -p /opt/ngrok
+   cd /opt/ngrok
+   unzip /tmp/ngrok-stable-linux-amd64.zip
+   chmod -R 0755 /opt/ngrok
+   chmod +x /opt/ngrok
+   ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
+   #+end_src
+
+* Other
+
+** Setup ~udev~ rule for HDMI cable
+
+   Create script that checks HDMI status and executes xrandr. Remember to change
+   ~DISPLAY~ to match the one used on the machine.
+
+   #+BEGIN_SRC sh :tangle /sudo::/usr/local/bin/toggle_display :tangle-mode (identity #o755) :padline no
+     #!/usr/bin/env bash
+
+     export DISPLAY=":0.0"
+
+     USER=`ps -aux | grep Xorg | cut -d\  -f 1 | head -n1`
+
+     export XAUTHORITY="/home/${USER}/.Xauthority"
+
+     CARDS=("card0" "card1")
+
+     for CARD in ${CARDS[*]}; do
+         HDMI_STATUS_PATH="/sys/class/drm/$CARD-HDMI-A-1/status"
+         if [ -f $HDMI_STATUS_PATH ]; then
+             HDMI_STATUS=`cat $HDMI_STATUS_PATH`
+
+             # echo "------------------------------------------------" >> /tmp/toggle_monitor.log
+             # echo "$(date) - DISPLAY: ${DISPLAY}, HDMI_STATUS: ${HDMI_STATUS}, USER: ${USER}" >> /tmp/toggle_monitor.log
+             xrandr > /dev/null # >> /tmp/toggle_monitor.log
+
+             if [[ ${HDMI_STATUS} == 'connected' ]]; then
+                 # echo "Turning monitor on" >> /tmp/toggle_monitor.log
+                 xrandr --output eDP1 --auto --pos 0x360 --output HDMI1 --auto --pos 1920x0
+             else
+                 # echo "Turning monitor off" >> /tmp/toggle_monitor.log
+                 xrandr --output HDMI1 --off
+             fi
+         fi
+     done
+   #+END_SRC
+
+   Create udev rule:
+
+   #+BEGIN_SRC sh :tangle /sudo::/etc/udev/rules.d/90-monitor.rules :padline no
+     KERNEL=="card0", SUBSYSTEM=="drm", RUN+="/usr/local/bin/toggle_display"
+     KERNEL=="card1", SUBSYSTEM=="drm", RUN+="/usr/local/bin/toggle_display"
+   #+END_SRC
+
+   After tangle, run this to enable the systemd unit and reload udev rules.
+
+   #+BEGIN_SRC sh :dir /sudo::/ :results output silent
+     udevadm control --reload
+   #+END_SRC
+
+** Ledger CLI
+
+   First, let's clone
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     if [ -d 'ledger' ]; then
+         cd ledger
+         git pull origin next
+     else
+         git clone git@github.com:ledger/ledger.git
+     fi
+   #+END_SRC
+
+   Make sure CMake is present:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -Syy --noconfirm cmake
+   #+END_SRC
+
+   Now build. This is also the command for updating it.
+
+   #+BEGIN_SRC shell :dir ~/reps/ledger :results output silent
+     ./acprep update
+   #+END_SRC
+
+   And install:
+
+   #+BEGIN_SRC shell :dir /sudo::~/reps/ledger :results output silent
+   make install
+   #+END_SRC
+
+** Command for gif recording
+
+   Dependencies:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+     pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
+   #+END_SRC
+
+   And then install FFcast:
+
+   #+BEGIN_SRC shell :dir ~/reps :results output silent
+     [ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
+     ./bootstrap
+     ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+     make
+   #+END_SRC
+
+   #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
+     make install
+   #+END_SRC
+
+   #+BEGIN_SRC shell :tangle /sudo::/usr/bin/gifrecord :tangle-mode (identity #o755)
+     #!/bin/bash
+     TMP_AVI=$(mktemp /tmp/outXXXXXXXXXX.avi)
+     ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
+            -video_size %s -i %D+%c -codec:v huffyuv               \
+            -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
+         && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
+   #+END_SRC
+
+** xml-coreutils
+
+   Cool little tools to work with XML files.
+
+   Download, configure and build:
+
+   #+BEGIN_SRC shell :dir /tmp
+     wget https://downloads.sourceforge.net/project/xml-coreutils/xml-coreutils-0.8.1.tar.gz
+     tar xfz xml-coreutils-0.8.1.tar.gz
+     cd xml-coreutils-0.8.1
+     ./configure
+     make
+     make check
+   #+END_SRC
+
+   #+RESULTS:
+
+   Now install
+
+   #+BEGIN_SRC shell :dir /sudo::/tmp/xml-coreutils-0.8.1 :results output silent
+     make install
+   #+END_SRC
+
+** Play DRM content on chromium
+
+   Install ~chromium-widevine~ using yaourt.
