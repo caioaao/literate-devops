@@ -968,6 +968,32 @@ And disable the babel-evaluate thingy that's super annoying:
 
    Now run the ~pamac build spotify~ on the shell.
 
+** Ulauncher
+
+   Install it using ~pamac build ulauncher~. Then, tangle the settings
+
+   #+begin_src json :tangle ~/.config/ulauncher/settings.json :mkdirp true
+   {
+       "blacklisted-desktop-dirs": "/usr/share/locale:/usr/share/app-install:/usr/share/kservices5:/usr/share/fk5:/usr/share/kservicetypes5:/usr/share/applications/screensavers:/usr/share/kde4:/usr/share/mimelnk",
+       "clear-previous-query": true,
+       "disable-desktop-filters": false,
+       "grab-mouse-pointer": false,
+       "hotkey-show-app": "<Super>space",
+       "render-on-screen": "mouse-pointer-monitor",
+       "show-indicator-icon": true,
+       "show-recent-apps": "1",
+       "terminal-command": "",
+       "theme-name": "light"
+   }
+   #+end_src
+
+   And enable ~ulauncher~
+
+   #+begin_src shell
+   systemctl --user enable --now ulauncher
+   systemctl --user start ulauncher
+   #+end_src
+
 * Development
 
 ** direnv
