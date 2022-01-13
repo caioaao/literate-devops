@@ -234,6 +234,19 @@
    #+begin_src shell
    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
    #+end_src
+** Ag
+
+*** Pop OS
+
+    #+begin_src shell :dir /sudo::
+    apt-get install silversearcher-ag
+    #+end_src
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pamac install --no-confirm the_silver_searcher
+    #+end_src
 
 * Security
 ** Yubikey
@@ -973,6 +986,28 @@
     #+end_src
 
 * Other
+
+** Autojump
+
+*** Install
+
+**** Arch Linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm zoxide
+     #+end_src
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+     apt install -y zoxide
+     #+end_src
+
+*** Configure
+
+    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-zoxide.sh
+    eval "$(zoxide init zsh)"
+    #+end_src
 
 ** Command for gif recording
 
