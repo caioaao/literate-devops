@@ -129,7 +129,7 @@
              pip
              lein
              command-not-found
-             autojump
+             zoxide
              emacs
              archlinux
              common-aliases
