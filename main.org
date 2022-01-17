@@ -232,8 +232,11 @@
    Add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
 
    #+begin_src shell
+   mkdir -p ~/.ssh
+   touch ~/.ssh/known_hosts
    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
    #+end_src
+
 ** Ag
 
 *** Pop OS
@@ -247,6 +250,25 @@
     #+begin_src shell :dir /sudo::
     pamac install --no-confirm the_silver_searcher
     #+end_src
+
+* Desktop Environment
+
+** Enlightenment
+
+   First install enlightenment and Entrance:
+
+   #+begin_src shell :dir /sudo::
+   pacman -Sy --noconfirm enlightenment
+   pacman -Sy --noconfirm --asdeps meson
+   #+end_src
+
+   Now build Entrance running ~pamac build entrance-git~.
+
+   Finally, enable entrance:
+   #+begin_src shell :dir /sudo::
+   systemctl enable entrance.service --force
+   #+end_src
+
 
 * Security
 ** Yubikey
@@ -511,7 +533,7 @@
 
 *** Configure
 
-    #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh
+    #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh :mkdirp yes
     #!/usr/bin/env bash
 
     eval "$(direnv hook zsh)"
@@ -772,6 +794,7 @@
    First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
 
    #+begin_src shell
+   asdf plugin-add python
    asdf install python 3.9.9
    #+end_src
 
@@ -838,7 +861,6 @@
    cd ~/.fonts
    curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
    #+end_src
-
 
    Update cache:
 
