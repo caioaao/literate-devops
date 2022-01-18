@@ -258,20 +258,40 @@
 
 *** Arch linux
 
+    More important information [[https://wiki.archlinux.org/title/System76_Oryx_Pro][here]].
+
     Install dependencies:
 
     #+begin_src shell :dir /sudo::
     pacman -Sy --noconfirm --needed base-devel git linux515-headers rust
     #+end_src
 
+    Import a PGP key that is needed for system76-io-dkms package:
+
+    #+begin_src shell
+    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys E988B49EE78A7FB1
+    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 87F211AF2BE4C2FE
+    #+end_src
+
     Now run the following in a terminal. The order here is important.
 
     #+begin_src shell
     pamac build system76-firmware
-    pamac build system76-firmware-daemon firmware-manager \
-          system76-dkms system76-acpi-dkms system76-io-dkms \
-          system76-power system76-driver \
-          sys76-kb
+    pamac build system76-firmware-daemon
+    pamac build firmware-manager
+    pamac build system76-dkms
+    pamac build system76-acpi-dkms
+    pamac build system76-power
+    pamac build system76-driver
+    pamac build sys76-kb
+    #+end_src
+
+    Finally, enable all services that need to be enabled:
+
+    #+begin_src shell :dir /sudo::
+    systemctl enable --now system76
+    systemctl enable --now system76-firmware-daemon
+    systemctl enable --now system76-power
     #+end_src
 
 * Desktop Environment
