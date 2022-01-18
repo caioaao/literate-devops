@@ -375,8 +375,8 @@
    systemctl enable entrance.service --force
    #+end_src
 
-
 * Security
+
 ** Yubikey
 
 *** Installing manager and dependencies
@@ -810,6 +810,7 @@
     Now the goodies:
 
     #+begin_src shell
+    source ~/.zsh.d/apps.d/10-golang.sh
     go get golang.org/x/tools/cmd/godoc
     go get golang.org/x/tools/cmd/goimports
     go get github.com/rogpeppe/godef
