@@ -212,6 +212,7 @@
 
    #+BEGIN_SRC shell :dir /sudo:: :results output silent
    setxkbmap -option ctrl:swapcaps
+   localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
    #+END_SRC
 
 ** Aspell
@@ -251,7 +252,112 @@
     pamac install --no-confirm the_silver_searcher
     #+end_src
 
+** System76
+
+   Follow [[https://support.system76.com/articles/system76-software][this article first]], and then [[https://support.system76.com/articles/system76-driver/#arch][the driver article]]. The first article install dependencies needed by the driver.
+
+*** Arch linux
+
+    Install dependencies:
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm --needed base-devel git linux515-headers rust
+    #+end_src
+
+    Now run the following in a terminal. The order here is important.
+
+    #+begin_src shell
+    pamac build system76-firmware
+    pamac build system76-firmware-daemon firmware-manager \
+          system76-dkms system76-acpi-dkms system76-io-dkms \
+          system76-power system76-driver \
+          sys76-kb
+    #+end_src
+
 * Desktop Environment
+
+** KDE Plasma
+
+   (Credits to [[https://github.com/shalva97/kde-configuration-files][this repo]] for most of the stuff here)
+
+   First of all, let's backup the original keybinds file:
+   #+begin_src shell
+   cp $HOME/.config/kglobalshortcutsrc "$HOME/.config/kglobalshortcutsrc.`date -u +'%Y-%m-%dT%H:%M:%S'`"
+   #+end_src
+
+   Then remove all existing binds:
+
+   #+begin_src shell
+   sed -i -r 's/=.+,.+,/=none,none,/g' $HOME/.config/kglobalshortcutsrc
+   #+end_src
+
+   Now let's disable touch screen edges:
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateCylinder "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateSphere "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateCylinder "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateSphere "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key BorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key TouchBorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateAll "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateClass "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateAll "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateClass "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderAlternativeActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderAlternativeActivate "9"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Bottom "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomLeft "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomRight "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Left "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Right "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Top "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopLeft "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopRight "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Bottom "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Left "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Right "None"
+   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Top "None"
+   #+end_src
+
+   Basic binds:
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Maximize' 'Meta+m,none,Maximize Window'
+
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Shift+Left,none,Quick Tile Window to the Left'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Shift+Right,none,Quick Tile Window to the Right'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Shift+Top,none,Quick Tile Window to the Top'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Shift+Bottom,none,Quick Tile Window to the Bottom'
+
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows' 'Meta+Tab,Meta+Tab,Walk Through Windows'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows (Reverse)' 'Meta+Shift+Backtab,Meta+Shift+Backtab,Walk Through Windows (Reverse)'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application' 'Meta+`,none,Walk through Windows of Current Application'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application (Reverse)' 'Meta+Shift+`,none,Walk through Windows of Current Application (Reverse)'
+
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Window to Next Screen'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Window to Previous Screen'
+
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group ksmserver --key 'Lock Session' "Meta+l	Meta+Esc	Screensaver,Meta+l	Meta+Esc	Screensaver,Lock Session"
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space\	Search,Meta+Space\	Search,KRunner'
+   #+end_src
+
+   Now logout and back in for the changes to take effect.
+
+** Web browser
+
+   I want to experiment with Vivaldi.
+
+   #+begin_src shell :dir /sudo::
+   pamac install --no-confirm vivaldi
+   #+end_src
 
 ** Enlightenment
 
