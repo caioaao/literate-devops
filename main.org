@@ -884,23 +884,8 @@
 
     #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
     font:
-      # The normal (roman) font face to use.
-      normal:
-        family: Iosevka Fixed SS12
-        style: Regular
-
-      # The bold font face
-      bold:
-        family: Iosevka Fixed SS12
-        style: Bold
-
-      # The italic font face
-      italic:
-        family: Iosevka Fixed SS12
-        style: Italic
-
       # Point size of the font
-      size: 12.0
+      size: 10.0
 
     colors:
       primary:
@@ -978,70 +963,56 @@
 * Cosmetics
 ** Make fonts great again
 
-   #+NAME: iosevka_font_version
-   : 3.4.6
+*** Dependencies
 
-   Download iosevka:
+**** Arch Linux
 
-   #+begin_src shell :var iosevka_font_version=iosevka_font_version
-   mkdir -p ~/.fonts
-   cd ~/.fonts
-   curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
-   #+end_src
+     Install busybox:
 
-   Update cache:
+     #+begin_src shell :dir /sudo::
+     pacman -Sy --noconfirm busybox
+     #+end_src
 
-   #+BEGIN_SRC shell :results output silent
-   fc-cache -fv
-   #+END_SRC
+*** Iosevka
 
-   Now tangle the fonts configuration.
+    #+NAME: iosevka_font_version
+    : 3.4.6
 
-   #+BEGIN_SRC xml :tangle ~/.config/fontconfig/fonts.conf :mkdirp yes
-   <?xml version='1.0'?>
-   <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
-   <fontconfig>
-     <match target="pattern">
-       <test qual="any" name="family"><string>SFMono</string></test>
-       <edit name="family" mode="assign" binding="same">
-         <string>Monaco</string>
-       </edit>
-     </match>
-     <match target="pattern">
-       <test qual="any" name="family"><string>Consolas</string></test>
-       <edit name="family" mode="assign" binding="same">
-         <string>Iosevka Fixed SS12</string>
-       </edit>
-     </match>
-     <match target="pattern">
-       <test qual="any" name="family"><string>monospace</string></test>
-       <edit name="family" mode="assign" binding="same">
-         <string>Iosevka Fixed SS12</string>
-       </edit>
-     </match>
-   </fontconfig>
-   #+END_SRC
+    Download iosevka:
 
-*** Arch Linux
+    #+begin_src shell :var iosevka_font_version=iosevka_font_version
+    mkdir -p ~/.fonts
+    cd ~/.fonts
+    curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
+    #+end_src
 
-    Install packages ~ttf-hanazono~, a japanese font needed for /shrugging/.
+    Update cache:
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-    pacman --noconfirm -Sy ttf-hanazono
+    #+BEGIN_SRC shell :results output silent
+    fc-cache -fv
     #+END_SRC
 
+    We can now set Iosevka as the default monospaced font by tangling this file:
 
-    Run this
+    #+begin_src xml :tangle ~/.config/fontconfig/conf.d/10-iosevka-mono.conf :mkdirp yes
+    <?xml version="1.0"?>
+    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+    <fontconfig>
+      <alias>
+        <family>monospace</family>
+        <prefer>
+          <family>Iosevka Fixed SS12</family>
+        </prefer>
+      </alias>
+      <alias>
+        <family>Iosevka Fixed SS12</family>
+        <default>
+          <family>monospace</family>
+        </default>
+      </alias>
+    </fontconfig>
+    #+end_src
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-    pacman -Sy --noconfirm freetype2 || true
-
-    echo 'export FREETYPE_PROPERTIES="truetype:interpreter-version=38"' >> /etc/profile.d/freetype2.sh
-
-    ln -s /etc/fonts/conf.avail/10-hinting-slight.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf         || true
-    ln -s /etc/fonts/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/10-sub-pixel-rgb.conf          || true
-    ln -s /etc/fonts/conf.avail/11-lcdfilter-default.conf /etc/fonts/conf.d/11-lcdfilter-default.conf  || true
-    #+END_SRC
 
 ** Gnome top bar
 
