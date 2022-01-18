@@ -346,7 +346,7 @@
    kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Top "None"
    #+end_src
 
-   Basic binds:
+   Navigation / window manipulation binds:
 
    #+begin_src shell
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
@@ -364,9 +364,20 @@
 
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Window to Next Screen'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Window to Previous Screen'
+   #+end_src
 
+   Locking screen:
+
+   #+begin_src shell
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group ksmserver --key 'Lock Session' "Meta+l	Meta+Esc	Screensaver,Meta+l	Meta+Esc	Screensaver,Lock Session"
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space\	Search,Meta+Space\	Search,KRunner'
+   #+end_src
+
+   Now application specific binds. Notice the group name is the same as the file under ~/usr/share/applications~.
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space	Search,Meta+Space	Search,KRunner'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'emacs.desktop' --key '_launch' 'Meta+e,Meta+e,Launch Emacs'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'Alacritty.desktop' --key '_launch' 'Meta+t,Meta+t,Launch Terminal'
    #+end_src
 
    Now logout and back in for the changes to take effect.
