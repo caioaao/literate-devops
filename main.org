@@ -1093,6 +1093,13 @@
    ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
    #+end_src
 
+
+** pre-commit
+
+   #+begin_src shell :dir /sudo::
+   pacman -Sy --noconfirm python-pre-commit
+   #+end_src
+
 * Cosmetics
 ** Make fonts great again
 
