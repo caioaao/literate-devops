@@ -372,6 +372,25 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group ksmserver --key 'Lock Session' "Meta+l	Meta+Esc	Screensaver,Meta+l	Meta+Esc	Screensaver,Lock Session"
    #+end_src
 
+   Volume control:
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'decrease_volume' 'Volume Down,Volume Down,Decrease Volume'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_microphone_volume' 'Microphone Volume Up,Microphone Volume Up,Increase Microphone Volume'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_volume' 'Volume Up,Volume Up,Increase Volume'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mic_mute' 'Microphone Mute	Meta+Volume Mute,Microphone Mute	Meta+Volume Mute,Mute Microphone'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mute' 'Volume Mute,Volume Mute,Mute'
+   #+end_src
+
+   And media control:
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'nextmedia' 'Media Next,Media Next,Media playback next'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'playpausemedia' 'Media Play,Media Play,Play/Pause media playback'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'previousmedia' 'Media Previous,Media Previous,Media playback previous'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'stopmedia' 'Media Stop,Media Stop,Stop media playback'
+   #+end_src
+
    Now application specific binds. Notice the group name is the same as the file under ~/usr/share/applications~.
 
    #+begin_src shell
@@ -380,7 +399,11 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'Alacritty.desktop' --key '_launch' 'Meta+t,Meta+t,Launch Terminal'
    #+end_src
 
-   Now logout and back in for the changes to take effect.
+   Now restart ~kglobalaccel~ so changes take effect:
+
+   #+begin_src shell
+   systemctl --user restart plasma-kglobalaccel.service
+   #+end_src
 
 ** Web browser
 
