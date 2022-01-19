@@ -1189,6 +1189,41 @@
 
 * Other
 
+** Spotify
+
+*** Arch Linux
+
+    Import the key:
+
+    #+begin_src shell
+    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 5E3C45D7B312C643
+    #+end_src
+
+    Run ~pamac build spotify~
+
+*** Pop OS
+
+   Add Spotify repository signing keys to be able to verify downloaded packages:
+
+   #+BEGIN_SRC shell :dir /sudo::
+     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+   #+END_SRC
+
+   Then add the repository
+
+   #+BEGIN_SRC shell :dir /sudo::
+     echo deb http://repository.spotify.com stable non-free | tee /etc/apt/sources.list.d/spotify.list
+     apt update
+   #+END_SRC
+
+   And install spotify
+
+   #+BEGIN_SRC shell :dir /sudo::
+     apt install -y spotify-client
+   #+END_SRC
+
+   Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
+
 ** Autojump
 
 *** Install
