@@ -654,7 +654,7 @@
 **** Arch-linux
 
      #+begin_src shell :dir /sudo::
-     pamac install --no-confirm tmux xclip
+     pacman -Sy --noconfirm tmux xclip fzf
      #+end_src
 
 **** Pop-OS
@@ -688,17 +688,13 @@
     bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
     set -g mouse on
 
-    set -g @plugin 'o0th/tmux-nova'
-    set -g @nova-nerdfonts true
-    set -g @nova-nerdfonts-left 
-    set -g @nova-nerdfonts-right 
-    set -g @nova-segment-mode "#{?client_prefix,Ω,ω}"
-    set -g @nova-segment-mode-colors "#50fa7b #282a36"
-    set -g @nova-segments-0-left "mode"
-    set -g @nova-segment-whoami "#(whoami)@#h"
-    set -g @nova-segment-whoami-colors "#50fa7b #282a36"
-    set -g @nova-segments-0-right "whoami"
-    set -g @nova-rows 0
+    set -g @plugin 'wfxr/tmux-fzf-url'
+
+    # theming
+    set -g @plugin 'wfxr/tmux-power'
+    set -g @plugin 'wfxr/tmux-net-speed'
+    set -g @tmux_power_theme 'snow'
+    set -g @tmux_power_show_download_speed true
 
     run '~/.tmux/plugins/tpm/tpm'
     #+end_src
