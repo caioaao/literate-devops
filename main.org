@@ -352,18 +352,18 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Maximize' 'Meta+m,none,Maximize Window'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Shift+Left,none,Quick Tile Window to the Left'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Shift+Right,none,Quick Tile Window to the Right'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Shift+Top,none,Quick Tile Window to the Top'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Shift+Bottom,none,Quick Tile Window to the Bottom'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Ctrl+Left,none,Quick Tile Window to the Left'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Ctrl+Right,none,Quick Tile Window to the Right'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Ctrl+Up,none,Quick Tile Window to the Top'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Ctrl+Down,none,Quick Tile Window to the Bottom'
 
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows' 'Meta+Tab,Meta+Tab,Walk Through Windows'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows (Reverse)' 'Meta+Shift+Backtab,Meta+Shift+Backtab,Walk Through Windows (Reverse)'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application' 'Meta+`,none,Walk through Windows of Current Application'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application (Reverse)' 'Meta+Shift+`,none,Walk through Windows of Current Application (Reverse)'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Window to Next Screen'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Window to Previous Screen'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Shift+Right,none,Window to Next Screen'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Shift+Left,none,Window to Previous Screen'
    #+end_src
 
    Locking screen:
