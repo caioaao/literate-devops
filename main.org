@@ -382,7 +382,7 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mute' 'Volume Mute,Volume Mute,Mute'
    #+end_src
 
-   And media control:
+   Media control:
 
    #+begin_src shell
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'nextmedia' 'Media Next,Media Next,Media playback next'
@@ -397,6 +397,17 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space	Search,Meta+Space	Search,KRunner'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'emacs.desktop' --key '_launch' 'Meta+e,Meta+e,Launch Emacs'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'Alacritty.desktop' --key '_launch' 'Meta+t,Meta+t,Launch Terminal'
+   #+end_src
+
+   Screenshots using Spectacle:
+
+   #+begin_src shell
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'ActiveWindowScreenShot' 'Meta+Print,Meta+Print,Capture Active Window'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'CurrentMonitorScreenShot' 'Ctrl+Print,Ctrl+Print,Capture Current Monitor'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'FullScreenScreenShot' 'Print,Print,Capture Entire Desktop'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'OpenWithoutScreenshot' 'none,none,Launch Spectacle without capturing'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'RectangularRegionScreenShot' 'Shift+Print,Shift+Print,Capture Rectangular Region'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'WindowUnderCursorScreenShot' 'none,none,Capture Window Under Cursor'
    #+end_src
 
    Now restart ~kglobalaccel~ so changes take effect:
