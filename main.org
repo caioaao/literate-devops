@@ -451,6 +451,7 @@
    Now build Entrance running ~pamac build entrance-git~.
 
    Finally, enable entrance:
+
    #+begin_src shell :dir /sudo::
    systemctl enable entrance.service --force
    #+end_src
@@ -889,7 +890,7 @@
 
    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp true
    export NVM_DIR="$HOME/.nvm"
-   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  --no-use
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
    #+end_src
 
    We can now install nodejs
@@ -922,6 +923,12 @@
     #+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
     export PATH="$PATH:`yarn global bin`"
     #+end_src
+
+** Typescript
+
+   #+begin_src shell
+   npm install -g typescript typescript-language-server
+   #+end_src
 
 ** Kubernetes
 
