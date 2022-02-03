@@ -1198,7 +1198,6 @@
     </fontconfig>
     #+end_src
 
-
 ** Gnome top bar
 
    Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
@@ -1391,6 +1390,22 @@
              -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
           && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
     #+END_SRC
+
+** obs-studio
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm obs-studio
+    #+end_src
+
+*** Pop OS
+
+    #+begin_src shell :dir /sudo::
+    add-apt-repository -y ppa:obsproject/obs-studio
+    apt-get update
+    apt install -y obs-studio
+    #+end_src
 
 * Playbooks
 
