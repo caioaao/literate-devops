@@ -1122,6 +1122,22 @@
    ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
    #+end_src
 
+** nats-cli
+
+   #+NAME: nats-cli-version
+   : 0.0.24
+
+   #+begin_src shell :dir /tmp :var version=nats-cli-version
+   wget https://github.com/nats-io/natscli/releases/download/${version}/nats-${version}-linux-amd64.zip
+   unzip nats-${version}-linux-amd64.zip
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=nats-cli-version
+   mkdir /opt/nats-cli
+   chmod 0755 /opt/nats-cli
+   mv /tmp/nats-${version}-linux-amd64 /opt/nats-cli/nats-${version}
+   ln -sf /opt/nats-cli/nats-${version}/nats /usr/local/bin/nats
+   #+end_src
 
 ** pre-commit
 
