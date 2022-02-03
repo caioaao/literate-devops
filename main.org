@@ -410,6 +410,21 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'WindowUnderCursorScreenShot' 'none,none,Capture Window Under Cursor'
    #+end_src
 
+   And some other hardware controls:
+
+   #+begin_src shell
+
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Keyboard Brightness' 'Keyboard Brightness Down,Keyboard Brightness Down,Decrease Keyboard Brightness'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Screen Brightness' 'Monitor Brightness Down,Monitor Brightness Down,Decrease Screen Brightness'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Hibernate' 'Hibernate,Hibernate,Hibernate'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Keyboard Brightness' 'Keyboard Brightness Up,Keyboard Brightness Up,Increase Keyboard Brightness'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Screen Brightness' 'Monitor Brightness Up,Monitor Brightness Up,Increase Screen Brightness'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerDown' 'Power Down,Power Down,Power Down'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerOff' 'Power Off,Power Off,Power Off'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Sleep' 'Sleep,Sleep,Suspend'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Toggle Keyboard Backlight' 'Keyboard Light On/Off,Keyboard Light On/Off,Toggle Keyboard Backlight'
+   #+end_src
+
    Now restart ~kglobalaccel~ so changes take effect:
 
    #+begin_src shell
