@@ -352,10 +352,10 @@
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Maximize' 'Meta+m,none,Maximize Window'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Ctrl+Left,none,Quick Tile Window to the Left'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Ctrl+Right,none,Quick Tile Window to the Right'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Ctrl+Up,none,Quick Tile Window to the Top'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Ctrl+Down,none,Quick Tile Window to the Bottom'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Quick Tile Window to the Left'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Quick Tile Window to the Right'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Ctrl+Up,Meta+Ctrl+Up,Quick Tile Window to the Top'
+   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Ctrl+Down,Meta+Ctrl+Down,Quick Tile Window to the Bottom'
 
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows' 'Meta+Tab,Meta+Tab,Walk Through Windows'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows (Reverse)' 'Meta+Shift+Backtab,Meta+Shift+Backtab,Walk Through Windows (Reverse)'
