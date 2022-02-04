@@ -1145,6 +1145,14 @@
    pacman -Sy --noconfirm python-pre-commit
    #+end_src
 
+** cookiecutter
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm python-cookiecutter
+    #+end_src
+
 * Cosmetics
 ** Make fonts great again
 
