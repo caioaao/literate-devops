@@ -1435,3 +1435,17 @@
    #+END_SRC
 
    If it runs without errors, then everything is back to normal.
+
+** Enable/Disable a single webcam
+
+   Extracted from https://askubuntu.com/a/166819
+
+   Find your the vendor id and device id with ~lsusb~. If it isn't clear which device is your webcam, you can try ~lsusb -t~ and look for ~Class=Video~ or ~Driver=uvcvideo~ or similar to find the port and device number and cross-reference with the output from ~lsusb~.
+
+   Next, go to ~cd /sys/bus/usb/devices/~
+
+   To find the correct directory do a ~grep~ there with the product id and if you get multiple results then also with the vendor id:
+
+   ~grep <product-id> */idProduct~ and ~grep <product-id> */idVendor~
+
+   Under the directory you found from the previous step, the file ~bConfigurationValue~ in this directory needs to contain a 0 to disable the device or a 1 to enable it. Just ~echo~ to it and the camera will be enabled or disabled.
