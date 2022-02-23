@@ -1297,6 +1297,60 @@
     gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/wallpapers/mountain1.jpg"
     #+end_src
 
+* CAD/CAM
+
+** Candle (grbl)
+
+   #+NAME: grbl_candle_version
+   : 5709b4961b8e3494d4a5e040b7223b57a0d083db
+
+   A grbl controller / g-code visualizer
+
+*** Install dependencies
+
+**** Arch Linux
+     #+begin_src shell :dir /sudo::
+     pacman -Sy --noconfirm glib2 qt5-serialport cmake
+     #+end_src
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+       apt update -y && apt install -y libglib2.0-0 libqt5serialport5-dev
+     #+end_src
+
+*** Build and install
+
+    Clone repo and start building:
+
+    #+begin_src shell :dir /tmp :var version=grbl_candle_version
+    git clone git@github.com:Denvi/Candle.git
+    cd Candle
+    git checkout ${version}
+    rm -rf build
+    mkdir build
+    cmake -S ./src -B ./build
+    cd build
+    make -j12
+    #+end_src
+
+    Now install the executable
+
+    #+begin_src shell :dir /sudo:: :var version=grbl_candle_version
+    cp /tmp/Candle/build/Candle /usr/local/bin/grbl-candle-${version}
+    ln -sf /usr/local/bin/grbl-candle-${version} /usr/local/bin/grbl-candle
+    chmod +x /usr/local/bin/grbl-candle-${version}
+    #+end_src
+
+
+** FreeCAD
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm freecad
+    #+end_src
+
 * Other
 
 ** Spotify
