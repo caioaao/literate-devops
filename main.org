@@ -178,7 +178,7 @@
 
     Now let's already create some app specific configs here. First, emacs:
 
-    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh
+    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh :mkdirp yes
     #!/usr/bin/env bash
 
     bindkey -A emacs main # set emacs as default
@@ -240,16 +240,16 @@
 
 ** Ag
 
-*** Pop OS
-
-    #+begin_src shell :dir /sudo::
-    apt-get install silversearcher-ag
-    #+end_src
-
 *** Arch Linux
 
     #+begin_src shell :dir /sudo::
     pamac install --no-confirm the_silver_searcher
+    #+end_src
+
+*** Pop OS
+
+    #+begin_src shell :dir /sudo::
+    apt-get install silversearcher-ag
     #+end_src
 
 ** System76
@@ -494,7 +494,7 @@
 
    Tangle the gpg-agent config.
 
-   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf
+   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
    enable-ssh-support
    log-file ~/.gnupg/gpg-agent.log
    allow-emacs-pinentry
@@ -551,6 +551,12 @@
    keyserver hkps://keys.openpgp.org
    #+END_SRC
 
+   Make sure gnupg home has correct permissions:
+
+   #+begin_src shell
+   chmod 700 ~/.gnupg
+   #+end_src
+
    Also install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
    installed together with it, for some reason.
 
@@ -601,6 +607,9 @@
    gpg --keyserver hkps://keyserver.ubuntu.com --recv ${keyid}
    #+END_SRC
 
+   We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
+   then type ~trust~ and choose option ~5~.
+
 ** iptables firewall
 
    After some issues because of exposed ports, using iptables as a firewall
@@ -625,7 +634,7 @@
    WantedBy=multi-user.target
    #+end_src
 
-   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp true :tangle-mode (identity #o755) :dir /sudo::
+   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp yes :tangle-mode (identity #o755) :dir /sudo::
    #!/usr/bin/env bash
    iptables -F
    iptables -X
@@ -701,7 +710,7 @@
 
     And tangle the config:
 
-    #+begin_src conf :tangle ~/.config/tmux/tmux.conf :mkdirp true
+    #+begin_src conf :tangle ~/.config/tmux/tmux.conf :mkdirp yes
     unbind-key C-b
     set -g prefix 'C-q'
     bind-key 'C-q' send-prefix
@@ -760,7 +769,7 @@
 
    Now add the completions and the executable to dot files:
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp true
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp yes
    #!/usr/bin/env bash
    . $HOME/.asdf/asdf.sh
    . $HOME/.asdf/completions/asdf.bash
@@ -785,17 +794,17 @@
 
 ** Git-LFS
 
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pamac install --no-confirm git-lfs
+    #+end_src
+
 *** Pop OS
 
     #+begin_src shell :dir /sudo::/tmp
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
     apt install -y git-lfs
-    #+end_src
-
-*** Arch Linux
-
-    #+begin_src shell :dir /sudo::
-    pamac install --no-confirm git-lfs
     #+end_src
 
 ** Docker
@@ -814,7 +823,6 @@
     systemctl enable docker
     systemctl start docker
     #+end_src
-
 
 *** Ubuntu
 
@@ -888,7 +896,7 @@
 
    Now tangle this to add it to zsh:
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp true
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp yes
    export NVM_DIR="$HOME/.nvm"
    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
    #+end_src
@@ -898,6 +906,7 @@
    #+begin_src shell :var node_version=default-nodejs-version
    \. "$HOME/.nvm/nvm.sh"  --no-use
    nvm install ${node_version}
+   nvm install --lts
    #+end_src
 
 ** Yarn
@@ -1098,7 +1107,7 @@
 
    First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp true
+   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp yes
    export PATH=$PATH:$HOME/.pulumi/bin
    #+end_src
 
