@@ -750,6 +750,9 @@
     run '~/.tmux/plugins/tpm/tpm'
     #+end_src
 
+    To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
+    frozen, but it's installing stuff.
+
 ** direnv
 
 *** Install
