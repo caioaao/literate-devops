@@ -682,6 +682,21 @@
    systemctl start iptables.service
    #+end_src
 
+** NordVPN
+
+   Install by running ~pamac build nordvpn-bin~. After installing, add your user to the nordvpn group:
+
+    #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
+    usermod -aG nordvpn $user
+    #+END_SRC
+
+    And start/enable the nordvpn daemon:
+
+    #+begin_src shell :dir /sudo::
+    systemctl enable nordvpnd
+    systemctl start nordvpnd
+    #+end_src
+
 * Development
 ** tmux
 
