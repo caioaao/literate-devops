@@ -238,7 +238,9 @@
    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
    #+end_src
 
-** Ag
+** +Ag+                                                          :DEPRECATED:
+
+   Deprecated - use ripgrep instead since it's faster!
 
 *** Arch Linux
 
@@ -250,6 +252,15 @@
 
     #+begin_src shell :dir /sudo::
     apt-get install silversearcher-ag
+    #+end_src
+
+** Ripgrep
+
+
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm ripgrep
     #+end_src
 
 ** System76
