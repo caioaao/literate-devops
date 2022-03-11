@@ -764,6 +764,41 @@
     To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
     frozen, but it's installing stuff.
 
+** Alacritty
+
+*** Install
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+     apt install -y alacritty
+     #+end_src
+
+**** Arch Linux
+
+     #+begin_src shell :dir /sudo::
+     pamac install --no-confirm alacritty
+     #+end_src
+
+*** Configure
+
+    #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
+    font:
+      # Point size of the font, but alacritty has many issues with font
+      # size apparently, so we need to choose this through trial and error
+      size: 10.0
+
+    colors:
+      primary:
+        background: '#333333'
+
+    window:
+      decorations: none
+      padding:
+        x: 5
+        y: 10
+    #+end_src
+
 ** direnv
 
 *** Install
@@ -1062,40 +1097,6 @@
 
     #+begin_src shell :dir /sudo::
     pamac install --no-confirm protobuf
-    #+end_src
-
-** Alacritty
-
-*** Install
-
-**** Pop OS
-
-     #+begin_src shell :dir /sudo::
-     apt install -y alacritty
-     #+end_src
-
-**** Arch Linux
-
-     #+begin_src shell :dir /sudo::
-     pamac install --no-confirm alacritty
-     #+end_src
-
-*** Configure
-
-    #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
-    font:
-      # Point size of the font
-      size: 10.0
-
-    colors:
-      primary:
-        background: '#333333'
-
-    window:
-      decorations: none
-      padding:
-        x: 5
-        y: 10
     #+end_src
 
 ** gcloud
