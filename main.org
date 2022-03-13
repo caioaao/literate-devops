@@ -1491,6 +1491,14 @@
           && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
     #+END_SRC
 
+** Org mode
+
+   We need latex and other commands for some stuff (like previewing latex fragments on org-mode). For that the easiest way is to install texlive:
+
+   #+begin_src shell :dir /sudo::
+   pacman -Sy --noconfirm texlive-bin texlive-latexextra
+   #+end_src
+
 ** obs-studio
 
 *** Arch Linux
