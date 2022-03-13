@@ -1515,6 +1515,56 @@
     apt install -y obs-studio
     #+end_src
 
+** rclone
+
+*** Install
+
+**** Arch linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm rclone
+    #+end_src
+
+*** Configure
+
+Just run ~rclone config~ and follow the prompt. Tangle the systemd unit to mount it on startup.
+
+#+begin_src conf :tangle ~/.config/systemd/user/rclone.service :mkdirp yes
+[Unit]
+Description=Google Drive (rclone)
+AssertPathIsDirectory=%h/google-drive
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+        --cache-tmp-upload-path=/tmp/rclone/upload \
+        --cache-chunk-path=/tmp/rclone/chunks \
+        --cache-workers=8 \
+        --cache-writes \
+        --cache-dir=/tmp/rclone/vfs \
+        --cache-db-path=/tmp/rclone/db \
+        --no-modtime \
+        --drive-use-trash \
+        --stats=0 \
+        --checkers=16 \
+        --bwlimit=40M \
+        --dir-cache-time=60m \
+        --cache-info-age=60m \
+        google-drive:/ %h/google-drive
+ExecStop=/bin/fusermount -u /mnt/google-drive
+
+[Install]
+WantedBy=default.target
+#+end_src
+
+Then run:
+
+#+begin_src shell :dir ~/
+mkdir ~/google-drive
+systemctl enable --user rclone
+systemctl start --user rclone
+#+end_src
+
 * Playbooks
 
 ** Fix emacs signature issues
