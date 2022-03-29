@@ -1184,6 +1184,21 @@
    pacman -Sy --noconfirm python-pre-commit
    #+end_src
 
+** python
+
+Install with asdf:
+
+#+begin_src shell
+asdf plugin-add python
+asdf install python 3.9.9
+#+end_src
+
+Then add the version to tools config.
+
+#+begin_src shell
+asdf global python 3.9.9
+#+end_src
+
 ** cookiecutter
 
 *** Arch Linux
