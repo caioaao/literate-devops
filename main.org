@@ -47,6 +47,14 @@
    apt autoremove -y
    #+END_SRC
 
+** Lenovo laptop
+
+Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's disable it for good by removing the loading of pcspkr module:
+
+#+begin_src shell :dir /sudo::
+/sbin/rmmod pcspkr; echo "blacklist pcspkr" >>/etc/modprobe.d/blacklist.conf
+#+end_src
+
 ** Emacs
 
 *** Gnome
@@ -256,7 +264,6 @@
 
 ** Ripgrep
 
-
 *** Arch Linux
 
     #+begin_src shell :dir /sudo::
@@ -424,7 +431,6 @@
    And some other hardware controls:
 
    #+begin_src shell
-
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Keyboard Brightness' 'Keyboard Brightness Down,Keyboard Brightness Down,Decrease Keyboard Brightness'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Screen Brightness' 'Monitor Brightness Down,Monitor Brightness Down,Decrease Screen Brightness'
    kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Hibernate' 'Hibernate,Hibernate,Hibernate'
@@ -442,7 +448,7 @@
    systemctl --user restart plasma-kglobalaccel.service
    #+end_src
 
-** Web browser
+** +Web browser+                                                 :DEPRECATED:
 
    I want to experiment with Vivaldi.
 
@@ -450,7 +456,7 @@
    pamac install --no-confirm vivaldi
    #+end_src
 
-** Enlightenment
+** +Enlightenment+                                               :DEPRECATED:
 
    First install enlightenment and Entrance:
 
@@ -498,7 +504,7 @@
 
     To create keys, see https://github.com/caioaao/YubiKey-Guide
 
-    We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com card-edit= and
+    We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com --card-edit= and
     then =fetch= and exit.
 
 ** GnuPG / SSH
@@ -768,16 +774,16 @@
 
 *** Install
 
-**** Pop OS
-
-     #+begin_src shell :dir /sudo::
-     apt install -y alacritty
-     #+end_src
-
 **** Arch Linux
 
      #+begin_src shell :dir /sudo::
      pamac install --no-confirm alacritty
+     #+end_src
+
+**** Pop OS
+
+     #+begin_src shell :dir /sudo::
+     apt install -y alacritty
      #+end_src
 
 *** Configure
@@ -786,7 +792,7 @@
     font:
       # Point size of the font, but alacritty has many issues with font
       # size apparently, so we need to choose this through trial and error
-      size: 10.0
+      size: 8.0
 
     colors:
       primary:
@@ -843,6 +849,7 @@
 
    Basic configs
 
+   TODO: try grabbing the email from system
    #+BEGIN_SRC conf :tangle ~/.gitconfig
    [user]
    name="Caio Oliveira"
@@ -861,7 +868,7 @@
 *** Arch Linux
 
     #+begin_src shell :dir /sudo::
-    pamac install --no-confirm git-lfs
+    pacman -Sy --noconfirm git-lfs
     #+end_src
 
 *** Pop OS
@@ -886,6 +893,13 @@
     #+begin_src shell :dir /sudo::
     systemctl enable docker
     systemctl start docker
+    #+end_src
+
+    And setup group and user:
+
+    #+begin_src shell :dir /sudo::
+     groupadd docker
+     usermod -aG docker $USER
     #+end_src
 
 *** Ubuntu
@@ -946,9 +960,6 @@
    #+NAME: node-nvm-version
    : v0.38.0
 
-   #+NAME: default-nodejs-version
-   : 17.3.0
-
    Installing NVM
 
    #+begin_src shell :var version=node-nvm-version
@@ -967,9 +978,8 @@
 
    We can now install nodejs
 
-   #+begin_src shell :var node_version=default-nodejs-version
-   \. "$HOME/.nvm/nvm.sh"  --no-use
-   nvm install ${node_version}
+   #+begin_src shell
+   \. "$HOME/.nvm/nvm.sh" --no-use
    nvm install --lts
    #+end_src
 
@@ -980,7 +990,7 @@
 **** Arch linux
 
      #+begin_src shell :dir /sudo::
-     pamac install --no-confirm yarn
+     pacman -Sy --noconfirm yarn
      #+end_src
 
 **** Pop OS
@@ -1000,6 +1010,8 @@
 ** Typescript
 
    #+begin_src shell
+   \. "$HOME/.nvm/nvm.sh"
+   nvm use node
    npm install -g typescript typescript-language-server
    #+end_src
 
@@ -1027,6 +1039,12 @@
 
 *** Install
 
+**** Arch Linux
+
+     #+begin_src shell :dir /sudo::
+     pacman -Sy --noconfirm go
+     #+end_src
+
 **** Pop OS
 
      Ubuntu has an old version only:
@@ -1042,12 +1060,6 @@
      mv /tmp/go /opt/go-${GO_VERSION}
      rm -rf /opt/go || true
      ln -sf /opt/go-${GO_VERSION} /opt/go
-     #+end_src
-
-**** Arch Linux
-
-     #+begin_src shell :dir /sudo::
-     pamac install --no-confirm go
      #+end_src
 
 *** Configure
@@ -1074,6 +1086,12 @@
 
 ** protobuf
 
+*** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy --noconfirm protobuf
+    #+end_src
+
 *** Pop OS
 
     Download, extract and configure:
@@ -1091,12 +1109,6 @@
     #+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
     make install
     ldconfig
-    #+end_src
-
-*** Arch Linux
-
-    #+begin_src shell :dir /sudo::
-    pamac install --no-confirm protobuf
     #+end_src
 
 ** gcloud
@@ -1449,7 +1461,7 @@ asdf global python 3.9.9
 **** Arch Linux
 
      #+begin_src shell :dir /sudo::
-     pamac install --no-confirm zoxide
+     pacman -Sy --noconfirm zoxide
      #+end_src
 
 **** Pop OS
