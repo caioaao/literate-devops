@@ -958,15 +958,12 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 ** NodeJS
 
    #+NAME: node-nvm-version
-   : v0.38.0
+   : v0.39.1
 
    Installing NVM
 
    #+begin_src shell :var version=node-nvm-version
-   git clone git@github.com:nvm-sh/nvm.git ${HOME}/.nvm
-   cd ${HOME}/.nvm
-   git checkout ${version}
-   chmod +x nvm.sh
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${version}/install.sh | bash
    #+end_src
 
    Now tangle this to add it to zsh:
@@ -976,11 +973,17 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
    #+end_src
 
+   Let's add LTS as the default node version using nvmrc:
+
+   #+begin_src conf :tangle ~/.nvmrc
+   lts/*
+   #+end_src
+
    We can now install nodejs
 
    #+begin_src shell
    \. "$HOME/.nvm/nvm.sh" --no-use
-   nvm install --lts
+   nvm install
    #+end_src
 
 ** Yarn
