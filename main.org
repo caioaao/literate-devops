@@ -792,7 +792,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     font:
       # Point size of the font, but alacritty has many issues with font
       # size apparently, so we need to choose this through trial and error
-      size: 8.0
+      size: 10.0
 
     colors:
       primary:
