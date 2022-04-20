@@ -812,7 +812,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 **** Arch-Linux
 
      #+begin_src sh :dir /sudo::
-     pamac install --no-confirm direnv
+     pacman -Sy --no-confirm direnv
      #+end_src
 
 **** Pop-OS
@@ -830,6 +830,8 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     #+end_src
 
 ** asdf
+
+   # TODO install asdf system-wide: https://github.com/asdf-vm/asdf/issues/577
 
    First clone the repo:
 
@@ -897,9 +899,9 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 
     And setup group and user:
 
-    #+begin_src shell :dir /sudo::
-     groupadd docker
-     usermod -aG docker $USER
+    #+begin_src shell :dir /sudo:: :var user=(user-login-name)
+    groupadd docker
+    usermod -aG docker $user
     #+end_src
 
 *** Ubuntu
@@ -1081,10 +1083,10 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 
     #+begin_src shell
     source ~/.zsh.d/apps.d/10-golang.sh
-    go get golang.org/x/tools/cmd/godoc
-    go get golang.org/x/tools/cmd/goimports
-    go get github.com/rogpeppe/godef
-    go get golang.org/x/tools/gopls
+    go install golang.org/x/tools/cmd/godoc@latest
+    go install golang.org/x/tools/cmd/goimports@latest
+    go install github.com/rogpeppe/godef@latest
+    go install golang.org/x/tools/gopls@latest
     #+end_src
 
 ** protobuf
@@ -1117,7 +1119,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 ** gcloud
 
    #+NAME: gcloud_sdk_version
-   : 368.0.0
+   : 382.0.0
 
    First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
 
