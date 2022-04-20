@@ -65,19 +65,32 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
     #+end_src
 
+** Locale
+
+   Set system language:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   localectl set-locale LANG=en_US.UTF-8
+   #+END_SRC
+
+   Keyboard config:
+
+   #+BEGIN_SRC shell :dir /sudo:: :results output silent
+   setxkbmap -option ctrl:swapcaps
+   localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
+   #+END_SRC
+
 ** Setup dotfiles
 
 *** Installing dependencies
 
-    First, install zsh and its dependencies and change the login shell:
+    First, install zsh and its dependencies and change the login shell. We'll install ~zoxide~ as well so we can use the plugin.
 
 **** Arch-linux
 
      #+BEGIN_SRC shell :dir /sudo::
-     pacman --noconfirm -Sy zsh
+     pacman --noconfirm -Sy zsh zoxide
      #+END_SRC
-
-     Install autojump manually running ~pamac build autojump~
 
 **** Pop-OS
 
@@ -208,21 +221,6 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     touch ~/.zsh.d/localrc
     #+END_SRC
 
-** Locale
-
-   Set system language:
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-   localectl set-locale LANG=en_US.UTF-8
-   #+END_SRC
-
-   Keyboard config:
-
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-   setxkbmap -option ctrl:swapcaps
-   localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
-   #+END_SRC
-
 ** Aspell
 
 *** Arch linux
@@ -236,6 +234,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     #+BEGIN_SRC shell :dir /sudo::
     apt install -y aspell aspell-en
     #+END_SRC
+
 ** Git
 
    Add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
@@ -319,6 +318,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
    (Credits to [[https://github.com/shalva97/kde-configuration-files][this repo]] for most of the stuff here)
 
    First of all, let's backup the original keybinds file:
+
    #+begin_src shell
    cp $HOME/.config/kglobalshortcutsrc "$HOME/.config/kglobalshortcutsrc.`date -u +'%Y-%m-%dT%H:%M:%S'`"
    #+end_src
@@ -581,11 +581,11 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
    pacman --noconfirm -Sy gcr
    #+END_SRC
 
-   We need to fix the DNS resolution:
+   # We need to fix the DNS resolution:
 
-   #+BEGIN_SRC shell :dir /sudo::
-   ln -sf /etc/resolv.conf /run/systemd/resolve/stub-resolv.conf
-   #+END_SRC
+   # #+BEGIN_SRC shell :dir /sudo::
+   # ln -sf /etc/resolv.conf /run/systemd/resolve/stub-resolv.conf
+   # #+END_SRC
 
    Also, tangle the ssh config.
 
@@ -777,7 +777,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 **** Arch Linux
 
      #+begin_src shell :dir /sudo::
-     pamac install --no-confirm alacritty
+     pacman -Sy --noconfirm alacritty
      #+end_src
 
 **** Pop OS
@@ -1456,28 +1456,6 @@ asdf global python 3.9.9
    #+END_SRC
 
    Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
-
-** Autojump
-
-*** Install
-
-**** Arch Linux
-
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm zoxide
-     #+end_src
-
-**** Pop OS
-
-     #+begin_src shell :dir /sudo::
-     apt install -y zoxide
-     #+end_src
-
-*** Configure
-
-    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-zoxide.sh
-    eval "$(zoxide init zsh)"
-    #+end_src
 
 ** Command for gif recording
 
