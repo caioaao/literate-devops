@@ -1228,10 +1228,10 @@ asdf global python 3.9.9
 ** Hugo
 
 #+NAME: hugo-version
-: v0.97.3
+: 0.97.3
 
 #+begin_src shell :dir /tmp :var version=hugo-version
-curl -fsSL https://github.com/gohugoio/hugo/releases/download/v${version}/hugo_${version}_Linux-64bit.tar.gz | tar xvzf -
+curl -fsSL https://github.com/gohugoio/hugo/releases/download/v${version}/hugo_extended_${version}_Linux-64bit.tar.gz | tar xvzf -
 #+end_src
 
 #+begin_src shell :dir /sudo:: :var version=hugo-version
