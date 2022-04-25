@@ -1163,6 +1163,12 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
    curl -fsSL https://get.pulumi.com | sh
    #+end_src
 
+   Now let's generate the pulumi autocomplete:
+
+   #+begin_src shell
+   $HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.zsh.d/apps.d/10-pulumi-autocomplete.sh
+   #+end_src
+
 ** ngrok
 
    #+begin_src sh :dir /tmp
