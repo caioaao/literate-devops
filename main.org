@@ -1540,6 +1540,18 @@ ln -sf /opt/hugo-$version/hugo /usr/local/bin/hugo
     apt install -y obs-studio
     #+end_src
 
+** Bluetooth
+
+According to Arch Linux wiki, pairing and connecting to bluetooth devices using the CLI is the most reliable and easiest way available.
+
+*** Install
+
+**** Arch Linux
+
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm bluez-utils
+#+end_src
+
 * Playbooks
 
 ** Fix emacs signature issues
