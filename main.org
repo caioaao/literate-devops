@@ -1230,6 +1230,42 @@ asdf global python 3.9.9
     pacman -Sy --noconfirm python-cookiecutter
     #+end_src
 
+** OCaml
+
+   #+begin_src shell :dir /sudo::
+     pacman -Sy --noconfirm ocaml opam
+   #+end_src
+
+   Now init opam:
+
+   #+begin_src shell
+     touch ~/.zsh.d/apps.d/10-opam.sh
+     opam init -a --dot-profile ~/.zsh.d/apps.d/10-opam.sh \
+          --enable-shell-hook --enable-completion --shell=zsh --reinit
+     eval $(opam env)
+   #+end_src
+
+   Install LSP server:
+
+   #+begin_src shell
+     opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
+     opam install ocaml-lsp-server
+   #+end_src
+
+   Also install ReasonML LSP server:
+
+   #+NAME: reason_ls_version
+   : 1.7.9
+
+   #+begin_src shell :dir /tmp :var version=reason_ls_version
+     curl -fsSL https://github.com/jaredly/reason-language-server/releases/download/${version}/rls-linux.zip | busybox unzip -
+   #+end_src
+
+   #+begin_src shell :dir /sudo:: :var version=reason_ls_version
+     mv /tmp/rls-linux /opt/reason-ls-${version}
+     chmod +x /opt/reason-ls-${version}/reason-language-server
+     ln -sf /opt/reason-ls-${version}/reason-language-server /usr/local/bin/reason-language-server
+   #+end_src
 
 ** Hugo
 
@@ -1244,6 +1280,45 @@ curl -fsSL https://github.com/gohugoio/hugo/releases/download/v${version}/hugo_e
 mkdir -p /opt/hugo-$version
 mv /tmp/hugo /opt/hugo-$version
 ln -sf /opt/hugo-$version/hugo /usr/local/bin/hugo
+#+end_src
+
+** Clojure
+
+#+name: clojure-lsp-version
+: 2022.06.29-19.32.13
+
+
+*** Install
+
+**** Arch Linux
+
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm clojure
+#+end_src
+
+*** Install LSP
+
+Let's install [[https://github.com/clojure-lsp/clojure-lsp][clojure-lsp]]
+
+#+begin_src shell :dir /tmp :var version=clojure-lsp-version
+curl -fsSL https://github.com/clojure-lsp/clojure-lsp/releases/download/${version}/clojure-lsp-native-linux-amd64.zip | busybox unzip -
+#+end_src
+
+#+begin_src shell :dir /sudo::
+mv /tmp/clojure-lsp /usr/bin/clojure-lsp
+chmod +x /usr/bin/clojure-lsp
+#+end_src
+
+*** Configure
+
+#+begin_src clojure :tangle ~/.clojure/deps.edn :mkdirp yes
+{:mvn/repos {"central" {:url "https://repo1.maven.org/maven2/"}
+             "clojars" {:url "https://repo.clojars.org/"}}
+
+ :aliases {:new {:extra-deps {com.github.seancorfield/clj-new
+                              {:mvn/version "1.2.362"}}
+                 :exec-fn clj-new/create
+                 :exec-args {:template "app"}}}}
 #+end_src
 
 * Cosmetics
