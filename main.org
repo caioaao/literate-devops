@@ -52,6 +52,7 @@
   - [[#ocaml][OCaml]]
   - [[#hugo][Hugo]]
   - [[#clojure][Clojure]]
+  - [[#scala][Scala]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1380,6 +1381,15 @@ chmod +x /usr/bin/clojure-lsp
                               {:mvn/version "1.2.362"}}
                  :exec-fn clj-new/create
                  :exec-args {:template "app"}}}}
+#+end_src
+
+** Scala
+
+#+NAME: scala-cs-launcher-version
+: 21616f77e3b47e65647acf946950275116f1c917
+
+#+begin_src shell :dir /tmp :var version=scala-cs-launcher-version
+curl -fL https://github.com/coursier/launchers/raw/${version}/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && ./cs setup --jvm 11 --apps metals -y
 #+end_src
 
 * Cosmetics
