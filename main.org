@@ -1389,7 +1389,7 @@ chmod +x /usr/bin/clojure-lsp
 : 21616f77e3b47e65647acf946950275116f1c917
 
 #+begin_src shell :dir /tmp :var version=scala-cs-launcher-version
-curl -fL https://github.com/coursier/launchers/raw/${version}/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && ./cs setup --jvm 11 --apps metals -y
+curl -fL https://github.com/coursier/launchers/raw/${version}/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && ./cs setup --jvm 11 --apps metals metals-emacs -y
 #+end_src
 
 * Cosmetics
