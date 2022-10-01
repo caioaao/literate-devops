@@ -1181,7 +1181,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 ** gcloud
 
    #+NAME: gcloud_sdk_version
-   : 382.0.0
+   : 401.0.0
 
    First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
 
