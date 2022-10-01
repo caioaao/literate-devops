@@ -1048,6 +1048,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
    #+begin_src shell
    \. "$HOME/.nvm/nvm.sh" --no-use
    nvm install
+   nvm alias default node
    #+end_src
 
 ** Yarn
