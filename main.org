@@ -53,6 +53,7 @@
   - [[#hugo][Hugo]]
   - [[#clojure][Clojure]]
   - [[#scala][Scala]]
+  - [[#nix][Nix]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1391,6 +1392,37 @@ chmod +x /usr/bin/clojure-lsp
 
 #+begin_src shell :dir /tmp :var version=scala-cs-launcher-version
 curl -fL https://github.com/coursier/launchers/raw/${version}/cs-x86_64-pc-linux.gz | gzip -d > cs && chmod +x cs && ./cs setup --jvm 11 --apps metals metals-emacs -y
+#+end_src
+
+** Nix
+
+*** Install
+
+**** Arch Linux
+
+    #+begin_src shell :dir /sudo::
+    pacman -Sy nix
+    #+end_src
+
+*** Configure
+
+Start and enable daemon:
+
+#+begin_src shell :dir /sudo
+systemctl start nix-daemon.service
+systemctl enable nix-daemon.service
+#+end_src
+
+Add current user to nix group to be able to access daemon socket:
+
+#+begin_src shell :dir /sudo:: :var user=(user-login-name)
+usermod -aG nix-users $user
+#+end_src
+
+Finally, add nix-profile to our path:
+
+#+begin_src shell :tangle ~/.zsh.d/apps.d/05-nix.sh
+PATH=$PATH:~/.nix-profile/bin
 #+end_src
 
 * Cosmetics
