@@ -1425,6 +1425,21 @@ Finally, add nix-profile to our path:
 PATH=$PATH:~/.nix-profile/bin
 #+end_src
 
+And add our global nix configuration:
+
+#+begin_src conf :tangle /sudo::/etc/nix/nix.conf
+#
+# https://nixos.org/manual/nix/stable/#sec-conf-file
+#
+
+# Unix group containing the Nix build user accounts
+build-users-group = nixbld
+
+# By default, nix only uses one builder. The following will allow nix
+# to use as many jobs as the number of CPUs:
+max-jobs = auto
+#+end_src
+
 * Cosmetics
 ** Make fonts great again
 
