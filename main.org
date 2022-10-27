@@ -54,6 +54,7 @@
   - [[#clojure][Clojure]]
   - [[#scala][Scala]]
   - [[#nix][Nix]]
+  - [[#osm2pgsql][osm2pgsql]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1125,7 +1126,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
      curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
      #+end_src
 
-     #+begin_src shell :dir /sudo::
+     #+begin_src shell :dir /sudo:: :var GO_VERSION=go_version
      mv /tmp/go /opt/go-${GO_VERSION}
      rm -rf /opt/go || true
      ln -sf /opt/go-${GO_VERSION} /opt/go
@@ -1440,7 +1441,18 @@ build-users-group = nixbld
 max-jobs = auto
 #+end_src
 
+** osm2pgsql                                                       :GIS:
+
+*** Arch linux
+
+Run in the shell:
+
+#+begin_src shell
+pamac build osm2pgsql
+#+end_src
+
 * Cosmetics
+
 ** Make fonts great again
 
 *** Dependencies
