@@ -54,7 +54,8 @@
   - [[#clojure][Clojure]]
   - [[#scala][Scala]]
   - [[#nix][Nix]]
-  - [[#osm2pgsql][osm2pgsql]]
+  - [[#bazel][Bazel]]
+  - [[#gis-tools][GIS tools]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1441,9 +1442,21 @@ build-users-group = nixbld
 max-jobs = auto
 #+end_src
 
-** osm2pgsql                                                       :GIS:
+** Bazel
 
-*** Arch linux
+*** Install
+
+**** Arch Linux
+
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm bazel
+#+end_src
+
+** GIS tools
+
+*** osm2pgsql
+
+**** Arch linux
 
 Run in the shell:
 
