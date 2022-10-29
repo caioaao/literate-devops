@@ -1192,7 +1192,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 : 1.9.0
 
 #+begin_src shell :dir /sudo:: :var version=buf-version
-curl -fsSL https://github.com/bufbuild/buf/releases/download/${version}/buf-Linux-x86_64 > /usr/local/bin/buf
+curl -fsSL https://github.com/bufbuild/buf/releases/download/v${version}/buf-Linux-x86_64 > /usr/local/bin/buf
 chmod +x /usr/local/bin/buf
 #+end_src
 
