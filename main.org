@@ -1157,13 +1157,14 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 
 ** protobuf
 
-*** Arch Linux
+*** Compiler
+**** Arch Linux
 
     #+begin_src shell :dir /sudo::
     pacman -Sy --noconfirm protobuf
     #+end_src
 
-*** Pop OS
+**** Pop OS
 
     Download, extract and configure:
 
@@ -1181,6 +1182,19 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     make install
     ldconfig
     #+end_src
+
+
+*** Buf
+
+[[https://buf.build][Buf]] is an awesome tool for building, linting and testing protobuf.
+
+#+NAME: buf-version
+: 1.9.0
+
+#+begin_src shell :dir /sudo:: :var version=buf-version
+curl -fsSL https://github.com/bufbuild/buf/releases/download/${version}/buf-Linux-x86_64 > /usr/local/bin/buf
+chmod +x /usr/local/bin/buf
+#+end_src
 
 ** gcloud
 
