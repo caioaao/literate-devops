@@ -1458,15 +1458,49 @@ max-jobs = auto
 
 ** Bazel
 
-*** Install
+[[https://github.com/bazelbuild/bazelisk][Bazelisk]] is used to manage bazel versions. It's said to be the nvm of bazel.
 
-**** Arch Linux
+#+begin_src shell :dir /tmp :var version=bazelisk-version
+curl -fsSL https://github.com/bazelbuild/bazelisk/releases/download/${version}/bazelisk-linux-amd64 > bazelisk-${version}
+#+end_src
 
-#+begin_src shell :dir /sudo::
-pacman -Sy --noconfirm bazel
+#+begin_src shell :dir /sudo:: :var version=bazelisk-version
+mv /tmp/bazelisk-${version} /usr/local/bin
+chmod +x /usr/local/bin/bazelisk-${version}
+rm -rf /usr/local/bin/bazelisk
+ln -sf /usr/local/bin/bazelisk-${version} /usr/local/bin/bazelisk
 #+end_src
 
 ** GIS tools
+
+*** osmium
+
+Download source and dependencies:
+
+#+begin_src shell :dir /tmp
+curl -fsSL https://github.com/osmcode/libosmium/archive/refs/tags/v2.18.0.tar.gz > /tmp/libosmium.tar.gz
+curl -fsSL https://github.com/mapbox/protozero/archive/refs/tags/v1.7.1.tar.gz > /tmp/protozero.tar.gz
+curl -fsSL https://github.com/osmcode/osmium-tool/archive/refs/tags/v1.14.0.tar.gz > /tmp/osmium-tool.tar.gz
+#+end_src
+
+#+begin_src shell :dir /sudo::
+cd /opt
+
+tar -xzf /tmp/libosmium.tar.gz
+tar -xzf /tmp/protozero.tar.gz
+tar -xzf /tmp/osmium-tool.tar.gz
+
+ln -sf /opt/libosmium-2.18.0 /opt/libosmium
+ln -sf /opt/protozero-1.7.1 /opt/protozero
+ln -sf /opt/osmium-tool-1.14.0 /opt/osmium-tool
+
+mkdir -p /opt/osmium-tool-1.14.0/build
+cd /opt/osmium-tool-1.14.0/build
+cmake ..
+make -j10
+make install
+#+end_src
+
 
 *** osm2pgsql
 
