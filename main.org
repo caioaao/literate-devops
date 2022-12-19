@@ -1091,7 +1091,7 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 *** kubectl
 
     #+NAME: default_kubectl_version
-    : 1.22.12
+    : 1.26.0
 
     Add the plugin to asdf and install the default version:
 
