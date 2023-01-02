@@ -74,43 +74,43 @@
 
 * Prelude
 
-  Requirements: emacs (obviously), git
+Requirements: emacs (obviously), git
 
-  Add permission to run shell script blocks:
+Add permission to run shell script blocks:
 
-  #+BEGIN_SRC elisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell . t)))
-  #+END_SRC
+#+BEGIN_SRC elisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t)))
+#+END_SRC
 
-  And disable the babel-evaluate thingy that's super annoying:
+And disable the babel-evaluate thingy that's super annoying:
 
-  #+begin_src emacs-lisp
-  (setq org-confirm-babel-evaluate nil)
-  #+end_src
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+#+end_src
 
 ** Pop-OS
 
-   Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of date
-   packages. The buggy version of org-mode that comes with the default Emacs
-   prevents us from using this file properly, so you'll have to update it before
-   using. To do so, first run the update script:
+Unfortunatelly, one of the +many+ annoyances of Pop! OS is the out of date
+packages. The buggy version of org-mode that comes with the default Emacs
+prevents us from using this file properly, so you'll have to update it before
+using. To do so, first run the update script:
 
-   #+BEGIN_SRC emacs-lisp
-   (require 'ob-sh)
-   (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((sh . t)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(require 'ob-sh)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((sh . t)))
+#+END_SRC
 
-   #+BEGIN_SRC sh :dir /sudo::
-   add-apt-repository ppa:kelleyk/emacs
-   apt-get update
-   apt install -y emacs26
-   apt purge -y emacs25
-   apt autoremove -y
-   #+END_SRC
+#+BEGIN_SRC sh :dir /sudo::
+add-apt-repository ppa:kelleyk/emacs
+apt-get update
+apt install -y emacs26
+apt purge -y emacs25
+apt autoremove -y
+#+END_SRC
 
 ** Lenovo laptop
 
@@ -124,71 +124,71 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 
 *** Gnome
 
-    We need to disable the active-menu shortcut (clashes with ~M-SPC~).
+We need to disable the active-menu shortcut (clashes with ~M-SPC~).
 
-    #+begin_src sh
-    gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
-    #+end_src
+#+begin_src sh
+gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
+#+end_src
 
 ** Locale
 
-   Set system language:
+Set system language:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-   localectl set-locale LANG=en_US.UTF-8
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo:: :results output silent
+localectl set-locale LANG=en_US.UTF-8
+#+END_SRC
 
-   Keyboard config:
+Keyboard config:
 
-   #+BEGIN_SRC shell :dir /sudo:: :results output silent
-   setxkbmap -option ctrl:swapcaps
-   localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo:: :results output silent
+setxkbmap -option ctrl:swapcaps
+localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
+#+END_SRC
 
 ** Setup dotfiles
 
 *** Installing dependencies
 
-    First, install zsh and its dependencies and change the login shell. We'll install ~zoxide~ as well so we can use the plugin.
+First, install zsh and its dependencies and change the login shell. We'll install ~zoxide~ as well so we can use the plugin.
 
 **** Arch-linux
 
-     #+BEGIN_SRC shell :dir /sudo::
-     pacman --noconfirm -Sy zsh zoxide
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+pacman --noconfirm -Sy zsh zoxide
+#+END_SRC
 
 **** Pop-OS
 
-     #+BEGIN_SRC shell :dir /sudo::
-     apt install -y zsh || true
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt install -y zsh || true
+#+END_SRC
 
 *** Configuring
 
-    Set user's shell:
+Set user's shell:
 
-    #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
-    chsh -s /bin/zsh $user
+#+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
+chsh -s /bin/zsh $user
+#+END_SRC
+
+Let's create a directory for some useful commands.
+
+#+BEGIN_SRC shell
+mkdir -p ~/utils/bin || true
+#+END_SRC
+
+And now some cool scripts:
+
+  - Notify when an execution ends.
+
+    #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
+    #!/usr/bin/env bash
+
+    # Notify when execution finishes. First arg is the success message, second arg
+    # is the failure message and the rest is the command to run
+
+    (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
     #+END_SRC
-
-    Let's create a directory for some useful commands.
-
-    #+BEGIN_SRC shell
-    mkdir -p ~/utils/bin || true
-    #+END_SRC
-
-    And now some cool scripts:
-
-    - Notify when an execution ends.
-
-      #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
-      #!/usr/bin/env bash
-
-      # Notify when execution finishes. First arg is the success message, second arg
-      # is the failure message and the rest is the command to run
-
-      (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
-      #+END_SRC
 
     Install oh-my-zsh. I used to use zsh-users/antigen but it was another
     abstraction layer on top of the plugin management that didn't bring much
@@ -279,26 +279,26 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
     #+end_src
 
 
-    Also create the ~localrc~ file. This should be the place to add local configs
-    (company notebook configs for instance).
+  Also create the ~localrc~ file. This should be the place to add local configs
+  (company notebook configs for instance).
 
-    #+BEGIN_SRC shell :dir ~/
-    touch ~/.zsh.d/localrc
-    #+END_SRC
+  #+BEGIN_SRC shell :dir ~/
+  touch ~/.zsh.d/localrc
+  #+END_SRC
 
 ** Aspell
 
 *** Arch linux
 
-    #+BEGIN_SRC shell :dir /sudo:: :results output silent
-    pacman --noconfirm -Sy aspell aspell-en
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo:: :results output silent
+pacman --noconfirm -Sy aspell aspell-en
+#+END_SRC
 
 *** Ubuntu/Pop-OS
 
-    #+BEGIN_SRC shell :dir /sudo::
-    apt install -y aspell aspell-en
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt install -y aspell aspell-en
+#+END_SRC
 
 *** Fedora
 
@@ -308,37 +308,37 @@ dnf install -y aspell aspell-en
 
 ** Git
 
-   Add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
+Add github to known SSH hosts list so we're not prompted to confirm it as it might break some org block.
 
-   #+begin_src shell
-   mkdir -p ~/.ssh
-   touch ~/.ssh/known_hosts
-   ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-   #+end_src
+#+begin_src shell
+mkdir -p ~/.ssh
+touch ~/.ssh/known_hosts
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+#+end_src
 
 ** +Ag+                                                          :DEPRECATED:
 
-   Deprecated - use ripgrep instead since it's faster!
+Deprecated - use ripgrep instead since it's faster!
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pamac install --no-confirm the_silver_searcher
-    #+end_src
+#+begin_src shell :dir /sudo::
+pamac install --no-confirm the_silver_searcher
+#+end_src
 
 *** Pop OS
 
-    #+begin_src shell :dir /sudo::
-    apt-get install silversearcher-ag
-    #+end_src
+#+begin_src shell :dir /sudo::
+apt-get install silversearcher-ag
+#+end_src
 
 ** Ripgrep
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm ripgrep
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm ripgrep
+#+end_src
 
 *** Fedora
 
@@ -348,207 +348,207 @@ dnf install -y ripgrep
 
 ** System76
 
-   Follow [[https://support.system76.com/articles/system76-software][this article first]], and then [[https://support.system76.com/articles/system76-driver/#arch][the driver article]]. The first article install dependencies needed by the driver.
+Follow [[https://support.system76.com/articles/system76-software][this article first]], and then [[https://support.system76.com/articles/system76-driver/#arch][the driver article]]. The first article install dependencies needed by the driver.
 
 *** Arch linux
 
-    More important information [[https://wiki.archlinux.org/title/System76_Oryx_Pro][here]].
+More important information [[https://wiki.archlinux.org/title/System76_Oryx_Pro][here]].
 
-    Install dependencies:
+Install dependencies:
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm --needed base-devel git linux515-headers rust
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm --needed base-devel git linux515-headers rust
+#+end_src
 
-    Import a PGP key that is needed for system76-io-dkms package:
+Import a PGP key that is needed for system76-io-dkms package:
 
-    #+begin_src shell
-    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys E988B49EE78A7FB1
-    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 87F211AF2BE4C2FE
-    #+end_src
+#+begin_src shell
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys E988B49EE78A7FB1
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 87F211AF2BE4C2FE
+#+end_src
 
-    Now run the following in a terminal. The order here is important.
+Now run the following in a terminal. The order here is important.
 
-    #+begin_src shell
-    pamac build system76-firmware
-    pamac build system76-firmware-daemon
-    pamac build firmware-manager
-    pamac build system76-dkms
-    pamac build system76-acpi-dkms
-    pamac build system76-power
-    pamac build system76-driver
-    pamac build sys76-kb
-    #+end_src
+#+begin_src shell
+pamac build system76-firmware
+pamac build system76-firmware-daemon
+pamac build firmware-manager
+pamac build system76-dkms
+pamac build system76-acpi-dkms
+pamac build system76-power
+pamac build system76-driver
+pamac build sys76-kb
+#+end_src
 
-    Finally, enable all services that need to be enabled:
+Finally, enable all services that need to be enabled:
 
-    #+begin_src shell :dir /sudo::
-    systemctl enable --now system76
-    systemctl enable --now system76-firmware-daemon
-    systemctl enable --now system76-power
-    #+end_src
+#+begin_src shell :dir /sudo::
+systemctl enable --now system76
+systemctl enable --now system76-firmware-daemon
+systemctl enable --now system76-power
+#+end_src
 
 * Desktop Environment
 
 ** KDE Plasma
 
-   (Credits to [[https://github.com/shalva97/kde-configuration-files][this repo]] for most of the stuff here)
+(Credits to [[https://github.com/shalva97/kde-configuration-files][this repo]] for most of the stuff here)
 
-   First of all, let's backup the original keybinds file:
+First of all, let's backup the original keybinds file:
 
-   #+begin_src shell
-   cp $HOME/.config/kglobalshortcutsrc "$HOME/.config/kglobalshortcutsrc.`date -u +'%Y-%m-%dT%H:%M:%S'`"
-   #+end_src
+#+begin_src shell
+cp $HOME/.config/kglobalshortcutsrc "$HOME/.config/kglobalshortcutsrc.`date -u +'%Y-%m-%dT%H:%M:%S'`"
+#+end_src
 
-   Then remove all existing binds:
+Then remove all existing binds:
 
-   #+begin_src shell
-   sed -i -r 's/=.+,.+,/=none,none,/g' $HOME/.config/kglobalshortcutsrc
-   #+end_src
+#+begin_src shell
+sed -i -r 's/=.+,.+,/=none,none,/g' $HOME/.config/kglobalshortcutsrc
+#+end_src
 
-   Now let's disable touch screen edges:
+Now let's disable touch screen edges:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateCylinder "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateSphere "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateCylinder "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateSphere "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key BorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key TouchBorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateAll "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateClass "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateAll "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateClass "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderAlternativeActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderAlternativeActivate "9"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Bottom "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomLeft "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomRight "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Left "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Right "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Top "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopLeft "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopRight "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Bottom "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Left "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Right "None"
-   kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Top "None"
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateCylinder "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key BorderActivateSphere "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateCylinder "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-Cube --key TouchBorderActivateSphere "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key BorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-DesktopGrid --key TouchBorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateAll "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key BorderActivateClass "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateAll "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group Effect-PresentWindows --key TouchBorderActivateClass "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key BorderAlternativeActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TabBox --key TouchBorderAlternativeActivate "9"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Bottom "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomLeft "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key BottomRight "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Left "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Right "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key Top "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopLeft "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group ElectricBorders --key TopRight "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Bottom "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Left "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Right "None"
+kwriteconfig5 --file $HOME/.config/kwinrc --group TouchEdges --key Top "None"
+#+end_src
 
-   Navigation / window manipulation binds:
+Navigation / window manipulation binds:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Maximize' 'Meta+m,none,Maximize Window'
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Close' 'Meta+q,none,Close Window'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Maximize' 'Meta+m,none,Maximize Window'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Quick Tile Window to the Left'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Quick Tile Window to the Right'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Ctrl+Up,Meta+Ctrl+Up,Quick Tile Window to the Top'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Ctrl+Down,Meta+Ctrl+Down,Quick Tile Window to the Bottom'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Left' 'Meta+Ctrl+Left,Meta+Ctrl+Left,Quick Tile Window to the Left'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Right' 'Meta+Ctrl+Right,Meta+Ctrl+Right,Quick Tile Window to the Right'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Top' 'Meta+Ctrl+Up,Meta+Ctrl+Up,Quick Tile Window to the Top'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window Quick Tile Bottom' 'Meta+Ctrl+Down,Meta+Ctrl+Down,Quick Tile Window to the Bottom'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows' 'Meta+Tab,Meta+Tab,Walk Through Windows'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows (Reverse)' 'Meta+Shift+Backtab,Meta+Shift+Backtab,Walk Through Windows (Reverse)'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application' 'Meta+`,none,Walk through Windows of Current Application'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application (Reverse)' 'Meta+Shift+`,none,Walk through Windows of Current Application (Reverse)'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows' 'Meta+Tab,Meta+Tab,Walk Through Windows'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows (Reverse)' 'Meta+Shift+Backtab,Meta+Shift+Backtab,Walk Through Windows (Reverse)'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application' 'Meta+`,none,Walk through Windows of Current Application'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Walk Through Windows of Current Application (Reverse)' 'Meta+Shift+`,none,Walk through Windows of Current Application (Reverse)'
 
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Shift+Right,none,Window to Next Screen'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Shift+Left,none,Window to Previous Screen'
-   #+end_src
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Next Screen' 'Meta+Shift+Right,none,Window to Next Screen'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kwin --key 'Window to Previous Screen' 'Meta+Shift+Left,none,Window to Previous Screen'
+#+end_src
 
-   Locking screen:
+Locking screen:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group ksmserver --key 'Lock Session' "Meta+l	Meta+Esc	Screensaver,Meta+l	Meta+Esc	Screensaver,Lock Session"
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group ksmserver --key 'Lock Session' "Meta+l	Meta+Esc	Screensaver,Meta+l	Meta+Esc	Screensaver,Lock Session"
+#+end_src
 
-   Volume control:
+Volume control:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'decrease_volume' 'Volume Down,Volume Down,Decrease Volume'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_microphone_volume' 'Microphone Volume Up,Microphone Volume Up,Increase Microphone Volume'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_volume' 'Volume Up,Volume Up,Increase Volume'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mic_mute' 'Microphone Mute	Meta+Volume Mute,Microphone Mute	Meta+Volume Mute,Mute Microphone'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mute' 'Volume Mute,Volume Mute,Mute'
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'decrease_volume' 'Volume Down,Volume Down,Decrease Volume'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_microphone_volume' 'Microphone Volume Up,Microphone Volume Up,Increase Microphone Volume'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'increase_volume' 'Volume Up,Volume Up,Increase Volume'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mic_mute' 'Microphone Mute	Meta+Volume Mute,Microphone Mute	Meta+Volume Mute,Mute Microphone'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group kmix --key 'mute' 'Volume Mute,Volume Mute,Mute'
+#+end_src
 
-   Media control:
+Media control:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'nextmedia' 'Media Next,Media Next,Media playback next'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'playpausemedia' 'Media Play,Media Play,Play/Pause media playback'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'previousmedia' 'Media Previous,Media Previous,Media playback previous'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'stopmedia' 'Media Stop,Media Stop,Stop media playback'
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'nextmedia' 'Media Next,Media Next,Media playback next'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'playpausemedia' 'Media Play,Media Play,Play/Pause media playback'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'previousmedia' 'Media Previous,Media Previous,Media playback previous'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group mediacontrol --key 'stopmedia' 'Media Stop,Media Stop,Stop media playback'
+#+end_src
 
-   Now application specific binds. Notice the group name is the same as the file under ~/usr/share/applications~.
+Now application specific binds. Notice the group name is the same as the file under ~/usr/share/applications~.
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space	Search,Meta+Space	Search,KRunner'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'emacs.desktop' --key '_launch' 'Meta+e,Meta+e,Launch Emacs'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'Alacritty.desktop' --key '_launch' 'Meta+t,Meta+t,Launch Terminal'
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.krunner.desktop' --key '_launch' 'Meta+Space	Search,Meta+Space	Search,KRunner'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'emacs.desktop' --key '_launch' 'Meta+e,Meta+e,Launch Emacs'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'Alacritty.desktop' --key '_launch' 'Meta+t,Meta+t,Launch Terminal'
+#+end_src
 
-   Screenshots using Spectacle:
+Screenshots using Spectacle:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'ActiveWindowScreenShot' 'Meta+Print,Meta+Print,Capture Active Window'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'CurrentMonitorScreenShot' 'Ctrl+Print,Ctrl+Print,Capture Current Monitor'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'FullScreenScreenShot' 'Print,Print,Capture Entire Desktop'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'OpenWithoutScreenshot' 'none,none,Launch Spectacle without capturing'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'RectangularRegionScreenShot' 'Shift+Print,Shift+Print,Capture Rectangular Region'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'WindowUnderCursorScreenShot' 'none,none,Capture Window Under Cursor'
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'ActiveWindowScreenShot' 'Meta+Print,Meta+Print,Capture Active Window'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'CurrentMonitorScreenShot' 'Ctrl+Print,Ctrl+Print,Capture Current Monitor'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'FullScreenScreenShot' 'Print,Print,Capture Entire Desktop'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'OpenWithoutScreenshot' 'none,none,Launch Spectacle without capturing'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'RectangularRegionScreenShot' 'Shift+Print,Shift+Print,Capture Rectangular Region'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org.kde.spectacle.desktop' --key 'WindowUnderCursorScreenShot' 'none,none,Capture Window Under Cursor'
+#+end_src
 
-   And some other hardware controls:
+And some other hardware controls:
 
-   #+begin_src shell
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Keyboard Brightness' 'Keyboard Brightness Down,Keyboard Brightness Down,Decrease Keyboard Brightness'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Screen Brightness' 'Monitor Brightness Down,Monitor Brightness Down,Decrease Screen Brightness'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Hibernate' 'Hibernate,Hibernate,Hibernate'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Keyboard Brightness' 'Keyboard Brightness Up,Keyboard Brightness Up,Increase Keyboard Brightness'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Screen Brightness' 'Monitor Brightness Up,Monitor Brightness Up,Increase Screen Brightness'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerDown' 'Power Down,Power Down,Power Down'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerOff' 'Power Off,Power Off,Power Off'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Sleep' 'Sleep,Sleep,Suspend'
-   kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Toggle Keyboard Backlight' 'Keyboard Light On/Off,Keyboard Light On/Off,Toggle Keyboard Backlight'
-   #+end_src
+#+begin_src shell
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Keyboard Brightness' 'Keyboard Brightness Down,Keyboard Brightness Down,Decrease Keyboard Brightness'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Decrease Screen Brightness' 'Monitor Brightness Down,Monitor Brightness Down,Decrease Screen Brightness'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Hibernate' 'Hibernate,Hibernate,Hibernate'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Keyboard Brightness' 'Keyboard Brightness Up,Keyboard Brightness Up,Increase Keyboard Brightness'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Increase Screen Brightness' 'Monitor Brightness Up,Monitor Brightness Up,Increase Screen Brightness'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerDown' 'Power Down,Power Down,Power Down'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'PowerOff' 'Power Off,Power Off,Power Off'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Sleep' 'Sleep,Sleep,Suspend'
+kwriteconfig5 --file $HOME/.config/kglobalshortcutsrc --group 'org_kde_powerdevil' --key 'Toggle Keyboard Backlight' 'Keyboard Light On/Off,Keyboard Light On/Off,Toggle Keyboard Backlight'
+#+end_src
 
-   Now restart ~kglobalaccel~ so changes take effect:
+Now restart ~kglobalaccel~ so changes take effect:
 
-   #+begin_src shell
-   systemctl --user restart plasma-kglobalaccel.service
-   #+end_src
+#+begin_src shell
+systemctl --user restart plasma-kglobalaccel.service
+#+end_src
 
 ** +Web browser+                                                 :DEPRECATED:
 
-   I want to experiment with Vivaldi.
+I want to experiment with Vivaldi.
 
-   #+begin_src shell :dir /sudo::
-   pamac install --no-confirm vivaldi
-   #+end_src
+#+begin_src shell :dir /sudo::
+pamac install --no-confirm vivaldi
+#+end_src
 
 ** +Enlightenment+                                               :DEPRECATED:
 
-   First install enlightenment and Entrance:
+First install enlightenment and Entrance:
 
-   #+begin_src shell :dir /sudo::
-   pacman -Sy --noconfirm enlightenment
-   pacman -Sy --noconfirm --asdeps meson
-   #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm enlightenment
+pacman -Sy --noconfirm --asdeps meson
+#+end_src
 
-   Now build Entrance running ~pamac build entrance-git~.
+Now build Entrance running ~pamac build entrance-git~.
 
-   Finally, enable entrance:
+Finally, enable entrance:
 
-   #+begin_src shell :dir /sudo::
-   systemctl enable entrance.service --force
-   #+end_src
+#+begin_src shell :dir /sudo::
+systemctl enable entrance.service --force
+#+end_src
 
 * Security
 
@@ -558,9 +558,9 @@ dnf install -y ripgrep
 
 **** Arch Linux
 
-     #+BEGIN_SRC shell :dir /sudo::
-     pacman --noconfirm -Sy yubikey-manager libfido2 pcsclite ccid
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+pacman --noconfirm -Sy yubikey-manager libfido2 pcsclite ccid
+#+END_SRC
 
 **** Fedora
 
@@ -570,25 +570,25 @@ dnf install -y yubikey-manager libfido2 pcsc-lite ccid
 
 **** Pop OS
 
-     #+BEGIN_SRC shell :dir /sudo::
-     apt-add-repository ppa:yubico/stable
-     apt update
-     apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt-add-repository ppa:yubico/stable
+apt update
+apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
+#+END_SRC
 
 *** Configuring
 
-    Start and enable the appropriate service
+Start and enable the appropriate service
 
-    #+BEGIN_SRC shell :dir /sudo::
-    systemctl enable pcscd.service
-    systemctl start pcscd.service
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+systemctl enable pcscd.service
+systemctl start pcscd.service
+#+END_SRC
 
-    To create keys, see https://github.com/caioaao/YubiKey-Guide
+To create keys, see https://github.com/caioaao/YubiKey-Guide
 
-    We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com --card-edit= and
-    then =fetch= and exit.
+We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com --card-edit= and
+then =fetch= and exit.
 
 ** GnuPG / SSH
 
@@ -596,12 +596,12 @@ dnf install -y yubikey-manager libfido2 pcsc-lite ccid
 
 **** Arch linux
 
-   Install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
-   installed together with it, for some reason.
+Install ~gcr~, as ~pinentry-gnome3~ needs it and it doesn't come
+installed together with it, for some reason.
 
-   #+BEGIN_SRC shell :dir /sudo::
-   pacman --noconfirm -Sy gcr
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+pacman --noconfirm -Sy gcr
+#+END_SRC
 
 **** Fedora
 
@@ -611,181 +611,181 @@ dnf install -y gcr
 
 *** Configure
 
-   Tangle the gpg-agent config.
+Tangle the gpg-agent config.
 
-   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
-   enable-ssh-support
-   log-file ~/.gnupg/gpg-agent.log
-   allow-emacs-pinentry
-   allow-loopback-pinentry
-   pinentry-program /usr/bin/pinentry-gnome3
-   default-cache-ttl 60
-   max-cache-ttl 120
-   #+END_SRC
+#+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
+enable-ssh-support
+log-file ~/.gnupg/gpg-agent.log
+allow-emacs-pinentry
+allow-loopback-pinentry
+pinentry-program /usr/bin/pinentry-gnome3
+default-cache-ttl 60
+max-cache-ttl 120
+#+END_SRC
 
-   And the GPG config:
+And the GPG config:
 
-   #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
-   # https://github.com/drduh/config/blob/master/gpg.conf
-   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
-   # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
-   # Use AES256, 192, or 128 as cipher
-   personal-cipher-preferences AES256 AES192 AES
-   # Use SHA512, 384, or 256 as digest
-   personal-digest-preferences SHA512 SHA384 SHA256
-   # Use ZLIB, BZIP2, ZIP, or no compression
-   personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
-   # Default preferences for new keys
-   default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
-   # SHA512 as digest to sign keys
-   cert-digest-algo SHA512
-   # SHA512 as digest for symmetric ops
-   s2k-digest-algo SHA512
-   # AES256 as cipher for symmetric ops
-   s2k-cipher-algo AES256
-   # UTF-8 support for compatibility
-   charset utf-8
-   # Show Unix timestamps
-   fixed-list-mode
-   # No comments in signature
-   no-comments
-   # No version in signature
-   no-emit-version
-   # Long hexidecimal key format
-   keyid-format 0xlong
-   # Display UID validity
-   list-options show-uid-validity
-   verify-options show-uid-validity
-   # Display all keys and their fingerprints
-   with-fingerprint
-   # Display key origins and updates
-   #with-key-origin
-   # Cross-certify subkeys are present and valid
-   require-cross-certification
-   # Disable putting recipient key IDs into messages
-   throw-keyids
-   # Enable smartcard
-   use-agent
-   # "SKS is dying" https://code.firstlook.media/the-death-of-sks-pgp-keyservers-and-how-first-look-media-is-handling-it
-   keyserver hkps://keys.openpgp.org
-   #+END_SRC
+#+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
+# https://github.com/drduh/config/blob/master/gpg.conf
+# https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+# https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
+# Use AES256, 192, or 128 as cipher
+personal-cipher-preferences AES256 AES192 AES
+# Use SHA512, 384, or 256 as digest
+personal-digest-preferences SHA512 SHA384 SHA256
+# Use ZLIB, BZIP2, ZIP, or no compression
+personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+# Default preferences for new keys
+default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+# SHA512 as digest to sign keys
+cert-digest-algo SHA512
+# SHA512 as digest for symmetric ops
+s2k-digest-algo SHA512
+# AES256 as cipher for symmetric ops
+s2k-cipher-algo AES256
+# UTF-8 support for compatibility
+charset utf-8
+# Show Unix timestamps
+fixed-list-mode
+# No comments in signature
+no-comments
+# No version in signature
+no-emit-version
+# Long hexidecimal key format
+keyid-format 0xlong
+# Display UID validity
+list-options show-uid-validity
+verify-options show-uid-validity
+# Display all keys and their fingerprints
+with-fingerprint
+# Display key origins and updates
+#with-key-origin
+# Cross-certify subkeys are present and valid
+require-cross-certification
+# Disable putting recipient key IDs into messages
+throw-keyids
+# Enable smartcard
+use-agent
+# "SKS is dying" https://code.firstlook.media/the-death-of-sks-pgp-keyservers-and-how-first-look-media-is-handling-it
+keyserver hkps://keys.openpgp.org
+#+END_SRC
 
-   Make sure gnupg home has correct permissions:
+Make sure gnupg home has correct permissions:
 
-   #+begin_src shell
-   chmod 700 ~/.gnupg
-   #+end_src
-   Also, tangle the ssh config.
+#+begin_src shell
+chmod 700 ~/.gnupg
+#+end_src
+Also, tangle the ssh config.
 
-   #+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
-   GSSAPIAuthentication no
-   #+END_SRC
+#+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
+GSSAPIAuthentication no
+#+END_SRC
 
-   PS: explanation for disabling GSSApi, besides the slowness it causes in some
-   cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
+PS: explanation for disabling GSSApi, besides the slowness it causes in some
+cases, is presented [[https://unix.stackexchange.com/questions/65068/why-ssh-takes-a-long-time-to-connect#comment875799_65276][here]].
 
-   And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling the following
-   config file to use Google's DNS:
+And fix the slowness caused by [[https://wiki.archlinux.org/index.php/Systemd-resolved][systemd-resolved]] by tangling the following
+config file to use Google's DNS:
 
-   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
-   [Resolve]
-   DNS=8.8.8.8
-   #+END_SRC
+#+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
+[Resolve]
+DNS=8.8.8.8
+#+END_SRC
 
-   Added security with DNS over TLS. *WARNING:* do not use with ubuntu since
-   systemd-resolved's is old and doesn't support it.
+Added security with DNS over TLS. *WARNING:* do not use with ubuntu since
+systemd-resolved's is old and doesn't support it.
 
-   #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
-   [Resolve]
-   DNSOverTLS=opportunistic
-   #+END_SRC
+#+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/tls.conf :mkdirp yes
+[Resolve]
+DNSOverTLS=opportunistic
+#+END_SRC
 
-   And restart the service
+And restart the service
 
-   #+BEGIN_SRC shell :dir /sudo::
-   systemctl restart systemd-resolved.service
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+systemctl restart systemd-resolved.service
+#+END_SRC
 
-   Also import the public key so we can use it:
+Also import the public key so we can use it:
 
-   #+BEGIN_SRC shell :var keyid=gpg-key-id
-   gpg --keyserver hkps://keys.openpgp.org --recv ${keyid}
-   #+END_SRC
+#+BEGIN_SRC shell :var keyid=gpg-key-id
+gpg --keyserver hkps://keys.openpgp.org --recv ${keyid}
+#+END_SRC
 
-   We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
-   then type ~trust~ and choose option ~5~.
+We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
+then type ~trust~ and choose option ~5~.
 
 ** iptables firewall
 
-   After some issues because of exposed ports, using iptables as a firewall
-   sounds like a good idea.
+After some issues because of exposed ports, using iptables as a firewall
+sounds like a good idea.
 
-   First create the systemd service and the flush script:
+First create the systemd service and the flush script:
 
-   #+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
-   # credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
-   [Unit]
-   Description=Packet Filtering Framework
-   DefaultDependencies=no
-   After=systemd-sysctl.service
-   Before=sysinit.target
-   [Service]
-   Type=oneshot
-   ExecStart=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
-   ExecReload=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
-   ExecStop=/etc/iptables/iptables-flush.sh
-   RemainAfterExit=yes
-   [Install]
-   WantedBy=multi-user.target
-   #+end_src
+#+begin_src conf :tangle /sudo::/etc/systemd/system/iptables.service
+# credits: https://github.com/gronke/systemd-iptables/commit/cae73534807575f7716ee4f03a1721b9d4075d31
+[Unit]
+Description=Packet Filtering Framework
+DefaultDependencies=no
+After=systemd-sysctl.service
+Before=sysinit.target
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+ExecReload=/usr/sbin/iptables-restore /etc/iptables/iptables.rules
+ExecStop=/etc/iptables/iptables-flush.sh
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target
+#+end_src
 
-   #+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp yes :tangle-mode (identity #o755) :dir /sudo::
-   #!/usr/bin/env bash
-   iptables -F
-   iptables -X
-   iptables -t nat -F
-   iptables -t nat -X
-   iptables -t mangle -F
-   iptables -t mangle -X
-   iptables -P INPUT ACCEPT
-   iptables -P FORWARD ACCEPT
-   iptables -P OUTPUT ACCEPT
-   #+end_src
+#+begin_src shell :tangle /sudo::/etc/iptables/iptables-flush.sh :mkdirp yes :tangle-mode (identity #o755) :dir /sudo::
+#!/usr/bin/env bash
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+#+end_src
 
-   Then generate the file containing the rules and enable the service:
+Then generate the file containing the rules and enable the service:
 
-   #+begin_src shell :dir /sudo::
-   # Flush all rules
-   /etc/iptables/iptables-flush.sh
+#+begin_src shell :dir /sudo::
+# Flush all rules
+/etc/iptables/iptables-flush.sh
 
-   # Default rule to drop incoming traffic
-   iptables --policy INPUT DROP
-   iptables --policy FORWARD DROP
-   iptables --policy OUTPUT ACCEPT
+# Default rule to drop incoming traffic
+iptables --policy INPUT DROP
+iptables --policy FORWARD DROP
+iptables --policy OUTPUT ACCEPT
 
-   # Rules to allow outgoing traffic
-   iptables --append INPUT -i lo -j ACCEPT
-   iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
-   iptables --append INPUT --jump REJECT
+# Rules to allow outgoing traffic
+iptables --append INPUT -i lo -j ACCEPT
+iptables --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+iptables --append INPUT --jump REJECT
 
-   iptables --append FORWARD --match state --state ESTABLISHED,RELATED -j ACCEPT
-   iptables --append FORWARD -o enp+ -j ACCEPT
-   iptables --append FORWARD -o wlp+ -j ACCEPT
-   iptables --append FORWARD --jump REJECT
+iptables --append FORWARD --match state --state ESTABLISHED,RELATED -j ACCEPT
+iptables --append FORWARD -o enp+ -j ACCEPT
+iptables --append FORWARD -o wlp+ -j ACCEPT
+iptables --append FORWARD --jump REJECT
 
-   # Rules to allow outgoing traffic from docker containers
-   iptables -N DOCKER-USER
-   iptables --append DOCKER-USER -i enp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
-   iptables --append DOCKER-USER -i wlp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
-   iptables --append DOCKER-USER -i enp+ -j DROP
-   iptables --append DOCKER-USER -i wlp+ -j DROP
+# Rules to allow outgoing traffic from docker containers
+iptables -N DOCKER-USER
+iptables --append DOCKER-USER -i enp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+iptables --append DOCKER-USER -i wlp+ --match state --state ESTABLISHED,RELATED -j ACCEPT
+iptables --append DOCKER-USER -i enp+ -j DROP
+iptables --append DOCKER-USER -i wlp+ -j DROP
 
-   mkdir -p /etc/iptables || true
-   iptables-save > /etc/iptables/iptables.rules
+mkdir -p /etc/iptables || true
+iptables-save > /etc/iptables/iptables.rules
 
-   systemctl enable iptables.service
-   systemctl start iptables.service
-   #+end_src
+systemctl enable iptables.service
+systemctl start iptables.service
+#+end_src
 
 ** NordVPN
 
@@ -793,7 +793,7 @@ dnf install -y gcr
 
 **** Arch Linux
 
-   Install by running ~pamac build nordvpn-bin~. After installing, add your user to the nordvpn group:
+Install by running ~pamac build nordvpn-bin~. After installing, add your user to the nordvpn group:
 
 **** Fedora
 
@@ -805,16 +805,16 @@ chmod +x /tmp/install-nord.sh
 
 *** Configure
 
-    #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
-    usermod -aG nordvpn $user
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
+usermod -aG nordvpn $user
+#+END_SRC
 
-    And start/enable the nordvpn daemon:
+And start/enable the nordvpn daemon:
 
-    #+begin_src shell :dir /sudo::
-    systemctl enable nordvpnd
-    systemctl start nordvpnd
-    #+end_src
+#+begin_src shell :dir /sudo::
+systemctl enable nordvpnd
+systemctl start nordvpnd
+#+end_src
 
 * Development
 
@@ -824,15 +824,15 @@ chmod +x /tmp/install-nord.sh
 
 **** Arch-linux
 
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm tmux xclip fzf
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm tmux xclip fzf
+#+end_src
 
 **** Pop-OS
 
-     #+begin_src shell :dir /sudo::
-     apt install -y tmux
-     #+end_src
+#+begin_src shell :dir /sudo::
+apt install -y tmux
+#+end_src
 
 **** Fedora
 
@@ -842,42 +842,42 @@ dnf install -y tmux xclip fzf
 
 *** Configuring
 
-    Let's first install tmux plugin manager:
+Let's first install tmux plugin manager:
 
-    #+begin_src shell
-    mkdir -p ~/.tmux/plugins
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    #+end_src
+#+begin_src shell
+mkdir -p ~/.tmux/plugins
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+#+end_src
 
-    And tangle the config:
+And tangle the config:
 
-    #+begin_src conf :tangle ~/.config/tmux/tmux.conf :mkdirp yes
-    unbind-key C-b
-    set -g prefix 'C-q'
-    bind-key 'C-q' send-prefix
-    set-window-option -g mode-keys vi
-    bind | split-window -h
-    bind - split-window -v
-    unbind '"'
-    unbind %
-    bind-key -T copy-mode-vi v send -X begin-selection
-    bind-key -T copy-mode-vi V send -X select-line
-    bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
-    set -g mouse on
+#+begin_src conf :tangle ~/.config/tmux/tmux.conf :mkdirp yes
+unbind-key C-b
+set -g prefix 'C-q'
+bind-key 'C-q' send-prefix
+set-window-option -g mode-keys vi
+bind | split-window -h
+bind - split-window -v
+unbind '"'
+unbind %
+bind-key -T copy-mode-vi v send -X begin-selection
+bind-key -T copy-mode-vi V send -X select-line
+bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+set -g mouse on
 
-    set -g @plugin 'wfxr/tmux-fzf-url'
+set -g @plugin 'wfxr/tmux-fzf-url'
 
-    # theming
-    set -g @plugin 'wfxr/tmux-power'
-    set -g @plugin 'wfxr/tmux-net-speed'
-    set -g @tmux_power_theme 'snow'
-    set -g @tmux_power_show_download_speed true
+# theming
+set -g @plugin 'wfxr/tmux-power'
+set -g @plugin 'wfxr/tmux-net-speed'
+set -g @tmux_power_theme 'snow'
+set -g @tmux_power_show_download_speed true
 
-    run '~/.tmux/plugins/tpm/tpm'
-    #+end_src
+run '~/.tmux/plugins/tpm/tpm'
+#+end_src
 
-    To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
-    frozen, but it's installing stuff.
+To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
+frozen, but it's installing stuff.
 
 ** Alacritty
 
@@ -885,15 +885,15 @@ dnf install -y tmux xclip fzf
 
 **** Arch Linux
 
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm alacritty
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm alacritty
+#+end_src
 
 **** Pop OS
 
-     #+begin_src shell :dir /sudo::
-     apt install -y alacritty
-     #+end_src
+#+begin_src shell :dir /sudo::
+apt install -y alacritty
+#+end_src
 
 **** Fedora
 
@@ -903,22 +903,22 @@ dnf -y install alacritty
 
 *** Configure
 
-    #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
-    font:
-      # Point size of the font, but alacritty has many issues with font
-      # size apparently, so we need to choose this through trial and error
-      size: 11.0
+#+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
+  font:
+    # Point size of the font, but alacritty has many issues with font
+    # size apparently, so we need to choose this through trial and error
+    size: 11.0
 
     colors:
       primary:
         background: '#333333'
 
-    window:
-      decorations: none
-      padding:
-        x: 5
-        y: 10
-    #+end_src
+        window:
+          decorations: none
+          padding:
+            x: 5
+            y: 10
+#+end_src
 
 ** direnv
 
@@ -926,75 +926,75 @@ dnf -y install alacritty
 
 **** Arch-Linux
 
-     #+begin_src sh :dir /sudo::
-     pacman -Sy --no-confirm direnv
-     #+end_src
+#+begin_src sh :dir /sudo::
+pacman -Sy --no-confirm direnv
+#+end_src
 
 **** Pop-OS
 
-     #+begin_src sh :dir /sudo::
-     apt install -y direnv
-     #+end_src
+#+begin_src sh :dir /sudo::
+apt install -y direnv
+#+end_src
 
 *** Configure
 
-    #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh :mkdirp yes
-    #!/usr/bin/env bash
+#+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh :mkdirp yes
+#!/usr/bin/env bash
 
-    eval "$(direnv hook zsh)"
-    #+end_src
+eval "$(direnv hook zsh)"
+#+end_src
 
 ** asdf
 
-   # TODO install asdf system-wide: https://github.com/asdf-vm/asdf/issues/577
+# TODO install asdf system-wide: https://github.com/asdf-vm/asdf/issues/577
 
-   First clone the repo:
+First clone the repo:
 
-   #+begin_src sh
-   git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
-   #+end_src
+#+begin_src sh
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
+#+end_src
 
-   Now add the completions and the executable to dot files:
+Now add the completions and the executable to dot files:
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp yes
-   #!/usr/bin/env bash
-   . $HOME/.asdf/asdf.sh
-   . $HOME/.asdf/completions/asdf.bash
-   #+end_src
+#+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp yes
+#!/usr/bin/env bash
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
+#+end_src
 
 ** Git
 
-   Basic configs
+Basic configs
 
-   TODO: try grabbing the email from system
+TODO: try grabbing the email from system
 
-   #+BEGIN_SRC conf :tangle ~/.gitconfig
-   [user]
-   name="Caio Oliveira"
-   email=caioaao@gmail.com
-   signingKey=DD90B67479EFA704
+#+BEGIN_SRC conf :tangle ~/.gitconfig
+[user]
+name="Caio Oliveira"
+email=caioaao@gmail.com
+signingKey=DD90B67479EFA704
 
-   [core]
-   editor=emacs
+[core]
+editor=emacs
 
-   [commit]
-   gpgsign=true
-   #+END_SRC
+[commit]
+gpgsign=true
+#+END_SRC
 
 ** Git-LFS
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm git-lfs
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm git-lfs
+#+end_src
 
 *** Pop OS
 
-    #+begin_src shell :dir /sudo::/tmp
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-    apt install -y git-lfs
-    #+end_src
+#+begin_src shell :dir /sudo::/tmp
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+apt install -y git-lfs
+#+end_src
 
 *** Fedora
 
@@ -1006,57 +1006,57 @@ dnf install -y git-lfs
 
 *** Arch Linux
 
-    Install:
+Install:
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm docker
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm docker
+#+end_src
 
-    Now enable and start service:
+Now enable and start service:
 
-    #+begin_src shell :dir /sudo::
-    systemctl enable docker
-    systemctl start docker
-    #+end_src
+#+begin_src shell :dir /sudo::
+systemctl enable docker
+systemctl start docker
+#+end_src
 
 *** Ubuntu
 
-    Install the dependencies
+Install the dependencies
 
-    #+BEGIN_SRC shell :dir /sudo::
-    apt update -y
+#+BEGIN_SRC shell :dir /sudo::
+apt update -y
 
-    apt install -y \
-         apt-transport-https \
-         ca-certificates \
-         curl \
-         gnupg-agent \
-         software-properties-common
-    #+END_SRC
+apt install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+#+END_SRC
 
-    And add the GPG key and PPA repository:
+And add the GPG key and PPA repository:
 
-    #+begin_src shell :dir /sudo::
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-    add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-       $(lsb_release -cs) \
-       stable"
-    #+end_src
+#+begin_src shell :dir /sudo::
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+#+end_src
 
-    Finally install:
+Finally install:
 
-    #+begin_src shell :dir /sudo::
-     apt update -y
-     apt install -y docker-ce docker-ce-cli containerd.io
-    #+end_src
+#+begin_src shell :dir /sudo::
+apt update -y
+apt install -y docker-ce docker-ce-cli containerd.io
+#+end_src
 
-    And create the docker bridge if it doesn't already exist:
+And create the docker bridge if it doesn't already exist:
 
-    #+BEGIN_SRC shell :dir /sudo::
-      ip link add name docker0 type bridge
-      ip addr add dev docker0 172.17.0.1/16
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+ip link add name docker0 type bridge
+ip addr add dev docker0 172.17.0.1/16
+#+END_SRC
 
 *** Fedora
 
@@ -1078,35 +1078,35 @@ systemctl start docker
 
 ** NodeJS
 
-   #+NAME: node-nvm-version
-   : v0.39.1
+#+NAME: node-nvm-version
+: v0.39.1
 
-   Installing NVM
+Installing NVM
 
-   #+begin_src shell :var version=node-nvm-version
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${version}/install.sh | bash
-   #+end_src
+#+begin_src shell :var version=node-nvm-version
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${version}/install.sh | bash
+#+end_src
 
-   Now tangle this to add it to zsh:
+Now tangle this to add it to zsh:
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp yes
-   export NVM_DIR="$HOME/.nvm"
-   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-   #+end_src
+#+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp yes
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+#+end_src
 
-   Let's add LTS as the default node version using nvmrc:
+Let's add LTS as the default node version using nvmrc:
 
-   #+begin_src conf :tangle ~/.nvmrc
-   lts/*
-   #+end_src
+#+begin_src conf :tangle ~/.nvmrc
+lts/*
+#+end_src
 
-   We can now install nodejs
+We can now install nodejs
 
-   #+begin_src shell
-   \. "$HOME/.nvm/nvm.sh" --no-use
-   nvm install
-   nvm alias default node
-   #+end_src
+#+begin_src shell
+\. "$HOME/.nvm/nvm.sh" --no-use
+nvm install
+nvm alias default node
+#+end_src
 
 ** Yarn
 
@@ -1114,17 +1114,17 @@ systemctl start docker
 
 **** Arch linux
 
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm yarn
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm yarn
+#+end_src
 
 **** Pop OS
 
-     #+begin_src shell :dir /sudo::
-     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-     apt update && apt install -y yarn
-     #+end_src
+#+begin_src shell :dir /sudo::
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+apt update && apt install -y yarn
+#+end_src
 
 **** Fedora
 
@@ -1134,37 +1134,37 @@ npm install -G yarn
 
 *** Configure
 
-    #+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
-    export PATH="$PATH:`yarn global bin`"
-    #+end_src
+#+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
+export PATH="$PATH:`yarn global bin`"
+#+end_src
 
 ** Typescript
 
-   #+begin_src shell
-   \. "$HOME/.nvm/nvm.sh"
-   nvm use node
-   npm install -g typescript typescript-language-server
-   #+end_src
+#+begin_src shell
+\. "$HOME/.nvm/nvm.sh"
+nvm use node
+npm install -g typescript typescript-language-server
+#+end_src
 
 ** Kubernetes
 
 *** kubectl
 
-    #+NAME: default_kubectl_version
-    : 1.26.0
+#+NAME: default_kubectl_version
+: 1.26.0
 
-    Add the plugin to asdf and install the default version:
+Add the plugin to asdf and install the default version:
 
-    #+begin_src shell :var kubectl_version=default_kubectl_version
-    asdf plugin-add kubectl
-    asdf install kubectl ${kubectl_version}
-    #+end_src
+#+begin_src shell :var kubectl_version=default_kubectl_version
+asdf plugin-add kubectl
+asdf install kubectl ${kubectl_version}
+#+end_src
 
-    Now setup kubectl global version:
+Now setup kubectl global version:
 
-    #+begin_src shell :var kubectl_version=default_kubectl_version
-    asdf global kubectl ${kubectl_version}
-    #+end_src
+#+begin_src shell :var kubectl_version=default_kubectl_version
+asdf global kubectl ${kubectl_version}
+#+end_src
 
 ** golang
 
@@ -1172,54 +1172,54 @@ npm install -G yarn
 
 **** Arch Linux
 
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm go
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm go
+#+end_src
 
 **** Other
 
-     #+NAME: go_version
-     : 1.19.4
+#+NAME: go_version
+: 1.19.4
 
-     #+begin_src shell :dir /tmp :var GO_VERSION=go_version
-     curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
-     #+end_src
+#+begin_src shell :dir /tmp :var GO_VERSION=go_version
+curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
+#+end_src
 
-     #+begin_src shell :dir /sudo:: :var GO_VERSION=go_version
-     mv /tmp/go /opt/go-${GO_VERSION}
-     rm -rf /opt/go || true
-     ln -sf /opt/go-${GO_VERSION} /opt/go
-     #+end_src
+#+begin_src shell :dir /sudo:: :var GO_VERSION=go_version
+mv /tmp/go /opt/go-${GO_VERSION}
+rm -rf /opt/go || true
+ln -sf /opt/go-${GO_VERSION} /opt/go
+#+end_src
 
 *** Configure
 
-    And add go executables to our path:
+And add go executables to our path:
 
-    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
-    #!/usr/bin/env bash
+#+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+#!/usr/bin/env bash
 
-    export GOPATH=~/go
-    export PATH="$PATH:/opt/go/bin:$GOPATH/bin"
-    #+end_src
+export GOPATH=~/go
+export PATH="$PATH:/opt/go/bin:$GOPATH/bin"
+#+end_src
 
-    Now the goodies:
+Now the goodies:
 
-    #+begin_src shell
-    source ~/.zsh.d/apps.d/10-golang.sh
-    go install golang.org/x/tools/cmd/godoc@latest
-    go install golang.org/x/tools/cmd/goimports@latest
-    go install github.com/rogpeppe/godef@latest
-    go install golang.org/x/tools/gopls@latest
-    #+end_src
+#+begin_src shell
+source ~/.zsh.d/apps.d/10-golang.sh
+go install golang.org/x/tools/cmd/godoc@latest
+go install golang.org/x/tools/cmd/goimports@latest
+go install github.com/rogpeppe/godef@latest
+go install golang.org/x/tools/gopls@latest
+#+end_src
 
 ** protobuf
 
 *** Compiler
 **** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm protobuf
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm protobuf
+#+end_src
 **** Fedora
 
 #+begin_src shell :dir /sudo::
@@ -1228,22 +1228,22 @@ dnf install -y protobuf
 
 **** Other
 
-    Download, extract and configure:
+Download, extract and configure:
 
-    #+begin_src shell :dir /tmp
-    curl -sL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz | tar xz
-    cd protobuf-3.11.2
-    ./configure
-    make
-    make check -j 13
-    #+end_src
+#+begin_src shell :dir /tmp
+curl -sL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-cpp-3.11.2.tar.gz | tar xz
+cd protobuf-3.11.2
+./configure
+make
+make check -j 13
+#+end_src
 
-    Install and refresh shared library cache
+Install and refresh shared library cache
 
-    #+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
-    make install
-    ldconfig
-    #+end_src
+#+begin_src shell :dir /sudo::/tmp/protobuf-3.11.2
+make install
+ldconfig
+#+end_src
 
 *** Buf
 
@@ -1259,94 +1259,94 @@ chmod +x /usr/local/bin/buf
 
 ** gcloud
 
-   #+NAME: gcloud_sdk_version
-   : 401.0.0
+#+NAME: gcloud_sdk_version
+: 401.0.0
 
-   First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
+First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
 
-   #+begin_src shell
-   asdf plugin-add python
-   asdf install python 3.9.9
-   #+end_src
+#+begin_src shell
+asdf plugin-add python
+asdf install python 3.9.9
+#+end_src
 
-   #+begin_src shell :dir /tmp :var version=gcloud_sdk_version
-   curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
-   #+end_src
+#+begin_src shell :dir /tmp :var version=gcloud_sdk_version
+curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
+#+end_src
 
-   #+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
-   mv /tmp/google-cloud-sdk /opt/google-cloud-sdk-${version}
-   rm -rf /opt/google-cloud-sdk || true
-   ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
-   #+end_src
+#+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
+mv /tmp/google-cloud-sdk /opt/google-cloud-sdk-${version}
+rm -rf /opt/google-cloud-sdk || true
+ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
+#+end_src
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
-   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
-   if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
-   if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
-   #+end_src
+#+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
+export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
+#+end_src
 
-   #+begin_src shell
-   export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
-   . '/opt/google-cloud-sdk/path.zsh.inc'
-   gcloud config set disable_usage_reporting true
-   #+end_src
+#+begin_src shell
+export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
+. '/opt/google-cloud-sdk/path.zsh.inc'
+gcloud config set disable_usage_reporting true
+#+end_src
 
 ** pulumi
 
-   First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
+First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
 
-   #+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp yes
-   export PATH=$PATH:$HOME/.pulumi/bin
-   #+end_src
+#+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp yes
+export PATH=$PATH:$HOME/.pulumi/bin
+#+end_src
 
-   #+begin_src shell
-   export PATH=$PATH:$HOME/.pulumi/bin
-   curl -fsSL https://get.pulumi.com | sh
-   #+end_src
+#+begin_src shell
+export PATH=$PATH:$HOME/.pulumi/bin
+curl -fsSL https://get.pulumi.com | sh
+#+end_src
 
-   Now let's generate the pulumi autocomplete:
+Now let's generate the pulumi autocomplete:
 
-   #+begin_src shell
-   $HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.zsh.d/apps.d/10-pulumi-autocomplete.sh
-   #+end_src
+#+begin_src shell
+$HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.zsh.d/apps.d/10-pulumi-autocomplete.sh
+#+end_src
 
 ** ngrok
 
-   #+begin_src sh :dir /tmp
-   wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-   #+end_src
+#+begin_src sh :dir /tmp
+wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+#+end_src
 
-   #+begin_src shell :dir /sudo::
-   mkdir -p /opt/ngrok
-   cd /opt/ngrok
-   busybox unzip /tmp/ngrok-stable-linux-amd64.zip
-   chmod -R 0755 /opt/ngrok
-   chmod +x /opt/ngrok
-   ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
-   #+end_src
+#+begin_src shell :dir /sudo::
+mkdir -p /opt/ngrok
+cd /opt/ngrok
+busybox unzip /tmp/ngrok-stable-linux-amd64.zip
+chmod -R 0755 /opt/ngrok
+chmod +x /opt/ngrok
+ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
+#+end_src
 
 ** nats-cli
 
-   #+NAME: nats-cli-version
-   : 0.0.24
+#+NAME: nats-cli-version
+: 0.0.24
 
-   #+begin_src shell :dir /tmp :var version=nats-cli-version
-   wget https://github.com/nats-io/natscli/releases/download/${version}/nats-${version}-linux-amd64.zip
-   unzip nats-${version}-linux-amd64.zip
-   #+end_src
+#+begin_src shell :dir /tmp :var version=nats-cli-version
+wget https://github.com/nats-io/natscli/releases/download/${version}/nats-${version}-linux-amd64.zip
+unzip nats-${version}-linux-amd64.zip
+#+end_src
 
-   #+begin_src shell :dir /sudo:: :var version=nats-cli-version
-   mkdir /opt/nats-cli
-   chmod 0755 /opt/nats-cli
-   mv /tmp/nats-${version}-linux-amd64 /opt/nats-cli/nats-${version}
-   ln -sf /opt/nats-cli/nats-${version}/nats /usr/local/bin/nats
-   #+end_src
+#+begin_src shell :dir /sudo:: :var version=nats-cli-version
+mkdir /opt/nats-cli
+chmod 0755 /opt/nats-cli
+mv /tmp/nats-${version}-linux-amd64 /opt/nats-cli/nats-${version}
+ln -sf /opt/nats-cli/nats-${version}/nats /usr/local/bin/nats
+#+end_src
 
 ** pre-commit
 
-   #+begin_src shell :dir /sudo::
-   pacman -Sy --noconfirm python-pre-commit
-   #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm python-pre-commit
+#+end_src
 
 ** python
 
@@ -1367,46 +1367,46 @@ asdf global python 3.9.9
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm python-cookiecutter
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm python-cookiecutter
+#+end_src
 
 ** OCaml
 
-   #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm ocaml opam
-   #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm ocaml opam
+#+end_src
 
-   Now init opam:
+Now init opam:
 
-   #+begin_src shell
-     touch ~/.zsh.d/apps.d/10-opam.sh
-     opam init -a --dot-profile ~/.zsh.d/apps.d/10-opam.sh \
-          --enable-shell-hook --enable-completion --shell=zsh --reinit
-     eval $(opam env)
-   #+end_src
+#+begin_src shell
+touch ~/.zsh.d/apps.d/10-opam.sh
+opam init -a --dot-profile ~/.zsh.d/apps.d/10-opam.sh \
+     --enable-shell-hook --enable-completion --shell=zsh --reinit
+eval $(opam env)
+#+end_src
 
-   Install LSP server:
+Install LSP server:
 
-   #+begin_src shell
-     opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
-     opam install ocaml-lsp-server
-   #+end_src
+#+begin_src shell
+opam pin add -y ocaml-lsp-server https://github.com/ocaml/ocaml-lsp.git
+opam install ocaml-lsp-server
+#+end_src
 
-   Also install ReasonML LSP server:
+Also install ReasonML LSP server:
 
-   #+NAME: reason_ls_version
-   : 1.7.9
+#+NAME: reason_ls_version
+: 1.7.9
 
-   #+begin_src shell :dir /tmp :var version=reason_ls_version
-     curl -fsSL https://github.com/jaredly/reason-language-server/releases/download/${version}/rls-linux.zip | busybox unzip -
-   #+end_src
+#+begin_src shell :dir /tmp :var version=reason_ls_version
+curl -fsSL https://github.com/jaredly/reason-language-server/releases/download/${version}/rls-linux.zip | busybox unzip -
+#+end_src
 
-   #+begin_src shell :dir /sudo:: :var version=reason_ls_version
-     mv /tmp/rls-linux /opt/reason-ls-${version}
-     chmod +x /opt/reason-ls-${version}/reason-language-server
-     ln -sf /opt/reason-ls-${version}/reason-language-server /usr/local/bin/reason-language-server
-   #+end_src
+#+begin_src shell :dir /sudo:: :var version=reason_ls_version
+mv /tmp/rls-linux /opt/reason-ls-${version}
+chmod +x /opt/reason-ls-${version}/reason-language-server
+ln -sf /opt/reason-ls-${version}/reason-language-server /usr/local/bin/reason-language-server
+#+end_src
 
 ** Hugo
 
@@ -1477,9 +1477,9 @@ curl -fL https://github.com/coursier/launchers/raw/${version}/cs-x86_64-pc-linux
 
 **** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy nix
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy nix
+#+end_src
 
 *** Configure
 
@@ -1581,196 +1581,196 @@ pamac build osm2pgsql
 
 **** Arch Linux
 
-     Install busybox:
+Install busybox:
 
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm busybox
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm busybox
+#+end_src
 
 *** Iosevka
 
-    #+NAME: iosevka_font_version
-    : 3.4.6
+#+NAME: iosevka_font_version
+: 3.4.6
 
-    Download iosevka:
+Download iosevka:
 
-    #+begin_src shell :var iosevka_font_version=iosevka_font_version
-    mkdir -p ~/.fonts
-    cd ~/.fonts
-    curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
-    #+end_src
+#+begin_src shell :var iosevka_font_version=iosevka_font_version
+mkdir -p ~/.fonts
+cd ~/.fonts
+curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
+#+end_src
 
-    Update cache:
+Update cache:
 
-    #+BEGIN_SRC shell :results output silent
-    fc-cache -fv
-    #+END_SRC
+#+BEGIN_SRC shell :results output silent
+fc-cache -fv
+#+END_SRC
 
-    We can now set Iosevka as the default monospaced font by tangling this file:
+We can now set Iosevka as the default monospaced font by tangling this file:
 
-    #+begin_src xml :tangle ~/.config/fontconfig/conf.d/10-iosevka-mono.conf :mkdirp yes
-    <?xml version="1.0"?>
-    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-    <fontconfig>
-      <alias>
-        <family>monospace</family>
-        <prefer>
-          <family>Iosevka Fixed SS12</family>
-        </prefer>
-      </alias>
-      <alias>
-        <family>Iosevka Fixed SS12</family>
-        <default>
-          <family>monospace</family>
-        </default>
-      </alias>
-    </fontconfig>
-    #+end_src
+#+begin_src xml :tangle ~/.config/fontconfig/conf.d/10-iosevka-mono.conf :mkdirp yes
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>monospace</family>
+    <prefer>
+      <family>Iosevka Fixed SS12</family>
+    </prefer>
+  </alias>
+  <alias>
+    <family>Iosevka Fixed SS12</family>
+    <default>
+      <family>monospace</family>
+    </default>
+  </alias>
+</fontconfig>
+#+end_src
 
 ** Gnome top bar
 
-   Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
+Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
 
-   #+begin_src sh :dir ~/reps
-   # git clone git@github.com:ewlsh/dynamic-panel-transparency.git
-   cd dynamic-panel-transparency && git checkout cd0e7ebbd0d8df3d871134a3a4b7cba16944c5e2
+#+begin_src sh :dir ~/reps
+# git clone git@github.com:ewlsh/dynamic-panel-transparency.git
+cd dynamic-panel-transparency && git checkout cd0e7ebbd0d8df3d871134a3a4b7cba16944c5e2
 
-   mkdir -p ~/.local/share/gnome-shell/extensions
+mkdir -p ~/.local/share/gnome-shell/extensions
 
-   EXTENSION_DIR=~/.local/share/gnome-shell/extensions/dynamic-panel-transparency@rockon999.github.io
+EXTENSION_DIR=~/.local/share/gnome-shell/extensions/dynamic-panel-transparency@rockon999.github.io
 
-   ln -sf `pwd`/dynamic-panel-transparency@rockon999.github.io ${EXTENSION_DIR}
+ln -sf `pwd`/dynamic-panel-transparency@rockon999.github.io ${EXTENSION_DIR}
 
-   SCHEMADIR=${EXTENSION_DIR}/schemas
+SCHEMADIR=${EXTENSION_DIR}/schemas
 
-   gnome-extensions enable dynamic-panel-transparency@rockon999.github.io
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-text-color false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency remove-panel-styling true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency maximized-opacity 0
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-opacity true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-with-overview true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-position '(1, 1, 3)'
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-color '(0, 0, 0, 1.0)'
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-theme-update false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency icon-shadow false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-type 1
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-windows-touch true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-overview-text-color false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-speed 0
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-background-color false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency hide-corners true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency unmaximized-opacity 0
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-animation false
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow true
-   gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-maximized-text-color false
-   #+end_src
+gnome-extensions enable dynamic-panel-transparency@rockon999.github.io
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-text-color false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency remove-panel-styling true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency maximized-opacity 0
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-opacity true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-with-overview true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-position '(1, 1, 3)'
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow-color '(0, 0, 0, 1.0)'
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-theme-update false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency icon-shadow false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-type 1
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-windows-touch true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-overview-text-color false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency transition-speed 0
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-background-color false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency hide-corners true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency unmaximized-opacity 0
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency force-animation false
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency text-shadow true
+gsettings --schemadir ${SCHEMADIR} set org.gnome.shell.extensions.dynamic-panel-transparency enable-maximized-text-color false
+#+end_src
 
-   And another for hiding it. Install:
+And another for hiding it. Install:
 
-   #+begin_src sh :dir /sudo::
-   apt update -y
-   apt install -y gnome-shell-extension-autohidetopbar
-   #+end_src
+#+begin_src sh :dir /sudo::
+apt update -y
+apt install -y gnome-shell-extension-autohidetopbar
+#+end_src
 
-   And enable/configure it:
+And enable/configure it:
 
-   #+begin_src sh
-   gnome-extensions enable hidetopbar@mathieu.bidon.ca
+#+begin_src sh
+gnome-extensions enable hidetopbar@mathieu.bidon.ca
 
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar hot-corner false
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-timeout 1000
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-autohide 0.2
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-intellihide false
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-active-window false
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive true
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar shortcut-delay 1.0
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-threshold 100
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-overview 0.4
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview false
-   gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window true
-   #+end_src
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar hot-corner false
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-timeout 1000
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-autohide 0.2
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-intellihide false
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar enable-active-window false
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive true
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar shortcut-delay 1.0
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar pressure-threshold 100
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar animation-time-overview 0.4
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview false
+gsettings --schemadir /usr/share/gnome-shell/extensions/hidetopbar@mathieu.bidon.ca/schemas set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window true
+#+end_src
 
-   And restart gnome to have everything updated:
+And restart gnome to have everything updated:
 
-   #+begin_src sh :dir /sudo::
-   killall -3 gnome-shell
-   #+end_src
+#+begin_src sh :dir /sudo::
+killall -3 gnome-shell
+#+end_src
 
 ** Wallpaper
 
-   Let's download one from unsplash:
+Let's download one from unsplash:
 
-   #+begin_src sh :dir ~/Pictures
-   mkdir -p wallpapers && cd wallpapers
-   curl -o mountain1.jpg -fsSL https://unsplash.com/photos/1527pjeb6jg/download?force=true&w=2400
-   #+end_src
+#+begin_src sh :dir ~/Pictures
+mkdir -p wallpapers && cd wallpapers
+curl -o mountain1.jpg -fsSL https://unsplash.com/photos/1527pjeb6jg/download?force=true&w=2400
+#+end_src
 
 *** XFCE
 
-    #+begin_src shell
-    xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitorHDMI-1-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
-    xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitoreDP-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
-    #+end_src
+#+begin_src shell
+xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitorHDMI-1-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+xfconf-query --channel xfce4-desktop --property /backdrop/screen0/monitoreDP-1/workspace0/last-image --set "$HOME/Pictures/wallpapers/mountain1.jpg"
+#+end_src
 
 *** Gnome
 
-    #+begin_src shell
-    gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/wallpapers/mountain1.jpg"
-    #+end_src
+#+begin_src shell
+gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/wallpapers/mountain1.jpg"
+#+end_src
 
 * CAD/CAM
 
 ** Candle (grbl)
 
-   #+NAME: grbl_candle_version
-   : 5709b4961b8e3494d4a5e040b7223b57a0d083db
+#+NAME: grbl_candle_version
+: 5709b4961b8e3494d4a5e040b7223b57a0d083db
 
-   A grbl controller / g-code visualizer
+A grbl controller / g-code visualizer
 
 *** Install dependencies
 
 **** Arch Linux
-     #+begin_src shell :dir /sudo::
-     pacman -Sy --noconfirm glib2 qt5-serialport cmake
-     #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm glib2 qt5-serialport cmake
+#+end_src
 
 **** Pop OS
 
-     #+begin_src shell :dir /sudo::
-       apt update -y && apt install -y libglib2.0-0 libqt5serialport5-dev
-     #+end_src
+#+begin_src shell :dir /sudo::
+apt update -y && apt install -y libglib2.0-0 libqt5serialport5-dev
+#+end_src
 
 *** Build and install
 
-    Clone repo and start building:
+Clone repo and start building:
 
-    #+begin_src shell :dir /tmp :var version=grbl_candle_version
-    git clone git@github.com:Denvi/Candle.git
-    cd Candle
-    git checkout ${version}
-    rm -rf build
-    mkdir build
-    cmake -S ./src -B ./build
-    cd build
-    make -j12
-    #+end_src
+#+begin_src shell :dir /tmp :var version=grbl_candle_version
+git clone git@github.com:Denvi/Candle.git
+cd Candle
+git checkout ${version}
+rm -rf build
+mkdir build
+cmake -S ./src -B ./build
+cd build
+make -j12
+#+end_src
 
-    Now install the executable
+Now install the executable
 
-    #+begin_src shell :dir /sudo:: :var version=grbl_candle_version
-    cp /tmp/Candle/build/Candle /usr/local/bin/grbl-candle-${version}
-    ln -sf /usr/local/bin/grbl-candle-${version} /usr/local/bin/grbl-candle
-    chmod +x /usr/local/bin/grbl-candle-${version}
-    #+end_src
+#+begin_src shell :dir /sudo:: :var version=grbl_candle_version
+cp /tmp/Candle/build/Candle /usr/local/bin/grbl-candle-${version}
+ln -sf /usr/local/bin/grbl-candle-${version} /usr/local/bin/grbl-candle
+chmod +x /usr/local/bin/grbl-candle-${version}
+#+end_src
 
 
 ** FreeCAD
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm freecad
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm freecad
+#+end_src
 
 * Other
 
@@ -1778,36 +1778,36 @@ pamac build osm2pgsql
 
 *** Arch Linux
 
-    Import the key:
+Import the key:
 
-    #+begin_src shell
-    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 5E3C45D7B312C643
-    #+end_src
+#+begin_src shell
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 5E3C45D7B312C643
+#+end_src
 
-    Run ~pamac build spotify~
+Run ~pamac build spotify~
 
 *** Pop OS
 
-   Add Spotify repository signing keys to be able to verify downloaded packages:
+Add Spotify repository signing keys to be able to verify downloaded packages:
 
-   #+BEGIN_SRC shell :dir /sudo::
-     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+#+END_SRC
 
-   Then add the repository
+Then add the repository
 
-   #+BEGIN_SRC shell :dir /sudo::
-     echo deb http://repository.spotify.com stable non-free | tee /etc/apt/sources.list.d/spotify.list
-     apt update
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+echo deb http://repository.spotify.com stable non-free | tee /etc/apt/sources.list.d/spotify.list
+apt update
+#+END_SRC
 
-   And install spotify
+And install spotify
 
-   #+BEGIN_SRC shell :dir /sudo::
-     apt install -y spotify-client
-   #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt install -y spotify-client
+#+END_SRC
 
-   Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
+Use the [[https://www.spotify.com/us/account/set-device-password/][device password]] to login.
 
 ** Command for gif recording
 
@@ -1815,58 +1815,58 @@ pamac build osm2pgsql
 
 **** Pop OS
 
-     #+BEGIN_SRC shell :dir /sudo::
-       apt install -y ffmpeg imagemagick autoconf libx11-dev
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::
+apt install -y ffmpeg imagemagick autoconf libx11-dev
+#+END_SRC
 
 **** Arch Linux
 
-     #+BEGIN_SRC shell :dir /sudo:: :results output silent
-       pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
-     #+END_SRC
+#+BEGIN_SRC shell :dir /sudo:: :results output silent
+pacman -S --noconfirm ffmpeg xorg-xdpyinfo xorg-xprop xorg-xwininfo imagemagick
+#+END_SRC
 
 *** Finish installation
 
-    And then install FFcast:
+And then install FFcast:
 
-    #+BEGIN_SRC shell :dir ~/reps :results output silent
-      [ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
-    #+END_SRC
+#+BEGIN_SRC shell :dir ~/reps :results output silent
+[ -d 'FFcast' ] || git clone --recursive https://github.com/lolilolicon/FFcast.git
+#+END_SRC
 
-    #+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
-      ./bootstrap
-      ./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
-      make
-    #+END_SRC
+#+BEGIN_SRC shell :dir ~/reps/FFcast :results output silent
+./bootstrap
+./configure --enable-xrectsel --prefix /usr --libexecdir /usr/lib --sysconfdir /etc
+make
+#+END_SRC
 
-    #+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
-      make install
-    #+END_SRC
+#+BEGIN_SRC shell :dir /sudo::/home/caio/reps/FFcast :results output silent
+make install
+#+END_SRC
 
-    #+BEGIN_SRC shell :tangle /sudo::/usr/bin/gifrecord :tangle-mode (identity #o755)
-      #!/bin/bash
-      TMP_AVI=$(mktemp /tmp/outXXXXXXXXXX.avi)
-      ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
-             -video_size %s -i %D+%c -codec:v huffyuv               \
-             -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
-          && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
-    #+END_SRC
+#+BEGIN_SRC shell :tangle /sudo::/usr/bin/gifrecord :tangle-mode (identity #o755)
+#!/bin/bash
+TMP_AVI=$(mktemp /tmp/outXXXXXXXXXX.avi)
+ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
+       -video_size %s -i %D+%c -codec:v huffyuv               \
+       -vf crop="iw-mod(iw\\,2):ih-mod(ih\\,2)" $TMP_AVI      \
+    && convert -set delay 10 -layers Optimize $TMP_AVI out.gif
+#+END_SRC
 
 ** obs-studio
 
 *** Arch Linux
 
-    #+begin_src shell :dir /sudo::
-    pacman -Sy --noconfirm obs-studio
-    #+end_src
+#+begin_src shell :dir /sudo::
+pacman -Sy --noconfirm obs-studio
+#+end_src
 
 *** Pop OS
 
-    #+begin_src shell :dir /sudo::
-    add-apt-repository -y ppa:obsproject/obs-studio
-    apt-get update
-    apt install -y obs-studio
-    #+end_src
+#+begin_src shell :dir /sudo::
+add-apt-repository -y ppa:obsproject/obs-studio
+apt-get update
+apt install -y obs-studio
+#+end_src
 
 ** Bluetooth
 
@@ -1884,33 +1884,33 @@ pacman -Sy --noconfirm bluez-utils
 
 ** Fix emacs signature issues
 
-   Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
+Every once in a while this breaks and emacs fails to verify elpa signatures. Run this to update them:
 
-   #+BEGIN_SRC elisp
-     (setq package-check-signature nil)
-     (package-install 'gnu-elpa-keyring-update)
-     (gnu-elpa-keyring-update)
-     (setq package-check-signature 'allow-unsigned)
-   #+END_SRC
+#+BEGIN_SRC elisp
+(setq package-check-signature nil)
+(package-install 'gnu-elpa-keyring-update)
+(gnu-elpa-keyring-update)
+(setq package-check-signature 'allow-unsigned)
+#+END_SRC
 
-   And to verify it solved the issue, run:
+And to verify it solved the issue, run:
 
-   #+BEGIN_SRC elisp
-     (package-refresh-contents)
-   #+END_SRC
+#+BEGIN_SRC elisp
+(package-refresh-contents)
+#+END_SRC
 
-   If it runs without errors, then everything is back to normal.
+If it runs without errors, then everything is back to normal.
 
 ** Enable/Disable a single webcam
 
-   Extracted from https://askubuntu.com/a/166819
+Extracted from https://askubuntu.com/a/166819
 
-   Find your the vendor id and device id with ~lsusb~. If it isn't clear which device is your webcam, you can try ~lsusb -t~ and look for ~Class=Video~ or ~Driver=uvcvideo~ or similar to find the port and device number and cross-reference with the output from ~lsusb~.
+Find your the vendor id and device id with ~lsusb~. If it isn't clear which device is your webcam, you can try ~lsusb -t~ and look for ~Class=Video~ or ~Driver=uvcvideo~ or similar to find the port and device number and cross-reference with the output from ~lsusb~.
 
-   Next, go to ~cd /sys/bus/usb/devices/~
+Next, go to ~cd /sys/bus/usb/devices/~
 
-   To find the correct directory do a ~grep~ there with the product id and if you get multiple results then also with the vendor id:
+To find the correct directory do a ~grep~ there with the product id and if you get multiple results then also with the vendor id:
 
-   ~grep <product-id> */idProduct~ and ~grep <product-id> */idVendor~
+~grep <product-id> */idProduct~ and ~grep <product-id> */idVendor~
 
-   Under the directory you found from the previous step, the file ~bConfigurationValue~ in this directory needs to contain a 0 to disable the device or a 1 to enable it. Just ~echo~ to it and the camera will be enabled or disabled.
+Under the directory you found from the previous step, the file ~bConfigurationValue~ in this directory needs to contain a 0 to disable the device or a 1 to enable it. Just ~echo~ to it and the camera will be enabled or disabled.
