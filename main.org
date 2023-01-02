@@ -238,15 +238,6 @@ And now some cool scripts:
 
     # add useful scripts to the path
     export PATH=$PATH:~/utils/bin
-
-    # gpg-agent configuration
-    export GPG_TTY=$(tty)
-    gpg-connect-agent updatestartuptty /bye >/dev/null
-
-    unset SSH_AGENT_PID
-    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
-        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-    fi
     #+END_SRC
 
     And the main apps config:
@@ -675,6 +666,18 @@ Make sure gnupg home has correct permissions:
 #+begin_src shell
 chmod 700 ~/.gnupg
 #+end_src
+
+And the init scripts:
+#+begin_src shell :tangle ~/.zsh.d/apps.d/00-gpg-agent
+export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+
+unset SSH_AGENT_PID
+if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+fi
+#+end_src
+
 Also, tangle the ssh config.
 
 #+BEGIN_SRC conf :tangle ~/.ssh/config :mkdirp yes
@@ -714,6 +717,12 @@ gpg --keyserver hkps://keys.openpgp.org --recv ${keyid}
 
 We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
 then type ~trust~ and choose option ~5~.
+
+Lastly, let's add the key to sshcontrol:
+
+#+begin_src shell :tangle ~/.gnupg/sshcontrol
+31B796AD58754173E9C2A6BCEC8D89EA79591638
+#+end_src
 
 ** iptables firewall
 
