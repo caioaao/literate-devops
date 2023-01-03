@@ -1360,8 +1360,16 @@ ln -sf /opt/nats-cli/nats-${version}/nats /usr/local/bin/nats
 
 ** pre-commit
 
+*** Arch linux
+
 #+begin_src shell :dir /sudo::
 pacman -Sy --noconfirm python-pre-commit
+#+end_src
+
+*** Fedora
+
+#+begin_src shell :dir /sudo::
+dnf install -y pre-commit
 #+end_src
 
 ** python
