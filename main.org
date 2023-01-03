@@ -1235,10 +1235,11 @@ go install golang.org/x/tools/gopls@latest
 #+begin_src shell :dir /sudo::
 pacman -Sy --noconfirm protobuf
 #+end_src
+
 **** Fedora
 
 #+begin_src shell :dir /sudo::
-dnf install -y protobuf
+dnf install -y protobuf protobuf-compiler
 #+end_src
 
 **** Other
