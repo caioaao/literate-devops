@@ -945,6 +945,12 @@ pacman -Sy --no-confirm direnv
 apt install -y direnv
 #+end_src
 
+**** Fedora
+
+#+begin_src shell :dir /sudo::
+dnf install -y direnv
+#+end_src
+
 *** Configure
 
 #+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh :mkdirp yes
