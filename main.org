@@ -171,17 +171,11 @@ Set user's shell:
 chsh -s /bin/zsh $user
 #+END_SRC
 
-Let's create a directory for some useful commands.
-
-#+BEGIN_SRC shell
-mkdir -p ~/utils/bin || true
-#+END_SRC
-
-And now some cool scripts:
+Now some cool scripts:
 
   - Notify when an execution ends.
 
-    #+BEGIN_SRC shell :tangle ~/utils/bin/exec_notify :tangle-mode (identity #o755)
+    #+BEGIN_SRC shell :tangle ~/.local/bin/exec_notify :tangle-mode (identity #o755)
     #!/usr/bin/env bash
 
     # Notify when execution finishes. First arg is the success message, second arg
@@ -236,8 +230,7 @@ And now some cool scripts:
     #+BEGIN_SRC shell :tangle ~/.zsh.d/base :mkdirp yes
     #!/usr/bin/env bash
 
-    # add useful scripts to the path
-    export PATH=$PATH:~/utils/bin
+    export PATH=$PATH:~/.local/bin
     #+END_SRC
 
     And the main apps config:
