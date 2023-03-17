@@ -37,7 +37,6 @@
   - [[#git-lfs][Git-LFS]]
   - [[#docker][Docker]]
   - [[#nodejs][NodeJS]]
-  - [[#yarn][Yarn]]
   - [[#typescript][Typescript]]
   - [[#kubernetes][Kubernetes]]
   - [[#golang][golang]]
@@ -1100,6 +1099,27 @@ Now tangle this to add it to zsh:
 #+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp yes
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# script to autoload nvm when there's an .nvmrc file in a directory
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+      nvm use
+    fi
+  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
 #+end_src
 
 Let's add LTS as the default node version using nvmrc:
@@ -1108,42 +1128,18 @@ Let's add LTS as the default node version using nvmrc:
 lts/*
 #+end_src
 
+And add some  [[https://github.com/nvm-sh/nvm/tree/edacf8275e3bef4a80971625ed89df13a9af427c#default-global-packages-from-file-while-installing][default global packages]]:
+
+#+begin_src conf :tangle ~/.nvm/default-packages :mkdirp t
+yarn
+#+end_src
+
 We can now install nodejs
 
 #+begin_src shell
 \. "$HOME/.nvm/nvm.sh" --no-use
 nvm install
 nvm alias default node
-#+end_src
-
-** Yarn
-
-*** Install
-
-**** Arch linux
-
-#+begin_src shell :dir /sudo::
-pacman -Sy --noconfirm yarn
-#+end_src
-
-**** Pop OS
-
-#+begin_src shell :dir /sudo::
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-apt update && apt install -y yarn
-#+end_src
-
-**** Fedora
-
-#+begin_src shell :dir /sudo::
-npm install -G yarn
-#+end_src
-
-*** Configure
-
-#+begin_src shell :tangle  ~/.zsh.d/apps.d/10-yarn.sh
-export PATH="$PATH:`yarn global bin`"
 #+end_src
 
 ** Typescript
