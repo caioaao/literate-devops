@@ -1255,7 +1255,7 @@ ldconfig
 [[https://buf.build][Buf]] is an awesome tool for building, linting and testing protobuf.
 
 #+NAME: buf-version
-: 1.9.0
+: 1.16.0
 
 #+begin_src shell :dir /sudo:: :var version=buf-version
 curl -fsSL https://github.com/bufbuild/buf/releases/download/v${version}/buf-Linux-x86_64 > /usr/local/bin/buf
