@@ -55,6 +55,7 @@
   - [[#nix][Nix]]
   - [[#bazel][Bazel]]
   - [[#gis-tools][GIS tools]]
+  - [[#elixir][Elixir]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1618,6 +1619,16 @@ Run in the shell:
 
 #+begin_src shell
 pamac build osm2pgsql
+#+end_src
+
+** Elixir
+
+*** Install
+
+**** Fedora
+
+#+begin_src shell :dir /sudo::
+dnf install -y elixir erlang
 #+end_src
 
 * Cosmetics
