@@ -30,7 +30,7 @@
   - [[#nordvpn][NordVPN]]
 - [[#development][Development]]
   - [[#tmux][tmux]]
-  - [[#alacritty][Alacritty]]
+  - [[#terminal-emulator][Terminal Emulator]]
   - [[#direnv][direnv]]
   - [[#asdf][asdf]]
   - [[#git-1][Git]]
@@ -880,29 +880,41 @@ run '~/.tmux/plugins/tpm/tpm'
 To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
 frozen, but it's installing stuff.
 
-** Alacritty
+** Terminal Emulator
 
-*** Install
+*** foot
 
-**** Arch Linux
+Only in Wayland
+
+**** Fedora
+
+#+begin_src shell :dir /sudo::
+yum install -y foot
+#+end_src
+
+*** Alacritty (prev)
+
+**** Install
+
+***** Arch Linux
 
 #+begin_src shell :dir /sudo::
 pacman -Sy --noconfirm alacritty
 #+end_src
 
-**** Pop OS
+***** Pop OS
 
 #+begin_src shell :dir /sudo::
 apt install -y alacritty
 #+end_src
 
-**** Fedora
+***** Fedora
 
 #+begin_src shell :dir /sudo::
 dnf -y install alacritty
 #+end_src
 
-*** Configure
+**** Configure
 
 #+begin_src yaml :tangle ~/.config/alacritty/alacritty.yml :mkdirp yes
   font:
