@@ -661,6 +661,7 @@ chmod 700 ~/.gnupg
 #+end_src
 
 And the init scripts:
+
 #+begin_src shell :tangle ~/.zsh.d/apps.d/00-gpg-agent.sh
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
@@ -710,6 +711,14 @@ gpg --keyserver hkps://keys.openpgp.org --recv ${keyid}
 
 We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
 then type ~trust~ and choose option ~5~.
+
+We also need to tell GnuPG to use PC/SC instead of CCID. Without this
+we need to restart the ~pcscd.service~ every time we plug the
+yubikey. [[https://ludovicrousseau.blogspot.com/2019/06/gnupg-and-pcsc-conflicts.html][This blog post]] goes more into detail.
+
+#+begin_src conf :tangle ~/.gnupg/scdaemon.conf :tangle-mode (identity #o700)
+disable-ccid
+#+end_src
 
 Lastly, let's add the key to sshcontrol:
 
