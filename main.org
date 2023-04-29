@@ -13,7 +13,7 @@
   - [[#lenovo-laptop][Lenovo laptop]]
   - [[#emacs][Emacs]]
   - [[#locale][Locale]]
-  - [[#setup-dotfiles][Setup dotfiles]]
+  - [[#zsh][Zsh]]
   - [[#aspell][Aspell]]
   - [[#git][Git]]
   - [[#ag][+Ag+]]
@@ -145,9 +145,9 @@ setxkbmap -option ctrl:swapcaps
 localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
 #+END_SRC
 
-** Setup dotfiles
+** Zsh
 
-*** Installing dependencies
+*** Installing
 
 First, install zsh and its dependencies and change the login shell. We'll install ~zoxide~ as well so we can use the plugin.
 
@@ -163,112 +163,106 @@ pacman --noconfirm -Sy zsh zoxide
 apt install -y zsh || true
 #+END_SRC
 
-*** Configuring
-
-Set user's shell:
+*** Set user shell
 
 #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
 chsh -s /bin/zsh $user
 #+END_SRC
 
-Now some cool scripts:
+*** Install oh-my-zsh
 
-  - Notify when an execution ends.
+I used to use zsh-users/antigen but it was another abstraction layer
+on top of the plugin management that didn't bring much benefit to
+me. It tries to solve the monorepo issue with oh-my-zsh, but that's
+not an issue for me.
 
-    #+BEGIN_SRC shell :tangle ~/.local/bin/exec_notify :tangle-mode (identity #o755)
-    #!/usr/bin/env bash
+#+begin_src shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-    # Notify when execution finishes. First arg is the success message, second arg
-    # is the failure message and the rest is the command to run
+#+end_src
 
-    (${@:3} && notify-send -t 1000 $1) || notify-send -t 1000 $2
-    #+END_SRC
+Let's also install syntax highlighting:
 
-    Install oh-my-zsh. I used to use zsh-users/antigen but it was another
-    abstraction layer on top of the plugin management that didn't bring much
-    benefit to me. It tries to solve the monorepo issue with oh-my-zsh, but
-    that's not an issue for me.
+#+begin_src shell
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+#+end_src
 
-    #+begin_src shell
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+*** Configuring
 
-    # installing it together to be sure `ZSH_CUSTOM` is set
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-    #+end_src
+Let's start with creating the folder to hold our config. This will
+make it easier than keeping everything under the standard ~.zshrc~.
 
-    Now, tangle the basic zshrc:
+In this structure, we'll have two main directories. The first one is
+loaded *before* oh-my-zsh is initialized and holds the scripts that
+will setup this initialization process. The other configures the shell
+for other apps.
 
-    #+BEGIN_SRC shell :tangle ~/.zshrc
-    REPS_PATH=~/reps
+#+begin_src shell
+mkdir -p ~/.config/zsh.d
+mkdir -p ~/.config/zsh.d/init-omz.d
+mkdir -p ~/.config/zsh.d/apps.d
+#+end_src
 
-    export ZSH="$HOME/.oh-my-zsh"
-    ZSH_THEME="gallois"
+Now let's set up the theme:
 
-    plugins=(git
-             heroku
-             pip
-             lein
-             command-not-found
-             zoxide
-             emacs
-             archlinux
-             common-aliases
-             kubectl
-             zsh-syntax-highlighting)
+#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-theme.sh
+ZSH_THEME="gallois"
+plugins+=(zsh-syntax-highlighting)
+#+end_src
 
-    source "$ZSH/oh-my-zsh.sh"
+And some basic plugins:
 
-    # Export zsh config dir path and import base config
-    export MY_ZSH_CONFIG=~/.zsh.d
-    source $MY_ZSH_CONFIG/base # base config
-    source $MY_ZSH_CONFIG/apps # apps config
-    source $MY_ZSH_CONFIG/localrc # local dotfile
-    #+END_SRC
+#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-git.sh
+plugins+=git
+#+end_src
 
-    Now, let's tangle the base zsh config:
+#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-utils.sh
+plugins+=(common-aliases zoxide)
+#+end_src
 
-    #+BEGIN_SRC shell :tangle ~/.zsh.d/base :mkdirp yes
-    #!/usr/bin/env bash
+#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-emacs.sh
+plugins+=emacs
+#+end_src
 
-    export PATH=$PATH:~/.local/bin
-    #+END_SRC
+Now let's tangle the zshrc, which will be responsible for setting up
+oh-my-zsh and importing the configs in the folders above:
 
-    And the main apps config:
+#+begin_src shell :tangle ~/.zshrc
+REPS_PATH=~/reps
 
-    #+BEGIN_SRC shell :tangle ~/.zsh.d/apps
-    #!/usr/bin/env bash
+export ZSH="$HOME/.oh-my-zsh"
+export PATH=$PATH:~/.local/bin
 
-    # Ensure apps.d is created
-    mkdir ~/.zsh.d/apps.d/ &> /dev/null || true
+export MY_ZSH_CONFIG=~/.config/zsh.d
 
-    for f in `ls ~/.zsh.d/apps.d/`; do
-        source ~/.zsh.d/apps.d/$f
-    done
-    #+END_SRC
+plugins=()
 
-    Now let's already create some app specific configs here. First, emacs:
+for f in `ls $MY_ZSH_CONFIG/init-omz.d | sort`; do
+       source $MY_ZSH_CONFIG/init-omz.d/$f
+done
 
-    #+begin_src shell :tangle ~/.zsh.d/apps.d/10-emacs.sh :mkdirp yes
-    #!/usr/bin/env bash
+source "$ZSH/oh-my-zsh.sh"
 
-    bindkey -A emacs main # set emacs as default
+for f in `ls $MY_ZSH_CONFIG/apps.d | sort`; do
+       source $MY_ZSH_CONFIG/apps.d/$f
+done
+#+end_src
 
-    # Configs for zsh to work nicelly inside emacs
-    if [ -n "$INSIDE_EMACS" ]; then
-        export TERM=vt100
-        chpwd() { print -P "\033AnSiTc %d" }
-        print -P "\033AnSiTu %n"
-        print -P "\033AnSiTc %d"
-    fi
-    #+end_src
+Now let's already create some app specific configs here. First, emacs:
 
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-emacs.sh
+#!/usr/bin/env bash
 
-  Also create the ~localrc~ file. This should be the place to add local configs
-  (company notebook configs for instance).
+bindkey -A emacs main # set emacs as default
 
-  #+BEGIN_SRC shell :dir ~/
-  touch ~/.zsh.d/localrc
-  #+END_SRC
+# Configs for zsh to work nicelly inside emacs
+if [ -n "$INSIDE_EMACS" ]; then
+    export TERM=vt100
+    chpwd() { print -P "\033AnSiTc %d" }
+    print -P "\033AnSiTu %n"
+    print -P "\033AnSiTc %d"
+fi
+#+end_src
 
 ** Aspell
 
@@ -1638,6 +1632,14 @@ pamac build osm2pgsql
 
 #+begin_src shell :dir /sudo::
 dnf install -y elixir erlang
+#+end_src
+
+*** Configure
+
+First, let's install zsh's plugin:
+
+#+begin_src shell
+antigen bundle gusaiani/elixir-oh-my-zsh
 #+end_src
 
 * Cosmetics
