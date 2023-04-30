@@ -55,7 +55,7 @@
   - [[#nix][Nix]]
   - [[#bazel][Bazel]]
   - [[#gis-tools][GIS tools]]
-  - [[#elixir][Elixir]]
+  - [[#erlang--elixir][Erlang / Elixir]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -656,7 +656,7 @@ chmod 700 ~/.gnupg
 
 And the init scripts:
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/00-gpg-agent.sh
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/00-gpg-agent.sh
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
@@ -964,7 +964,7 @@ dnf install -y direnv
 
 *** Configure
 
-#+begin_src sh :tangle ~/.zsh.d/apps.d/10-direnv.sh :mkdirp yes
+#+begin_src sh :tangle ~/.config/zsh.d/apps.d/10-direnv.sh :mkdirp yes
 #!/usr/bin/env bash
 
 eval "$(direnv hook zsh)"
@@ -982,10 +982,10 @@ git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8
 
 Now add the completions and the executable to dot files:
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/10-asdf.sh :mkdirp yes
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-asdf.sh :mkdirp yes
 #!/usr/bin/env bash
 . $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
+. ../../.asdf/completions/asdf.bash
 #+end_src
 
 ** Git
@@ -1115,7 +1115,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${version}/install.sh | ba
 
 Now tangle this to add it to zsh:
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/10-nvm.sh :mkdirp yes
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-nvm.sh :mkdirp yes
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -1218,7 +1218,7 @@ ln -sf /opt/go-${GO_VERSION} /opt/go
 
 And add go executables to our path:
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/10-golang.sh
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-golang.sh
 #!/usr/bin/env bash
 
 export GOPATH=~/go
@@ -1228,7 +1228,7 @@ export PATH="$PATH:/opt/go/bin:$GOPATH/bin"
 Now the goodies:
 
 #+begin_src shell
-source ~/.zsh.d/apps.d/10-golang.sh
+source ~/.config/zsh.d/apps.d/10-golang.sh
 go install golang.org/x/tools/cmd/godoc@latest
 go install golang.org/x/tools/cmd/goimports@latest
 go install github.com/rogpeppe/godef@latest
@@ -1325,7 +1325,7 @@ rm -rf /opt/google-cloud-sdk || true
 ln -sf /opt/google-cloud-sdk-${version} /opt/google-cloud-sdk
 #+end_src
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/10-gcloud.sh
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-gcloud.sh
 export CLOUDSDK_PYTHON="${HOME}/.asdf/installs/python/3.9.9/bin/python"
 if [ -f '/opt/google-cloud-sdk/path.zsh.inc' ]; then . '/opt/google-cloud-sdk/path.zsh.inc'; fi
 if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '/opt/google-cloud-sdk/completion.zsh.inc'; fi
@@ -1341,7 +1341,7 @@ gcloud config set disable_usage_reporting true
 
 First tangle this so the install script doesn't try to add to our main ~zshrc~ file.
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/10-pulumi.sh :mkdirp yes
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-pulumi.sh :mkdirp yes
 export PATH=$PATH:$HOME/.pulumi/bin
 #+end_src
 
@@ -1434,8 +1434,8 @@ pacman -Sy --noconfirm ocaml opam
 Now init opam:
 
 #+begin_src shell
-touch ~/.zsh.d/apps.d/10-opam.sh
-opam init -a --dot-profile ~/.zsh.d/apps.d/10-opam.sh \
+touch ~/.config/zsh.d/apps.d/10-opam.sh
+opam init -a --dot-profile ~/.config/zsh.d/apps.d/10-opam.sh \
      --enable-shell-hook --enable-completion --shell=zsh --reinit
 eval $(opam env)
 #+end_src
@@ -1552,7 +1552,7 @@ usermod -aG nix-users $user
 
 Finally, add nix-profile to our path:
 
-#+begin_src shell :tangle ~/.zsh.d/apps.d/05-nix.sh
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/05-nix.sh
 PATH=$PATH:~/.nix-profile/bin
 #+end_src
 
@@ -1627,23 +1627,42 @@ Run in the shell:
 pamac build osm2pgsql
 #+end_src
 
-** Elixir
+** Erlang / Elixir
 
-*** Install
-
-**** Fedora
+*** Install dependencies
 
 #+begin_src shell :dir /sudo::
-dnf install -y elixir erlang
+dnf install -y openssl-devel automake autoconf ncurses-devel g++
+#+end_src
+
+*** Install Erlang
+
+#+NAME: default_erlang_version
+: 25.3
+
+Add the plugin to asdf, install the default version and set the global version:
+
+#+begin_src shell :var erlang_version=default_erlang_version
+asdf plugin-add erlang
+asdf install erlang ${erlang_version}
+asdf global erlang ${erlang_version}
+#+end_src
+
+*** Install Elixir
+
+#+NAME: default_elixir_version
+: 1.14
+
+Add the plugin to asdf, install the default version and set the global version:
+
+#+begin_src shell :var elixir_version=default_elixir_version
+asdf plugin-add elixir
+asdf install elixir ${elixir_version}
+asdf global elixir ${elixir_version}
 #+end_src
 
 *** Configure
 
-First, let's install zsh's plugin:
-
-#+begin_src shell
-antigen bundle gusaiani/elixir-oh-my-zsh
-#+end_src
 
 * Cosmetics
 
