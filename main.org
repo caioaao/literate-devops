@@ -1632,7 +1632,7 @@ pamac build osm2pgsql
 *** Install dependencies
 
 #+begin_src shell :dir /sudo::
-dnf install -y openssl-devel automake autoconf ncurses-devel g++
+dnf install -y openssl-devel automake autoconf ncurses-devel g++ busybox
 #+end_src
 
 *** Install Erlang
@@ -1661,8 +1661,12 @@ asdf install elixir ${elixir_version}
 asdf global elixir ${elixir_version}
 #+end_src
 
-*** Configure
+*** Install elixir-ls
 
+#+begin_src shell :dir ~/.local/elixir-ls :mkdirp yes
+rm -rf *
+curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/elixir-ls-1.14-25.1.zip | busybox unzip -
+#+end_src
 
 * Cosmetics
 
