@@ -708,9 +708,12 @@ then type ~trust~ and choose option ~5~.
 
 We also need to tell GnuPG to use PC/SC instead of CCID. Without this
 we need to restart the ~pcscd.service~ every time we plug the
-yubikey. [[https://ludovicrousseau.blogspot.com/2019/06/gnupg-and-pcsc-conflicts.html][This blog post]] goes more into detail.
+yubikey. As always, [[https://wiki.archlinux.org/title/GnuPG#GnuPG_with_pcscd_(PCSC_Lite)][Arch Linux's Wiki]] is a great resource to
+understand and fix the issue.
 
 #+begin_src conf :tangle ~/.gnupg/scdaemon.conf :tangle-mode (identity #o700)
+pcsc-driver /usr/lib/libpcsclite.so.1
+card-timeout 5
 disable-ccid
 #+end_src
 
