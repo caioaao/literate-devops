@@ -1651,7 +1651,7 @@ asdf global erlang ${erlang_version}
 *** Install Elixir
 
 #+NAME: default_elixir_version
-: 1.14
+: 1.14.4-otp-25
 
 Add the plugin to asdf, install the default version and set the global version:
 
@@ -1661,11 +1661,18 @@ asdf install elixir ${elixir_version}
 asdf global elixir ${elixir_version}
 #+end_src
 
+*** Install hex
+
+#+begin_src shell
+mix local.hex --force
+#+end_src
+
 *** Install elixir-ls
 
 #+begin_src shell :dir ~/.local/elixir-ls :mkdirp yes
 rm -rf *
 curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/elixir-ls-1.14-25.1.zip | busybox unzip -
+chmod +x language_server.sh launch.sh debugger.sh
 #+end_src
 
 * Cosmetics
