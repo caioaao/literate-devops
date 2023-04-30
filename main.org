@@ -1188,6 +1188,12 @@ Now setup kubectl global version:
 asdf global kubectl ${kubectl_version}
 #+end_src
 
+Now install the OMZ kubectl plugin:
+
+#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-kubectl.sh
+plugins+=kubectl
+#+end_src
+
 ** golang
 
 *** Install
