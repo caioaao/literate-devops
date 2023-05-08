@@ -56,6 +56,7 @@
   - [[#bazel][Bazel]]
   - [[#gis-tools][GIS tools]]
   - [[#erlang--elixir][Erlang / Elixir]]
+  - [[#plantuml][Plantuml]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -712,7 +713,7 @@ yubikey. As always, [[https://wiki.archlinux.org/title/GnuPG#GnuPG_with_pcscd_(P
 understand and fix the issue.
 
 #+begin_src conf :tangle ~/.gnupg/scdaemon.conf :tangle-mode (identity #o700)
-pcsc-driver /usr/lib/libpcsclite.so.1
+pcsc-driver /usr/lib64/libpcsclite.so.1
 card-timeout 5
 disable-ccid
 #+end_src
@@ -1678,6 +1679,17 @@ mix local.hex --force
 rm -rf *
 curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/elixir-ls-1.14-25.1.zip | busybox unzip -
 chmod +x language_server.sh launch.sh debugger.sh
+#+end_src
+
+** Plantuml
+
+#+NAME: plantuml-version
+: v1.2023.6
+
+#+begin_src shell :dir ~/.local/plantuml :mkdirp yes :var version=plantuml-version
+curl -fsSL https://github.com/plantuml/plantuml/releases/download/${version}/plantuml.jar > plantuml-${version}.jar
+
+ln -sf  plantuml-${version}.jar plantuml.jar
 #+end_src
 
 * Cosmetics
