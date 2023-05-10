@@ -888,7 +888,7 @@ run '~/.tmux/plugins/tpm/tpm'
 We also need to download some fonts for the glyphs:
 
 #+begin_src shell :dir ~/.fonts :mkdirp ye
-curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.0/Meslo.zip | busybox -
+curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.0/Meslo.zip | busybox unzip -
 fc-cache -fv
 #+end_src
 
