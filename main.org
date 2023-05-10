@@ -1736,9 +1736,7 @@ pacman -Sy --noconfirm busybox
 
 Download iosevka:
 
-#+begin_src shell :var iosevka_font_version=iosevka_font_version
-mkdir -p ~/.fonts
-cd ~/.fonts
+#+begin_src shell :var iosevka_font_version=iosevka_font_version :dir ~/.fonts :mkdirp yes
 curl -fsSL https://github.com/be5invis/Iosevka/releases/download/v${iosevka_font_version}/pkg-iosevka-ss12-${iosevka_font_version}.zip | busybox unzip -
 #+end_src
 
