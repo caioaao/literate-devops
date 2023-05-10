@@ -885,6 +885,13 @@ set -g @tmux_power_show_download_speed true
 run '~/.tmux/plugins/tpm/tpm'
 #+end_src
 
+We also need to download some fonts for the glyphs:
+
+#+begin_src shell :dir ~/.fonts :mkdirp ye
+curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.0/Meslo.zip | busybox -
+fc-cache -fv
+#+end_src
+
 To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
 frozen, but it's installing stuff.
 
