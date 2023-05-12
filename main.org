@@ -150,12 +150,12 @@ localectl set-x11-keymap us pc104 altgr-intl ctrl:swapcaps
 
 *** Installing
 
-First, install zsh and its dependencies and change the login shell. We'll install ~zoxide~ as well so we can use the plugin.
+First, install zsh and its dependencies and change the login shell.
 
 **** Arch-linux
 
 #+BEGIN_SRC shell :dir /sudo::
-pacman --noconfirm -Sy zsh zoxide
+pacman --noconfirm -Sy zsh
 #+END_SRC
 
 **** Pop-OS
@@ -218,7 +218,7 @@ plugins+=git
 #+end_src
 
 #+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-utils.sh
-plugins+=(common-aliases zoxide)
+plugins+=common-aliases
 #+end_src
 
 #+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-emacs.sh
