@@ -1734,7 +1734,7 @@ Install busybox:
 pacman -Sy --noconfirm busybox
 #+end_src
 
-*** Iosevka
+**** Iosevka
 
 #+NAME: iosevka_font_version
 : 3.4.6
@@ -1751,14 +1751,18 @@ Update cache:
 fc-cache -fv
 #+END_SRC
 
+*** Configure
+
 We can now set Iosevka as the default monospaced font by tangling this file:
 
 #+begin_src xml :tangle ~/.config/fontconfig/conf.d/10-iosevka-mono.conf :mkdirp yes
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
-  <match>
-    <edit name="pixelsize"><double>16</double></edit>
+  <match target="pattern">
+    <edit name="dpi" mode="assign">
+      <double>200</double>
+    </edit>
   </match>
   <alias>
     <family>monospace</family>
@@ -1773,6 +1777,26 @@ We can now set Iosevka as the default monospaced font by tangling this file:
     </default>
   </alias>
 </fontconfig>
+#+end_src
+
+We also need to update Xresources since some (ahem +emacs+) programs don't understand fontconfig yet.
+
+# TODO:  make sure this doesn't override other Xresources changes
+
+#+begin_src shell :tangle ~/.Xresources
+Xft.dpi: 150
+Xft.autohint: 1
+Xft.lcdfilter: lcdnone
+Xft.hintstyle: hintmedium
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+#+end_src
+
+Now apply these changes:
+
+#+begin_src shell
+xrdb -merge ~/.Xresources
 #+end_src
 
 ** Gnome top bar
