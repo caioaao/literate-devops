@@ -1752,6 +1752,9 @@ We can now set Iosevka as the default monospaced font by tangling this file:
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
+  <match>
+    <edit name="pixelsize"><double>16</double></edit>
+  </match>
   <alias>
     <family>monospace</family>
     <prefer>
