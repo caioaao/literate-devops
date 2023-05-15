@@ -1495,13 +1495,18 @@ ln -sf /opt/hugo-$version/hugo /usr/local/bin/hugo
 #+name: clojure-lsp-version
 : 2022.06.29-19.32.13
 
-
 *** Install
 
 **** Arch Linux
 
 #+begin_src shell :dir /sudo::
 pacman -Sy --noconfirm clojure
+#+end_src
+
+**** Fedora
+
+#+begin_src shell :dir /sudo::
+dnf install -y clojure
 #+end_src
 
 *** Install LSP
