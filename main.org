@@ -1805,6 +1805,12 @@ Now apply these changes:
 xrdb -merge ~/.Xresources
 #+end_src
 
+And finally, if you're using Gnome:
+
+#+begin_src shell
+gsettings set org.gnome.desktop.interface monospace-font-name 'Iosevka Fixed SS12 11'
+#+end_src
+
 ** Gnome top bar
 
 Yeah, gnome is pretty bad at that apparently. I just install an extension for transparency:
