@@ -1492,24 +1492,24 @@ ln -sf /opt/hugo-$version/hugo /usr/local/bin/hugo
 
 ** Clojure
 
-#+name: clojure-lsp-version
-: 2022.06.29-19.32.13
-
 *** Install
 
-**** Arch Linux
+#+name: clojure-version
+: 1.11.1.1273
 
-#+begin_src shell :dir /sudo::
-pacman -Sy --noconfirm clojure
+#+begin_src shell :dir /tmp :var version=clojure-version
+curl -O https://download.clojure.org/install/linux-install-${version}.sh
+chmod +x linux-install-${version}.sh
 #+end_src
 
-**** Fedora
-
-#+begin_src shell :dir /sudo::
-dnf install -y clojure
+#+begin_src shell :dir /sudo::/tmp :var version=clojure-version
+./linux-install-${version}.sh
 #+end_src
 
 *** Install LSP
+
+#+name: clojure-lsp-version
+: 2023.05.04-19.38.01
 
 Let's install [[https://github.com/clojure-lsp/clojure-lsp][clojure-lsp]]
 
