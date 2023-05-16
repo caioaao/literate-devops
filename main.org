@@ -1492,6 +1492,12 @@ ln -sf /opt/hugo-$version/hugo /usr/local/bin/hugo
 
 ** Clojure
 
+*** Dependencies
+
+#+begin_src shell :dir /sudo::
+dnf install -y rlwrap
+#+end_src
+
 *** Install
 
 #+name: clojure-version
