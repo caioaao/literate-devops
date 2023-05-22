@@ -56,6 +56,7 @@
   - [[#bazel][Bazel]]
   - [[#gis-tools][GIS tools]]
   - [[#erlang--elixir][Erlang / Elixir]]
+  - [[#rust][Rust]]
   - [[#plantuml][Plantuml]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
@@ -1697,6 +1698,19 @@ mix local.hex --force
 rm -rf *
 curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/elixir-ls-1.14-25.1.zip | busybox unzip -
 chmod +x language_server.sh launch.sh debugger.sh
+#+end_src
+
+** Rust
+
+First install [[https://rustup.rs/][rustup]]
+#+begin_src shell
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
+#+end_src
+
+And tangle the config:
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-rust.sh
+PATH=$PATH:$HOME/.cargo
 #+end_src
 
 ** Plantuml
