@@ -2052,6 +2052,19 @@ ffcast -s % ffmpeg -y -f x11grab -show_region 1 -framerate 15 \
 
 ** obs-studio
 
+*** Fedora
+
+#+begin_src src shell :dir /sudo::
+sudo dnf install obs-studio
+#+end_src
+
+Now, to enable virtual camera (a thingy that will allow us to use OBS output as input in google meet), we need [[https://github.com/umlaeute/v4l2loopback][v4l2loopback]] installed. The easiest way I found was using [[https://rpmfusion.org][rpmfusion repo]], so let's install it, then install the module:
+
+#+begin_src shell :dir /sudo::
+dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-38.noarch.rpm
+dnf install -y v4l2loopback
+#+end_src
+
 *** Arch Linux
 
 #+begin_src shell :dir /sudo::
