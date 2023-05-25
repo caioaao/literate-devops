@@ -1367,7 +1367,7 @@ curl -fsSL https://get.pulumi.com | sh
 Now let's generate the pulumi autocomplete:
 
 #+begin_src shell
-$HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.zsh.d/apps.d/10-pulumi-autocomplete.sh
+$HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.config/zsh.d/apps.d/10-pulumi-autocomplete.sh
 #+end_src
 
 ** ngrok
