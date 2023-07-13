@@ -1656,8 +1656,10 @@ pamac build osm2pgsql
 
 *** Install dependencies
 
+Check the [[https://github.com/asdf-vm/asdf-erlang#before-asdf-install]["before install" instructions]] for more info on why each dependency is needed
+
 #+begin_src shell :dir /sudo::
-dnf install -y openssl-devel automake autoconf ncurses-devel g++ busybox
+dnf install -y openssl-devel automake autoconf ncurses-devel g++ busybox wxGTK-devel
 #+end_src
 
 *** Install Erlang
