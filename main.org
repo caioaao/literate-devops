@@ -570,6 +570,16 @@ To create keys, see https://github.com/caioaao/YubiKey-Guide
 We also need to import the keys for use. For that, run =gpg --keyserver hkps://keyserver.ubuntu.com --card-edit= and
 then =fetch= and exit.
 
+*** Fix firefox prompt issue
+
+Firefox keeps asking for some `PKCS#11 token PIV_II' password at random times. A solution is to disable the OpenSC module in Firefox.
+
+#+begin_src shell
+mkdir -p ~/.config/pkcs11/modules
+cp /usr/share/p11-kit/modules/opensc.module ~/.config/pkcs11/modules/
+echo 'disable-in: firefox' >> ~/.config/pkcs11/modules/opensc.module
+#+end_src
+
 ** GnuPG / SSH
 
 *** Installing dependencies
