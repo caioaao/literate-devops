@@ -1712,6 +1712,12 @@ curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/eli
 chmod +x language_server.sh launch.sh debugger.sh
 #+end_src
 
+*** Install Phoenix
+
+#+begin_src shell
+mix archive.install hex phx_new --force
+#+end_src
+
 ** Rust
 
 First install [[https://rustup.rs/][rustup]]
