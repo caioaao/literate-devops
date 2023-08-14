@@ -1023,6 +1023,9 @@ editor=emacs
 
 [commit]
 gpgsign=true
+
+[init]
+defaultBranch=main
 #+END_SRC
 
 ** Git-LFS
