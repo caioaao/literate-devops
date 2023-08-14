@@ -58,6 +58,7 @@
   - [[#erlang--elixir][Erlang / Elixir]]
   - [[#rust][Rust]]
   - [[#plantuml][Plantuml]]
+  - [[#flyio][fly.io]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1022,7 +1023,7 @@ signingKey=DD90B67479EFA704
 editor=emacs
 
 [commit]
-gpgsign=true
+# gpgsign=true
 
 [init]
 defaultBranch=main
@@ -1759,6 +1760,21 @@ Add a script to call it:
 
 #+begin_src shell :tangle ~/.local/bin/plantuml :tangle-mode (identity #o755)
 java -jar ~/.local/plantuml/plantuml.jar $@
+#+end_src
+
+** fly.io
+
+Installing CLI:
+
+#+begin_src shell
+curl -L https://fly.io/install.sh | sh
+#+end_src
+
+Add it to path:
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-flyctl.sh
+export FLYCTL_INSTALL="~/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
 #+end_src
 
 * Cosmetics
