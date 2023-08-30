@@ -133,6 +133,57 @@ We need to disable the active-menu shortcut (clashes with ~M-SPC~).
 gsettings set org.gnome.desktop.wm.keybindings activate-window-menu []
 #+end_src
 
+*** Install from source
+
+#+name: emacs-version
+: 29.1
+
+To use the latest version, we need to download emacs and install it from the GNU mirror
+
+First let's install the dependencies:
+
+#+begin_src shell :dir /sudo::
+dnf builddep -y emacs
+dnf install -y libtree-sitter-devel wxBase-devel wxGTK3-devel libwebp-devel
+#+end_src
+
+#+begin_src shell :dir /tmp :var version=emacs-version
+curl -fsSL http://gnu.c3sl.ufpr.br/ftp/emacs/emacs-${version}.tar.xz | tar -xJ
+cd /tmp/emacs-${version}
+PKG_CONFIG_PATH=:/usr/lib64/pkgconfig:/usr/share/pkgconfig
+make distclean
+make uninstall
+./autogen.sh
+./configure \
+  --without-pop \
+  --with-mailutils \
+  --with-pgtk \
+  --without-x \
+  --with-xwidgets \
+  --with-cairo \
+  --without-compress-install \
+  --with-native-compilation \
+  --with-json \
+  --with-dbus \
+  --with-gif \
+  --with-jpeg \
+  --with-png \
+  --with-rsvg \
+  --with-tiff \
+  --with-webp \
+  --with-gpm \
+  --with-modules \
+  --with-harfbuzz \
+  build_alias=x86_64-redhat-linux-gnu \
+  host_alias=x86_64-redhat-linux-gnu
+make -j12
+#+end_src
+
+#+begin_src shell :dir /sudo:: :var version=emacs-version
+cd /tmp/emacs-${version}
+make install
+#+end_src
+
 ** Locale
 
 Set system language:
