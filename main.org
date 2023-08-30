@@ -1386,17 +1386,9 @@ $HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.config/zsh.d/apps.d/10-pulu
 
 ** ngrok
 
-#+begin_src sh :dir /tmp
-wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-#+end_src
-
-#+begin_src shell :dir /sudo::
-mkdir -p /opt/ngrok
-cd /opt/ngrok
-busybox unzip /tmp/ngrok-stable-linux-amd64.zip
-chmod -R 0755 /opt/ngrok
-chmod +x /opt/ngrok
-ln -sf /opt/ngrok/ngrok /usr/local/bin/ngrok
+#+begin_src sh :dir ~/.local/bin
+curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-s390x.tgz | tar xvzf -
+chmod +x ngrok
 #+end_src
 
 ** nats-cli
