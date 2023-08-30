@@ -1765,7 +1765,7 @@ curl -L https://fly.io/install.sh | sh
 Add it to path:
 
 #+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-flyctl.sh
-export FLYCTL_INSTALL="~/.fly"
+export FLYCTL_INSTALL="`pwd`/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
 #+end_src
 
