@@ -1858,8 +1858,25 @@ rm -rf /opt/zig
 ln -s /opt/zig-${version} /opt/zig
 #+end_src
 
+Now the language server:
+
+#+begin_src shell :dir /tmp :var version=zig-version
+rm -rf zls-${version}
+mkdir -p zls-${version}
+cd zls-${version}
+curl -fsSL https://github.com/zigtools/zls/releases/download/${version}/zls-x86_64-linux.tar.gz | tar xzvf -
+chmod +x bin/zls
+#+end_src
+
+#+begin_src shell :dir /sudo:: :var version=zig-version
+rm -rf /opt/zls-${version}
+mv /tmp/zls-${version} /opt/zls-${version}
+rm -rf /opt/zls
+ln -s /opt/zls-${version} /opt/zls
+#+end_src
+
 #+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-zig.sh
-export PATH=$PATH:/opt/zig
+export PATH=$PATH:/opt/zig:/opt/zls/bin
 #+end_src
 
 * Cosmetics
