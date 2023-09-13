@@ -59,6 +59,7 @@
   - [[#rust][Rust]]
   - [[#plantuml][Plantuml]]
   - [[#flyio][fly.io]]
+  - [[#zig][Zig]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -1840,6 +1841,25 @@ Add it to path:
 #+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-flyctl.sh
 export FLYCTL_INSTALL="`pwd`/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
+#+end_src
+
+** Zig
+
+#+name: zig-version
+: 0.11.0
+
+#+begin_src shell :dir /tmp :var version=zig-version
+curl -fsSL https://ziglang.org/download/0.11.0/zig-linux-x86_64-${version}.tar.xz | tar -xJ
+#+end_src
+
+#+begin_src shell :dir /sudo:: :var version=zig-version
+mv /tmp/zig-linux-x86_64-${version} /opt/zig-${version}
+rm -rf /opt/zig
+ln -s /opt/zig-${version} /opt/zig
+#+end_src
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-zig.sh
+export PATH=$PATH:/opt/zig
 #+end_src
 
 * Cosmetics
