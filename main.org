@@ -1304,7 +1304,7 @@ pacman -Sy --noconfirm go
 **** Other
 
 #+NAME: go_version
-: 1.20.5
+: 1.21.1
 
 #+begin_src shell :dir /tmp :var GO_VERSION=go_version
 curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar xvz
