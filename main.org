@@ -1843,6 +1843,12 @@ export FLYCTL_INSTALL="`pwd`/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
 #+end_src
 
+And generate the autocomplete:
+
+#+begin_src shell
+fly completion zsh > ~/.config/zsh.d/apps.d/10-flyctl-autocomplete.sh
+#+end_src
+
 ** Zig
 
 #+name: zig-version
