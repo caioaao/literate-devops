@@ -233,7 +233,6 @@ not an issue for me.
 
 #+begin_src shell
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-
 #+end_src
 
 Let's also install syntax highlighting:
@@ -765,7 +764,7 @@ systemctl restart systemd-resolved.service
 Also import the public key so we can use it:
 
 #+BEGIN_SRC shell :var keyid=gpg-key-id
-gpg --keyserver hkps://keys.openpgp.org --recv ${keyid}
+gpg --keyserver hkps://keyserver.ubuntu.com --recv ${keyid}
 #+END_SRC
 
 We also need to trust the key. For that run ~gpg --edit-key ${gpg-key-id}~,
@@ -973,7 +972,7 @@ run '~/.tmux/plugins/tpm/tpm'
 
 We also need to download some fonts for the glyphs:
 
-#+begin_src shell :dir ~/.fonts :mkdirp ye
+#+begin_src shell :dir ~/.fonts :mkdirp yes
 curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.0/Meslo.zip | busybox unzip -
 fc-cache -fv
 #+end_src
@@ -1750,6 +1749,7 @@ dnf install -y openssl-devel automake autoconf ncurses-devel g++ busybox wxGTK-d
 Add the plugin to asdf, install the default version and set the global version:
 
 #+begin_src shell :var erlang_version=default_erlang_version
+. $HOME/.asdf/asdf.sh
 asdf plugin-add erlang
 asdf install erlang ${erlang_version}
 asdf global erlang ${erlang_version}
@@ -1758,7 +1758,7 @@ asdf global erlang ${erlang_version}
 *** Install Elixir
 
 #+NAME: default_elixir_version
-: 1.14.4-otp-25
+: 1.15.6-otp-25
 
 Add the plugin to asdf, install the default version and set the global version:
 
@@ -1839,14 +1839,14 @@ curl -L https://fly.io/install.sh | sh
 Add it to path:
 
 #+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-flyctl.sh
-export FLYCTL_INSTALL="`pwd`/.fly"
+export FLYCTL_INSTALL="$HOME/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
 #+end_src
 
 And generate the autocomplete:
 
 #+begin_src shell
-fly completion zsh > ~/.config/zsh.d/apps.d/10-flyctl-autocomplete.sh
+$HOME/.fly/bin/fly completion zsh > ~/.config/zsh.d/apps.d/10-flyctl-autocomplete.sh
 #+end_src
 
 ** Zig
