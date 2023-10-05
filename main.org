@@ -30,6 +30,7 @@
   - [[#nordvpn][NordVPN]]
 - [[#development][Development]]
   - [[#tmux][tmux]]
+  - [[#zoxide][zoxide]]
   - [[#terminal-emulator][Terminal Emulator]]
   - [[#direnv][direnv]]
   - [[#asdf][asdf]]
@@ -980,6 +981,22 @@ fc-cache -fv
 To install the plugins, run ~C-q I~ from inside tmux. It will look like it's
 frozen, but it's installing stuff.
 
+** zoxide
+
+[[https://github.com/ajeetdsouza/zoxide][zoxide]] is a tool for jumping to folders using ~z~
+
+Install using the bash script:
+
+#+begin_src shell
+curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+#+end_src
+
+And tangle the setup script
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/20-zoxide.sh :mkdirp yes
+eval "$(zoxide init zsh)"
+#+end_src
+
 ** Terminal Emulator
 
 *** foot
@@ -1124,8 +1141,9 @@ dnf install -y git-lfs
 #+end_src
 
 ** Docker
+*** Install
 
-*** Arch Linux
+**** Arch Linux
 
 Install:
 
@@ -1140,7 +1158,7 @@ systemctl enable docker
 systemctl start docker
 #+end_src
 
-*** Ubuntu
+**** Ubuntu
 
 Install the dependencies
 
@@ -1179,7 +1197,7 @@ ip link add name docker0 type bridge
 ip addr add dev docker0 172.17.0.1/16
 #+END_SRC
 
-*** Fedora
+**** Fedora
 
 Configure the repository and install it:
 
@@ -1196,6 +1214,16 @@ Start docker service:
 #+begin_src shell :dir /sudo::
 systemctl start docker
 #+end_src
+
+*** Configure
+
+Add current user to docker group:
+
+#+begin_src shell :dir /sudo:: :var user=(user-login-name)
+usermod -a -G docker $user
+#+end_src
+
+After that we need to re-login in order for it to take effect or use ~sudo su $USER~ to start a session with the groups.
 
 ** NodeJS
 
@@ -1783,6 +1811,8 @@ chmod +x language_server.sh launch.sh debugger.sh
 #+end_src
 
 *** Install Phoenix
+
+We install phoenix in the default version so we can create phoenix projects.
 
 #+begin_src shell
 mix archive.install hex phx_new --force
