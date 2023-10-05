@@ -1792,6 +1792,7 @@ Before installing, let's define some default mix commands to be run after a new 
 
 #+begin_src conf :tangle ~/.default-mix-commands
 local.hex
+local.rebar
 #+end_src
 
 Add the plugin to asdf, install the default version and set the global version:
