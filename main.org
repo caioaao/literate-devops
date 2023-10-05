@@ -1788,6 +1788,12 @@ asdf global erlang ${erlang_version}
 #+NAME: default_elixir_version
 : 1.15.6-otp-25
 
+Before installing, let's define some default mix commands to be run after a new elixir version is added with asdf:
+
+#+begin_src conf :tangle ~/.default-mix-commands
+local.hex
+#+end_src
+
 Add the plugin to asdf, install the default version and set the global version:
 
 #+begin_src shell :var elixir_version=default_elixir_version
@@ -1797,6 +1803,8 @@ asdf global elixir ${elixir_version}
 #+end_src
 
 *** Install hex
+
+You usually won't need to do this, since the command is already included in the default mix commands
 
 #+begin_src shell
 mix local.hex --force
