@@ -319,6 +319,20 @@ if [ -n "$INSIDE_EMACS" ]; then
 fi
 #+end_src
 
+** Homebrew                                                           :macos:
+
+#+begin_src shell :dir /tmp
+curl -fsSL https://github.com/Homebrew/brew/releases/download/4.1.17/Homebrew-4.1.17.pkg -o homebrew.pkg
+open homebrew.pkg
+#+end_src
+
+Now the config. This is thust the output of ~brew shellenv~, but we hard-code it here otherwise it might not be called by homebrew
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/00-brew.sh
+export HOMEBREW_NO_ANALYTICS=1
+eval `/opt/homebrew/bin/brew shellenv`
+#+end_src
+
 ** Aspell
 
 *** Arch linux
