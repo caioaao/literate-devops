@@ -11,9 +11,11 @@
 - [[#prelude][Prelude]]
   - [[#pop-os][Pop-OS]]
   - [[#lenovo-laptop][Lenovo laptop]]
+  - [[#macbook][Macbook]]
   - [[#emacs][Emacs]]
   - [[#locale][Locale]]
   - [[#zsh][Zsh]]
+  - [[#homebrew][Homebrew]]
   - [[#aspell][Aspell]]
   - [[#git][Git]]
   - [[#ag][+Ag+]]
@@ -124,6 +126,8 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 #+begin_src shell :dir /sudo::
 /sbin/rmmod pcspkr; echo "blacklist pcspkr" >>/etc/modprobe.d/blacklist.conf
 #+end_src
+
+** Macbook
 
 ** Emacs
 
@@ -629,7 +633,18 @@ apt update
 apt install -y yubikey-manager u2f-host libu2f-host-dev scdaemon
 #+END_SRC
 
-*** Configuring
+**** OSX
+
+#+begin_src shell :dir /tmp
+curl -fsSL https://developers.yubico.com/yubikey-manager-qt/Releases/yubikey-manager-qt-latest-mac.pkg -o ykman.pkg
+open ykman.pkg
+#+end_src
+
+#+begin_src shell
+brew install gnupg
+#+end_src
+
+*** Configuring                                                       :linux:
 
 Start and enable the appropriate service
 
@@ -672,6 +687,13 @@ pacman --noconfirm -Sy gcr
 dnf install -y gcr
 #+end_src
 
+**** OSX
+
+#+begin_src shell
+brew tap jorgelbg/tap
+brew install pinentry-mac pinentry-touchid
+#+end_src
+
 *** Configure
 
 Tangle the gpg-agent config.
@@ -682,6 +704,18 @@ log-file ~/.gnupg/gpg-agent.log
 allow-emacs-pinentry
 allow-loopback-pinentry
 pinentry-program /usr/bin/pinentry-gnome3
+default-cache-ttl 60
+max-cache-ttl 120
+#+END_SRC
+
+If on Mac, this is the config instead:
+
+#+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
+enable-ssh-support
+log-file ~/.gnupg/gpg-agent.log
+allow-emacs-pinentry
+allow-loopback-pinentry
+pinentry-program $HOMEBREW_PREFIX/bin/pinentry-touchid
 default-cache-ttl 60
 max-cache-ttl 120
 #+END_SRC
@@ -765,7 +799,7 @@ config file to use Google's DNS:
 
 #+BEGIN_SRC conf :tangle /sudo::/etc/systemd/resolved.conf.d/dns.conf :mkdirp yes
 [Resolve]
-DNS=8.8.8.8
+DNS=1.1.1.1
 #+END_SRC
 
 Added security with DNS over TLS. *WARNING:* do not use with ubuntu since
@@ -807,6 +841,8 @@ Lastly, let's add the key to sshcontrol:
 #+begin_src shell :tangle ~/.gnupg/sshcontrol
 31B796AD58754173E9C2A6BCEC8D89EA79591638
 #+end_src
+
+At this point we can also switch the repositories (emacs.d and literate-devops) to use the ssh remotes.
 
 ** iptables firewall
 
