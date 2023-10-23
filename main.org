@@ -393,6 +393,12 @@ pacman -Sy --noconfirm ripgrep
 dnf install -y ripgrep
 #+end_src
 
+*** OSX
+
+#+begin_src shell
+brew install ripgrep
+#+end_src
+
 ** System76
 
 Follow [[https://support.system76.com/articles/system76-software][this article first]], and then [[https://support.system76.com/articles/system76-driver/#arch][the driver article]]. The first article install dependencies needed by the driver.
