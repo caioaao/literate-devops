@@ -690,13 +690,10 @@ dnf install -y gcr
 **** OSX
 
 #+begin_src shell
-brew tap jorgelbg/tap
-brew install pinentry-mac pinentry-touchid
+brew install pinentry-mac
 #+end_src
 
-*** Configure
-
-Tangle the gpg-agent config.
+*** Linux GPG Agent config
 
 #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
 enable-ssh-support
@@ -708,19 +705,19 @@ default-cache-ttl 60
 max-cache-ttl 120
 #+END_SRC
 
-If on Mac, this is the config instead:
+*** OSX GPG Agent config
 
 #+BEGIN_SRC conf :tangle ~/.gnupg/gpg-agent.conf :mkdirp yes
 enable-ssh-support
 log-file ~/.gnupg/gpg-agent.log
 allow-emacs-pinentry
 allow-loopback-pinentry
-pinentry-program $HOMEBREW_PREFIX/bin/pinentry-touchid
+pinentry-program /opt/homebrew/bin/pinentry-mac
 default-cache-ttl 60
 max-cache-ttl 120
 #+END_SRC
 
-And the GPG config:
+*** Configure GPG
 
 #+BEGIN_SRC conf :tangle ~/.gnupg/gpg.conf
 # https://github.com/drduh/config/blob/master/gpg.conf
@@ -1208,7 +1205,14 @@ apt install -y git-lfs
 dnf install -y git-lfs
 #+end_src
 
+*** OSX
+
+#+begin_src shell
+brew install git-lfs
+#+end_src
+
 ** Docker
+
 *** Install
 
 **** Arch Linux
@@ -1281,6 +1285,13 @@ Start docker service:
 
 #+begin_src shell :dir /sudo::
 systemctl start docker
+#+end_src
+
+**** OSX
+
+#+begin_src shell :dir /tmp
+curl -fsSL https://desktop.docker.com/mac/main/arm64/Docker.dmg -o Docker.dmg
+open Docker.dmg
 #+end_src
 
 *** Configure
