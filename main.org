@@ -969,6 +969,12 @@ apt install -y tmux
 dnf install -y tmux xclip fzf
 #+end_src
 
+**** OSX
+
+#+begin_src shell
+brew install tmux
+#+end_src
+
 *** Configuring
 
 Let's first install tmux plugin manager:
@@ -1126,6 +1132,12 @@ apt install -y direnv
 
 #+begin_src shell :dir /sudo::
 dnf install -y direnv
+#+end_src
+
+**** OSX
+
+#+begin_src shell
+brew install direnv
 #+end_src
 
 *** Configure
