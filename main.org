@@ -1855,20 +1855,29 @@ pamac build osm2pgsql
 
 Check the [[https://github.com/asdf-vm/asdf-erlang#before-asdf-install]["before install" instructions]] for more info on why each dependency is needed
 
+**** Fedora
+
 #+begin_src shell :dir /sudo::
 dnf install -y openssl-devel automake autoconf ncurses-devel g++ busybox wxGTK-devel
+#+end_src
+
+**** OSX
+
+#+begin_src shell
+brew install autoconf openssl wxwidgets libxslt fop wxmac
 #+end_src
 
 *** Install Erlang
 
 #+NAME: default_erlang_version
-: 25.3
+: 26.1
 
 Add the plugin to asdf, install the default version and set the global version:
 
 #+begin_src shell :var erlang_version=default_erlang_version
 . $HOME/.asdf/asdf.sh
-asdf plugin-add erlang
+
+asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git
 asdf install erlang ${erlang_version}
 asdf global erlang ${erlang_version}
 #+end_src
@@ -1876,7 +1885,7 @@ asdf global erlang ${erlang_version}
 *** Install Elixir
 
 #+NAME: default_elixir_version
-: 1.15.6-otp-25
+: 1.15.7-otp-26
 
 Before installing, let's define some default mix commands to be run after a new elixir version is added with asdf:
 
@@ -1888,6 +1897,7 @@ local.rebar
 Add the plugin to asdf, install the default version and set the global version:
 
 #+begin_src shell :var elixir_version=default_elixir_version
+. $HOME/.asdf/asdf.sh
 asdf plugin-add elixir
 asdf install elixir ${elixir_version}
 asdf global elixir ${elixir_version}
@@ -1905,7 +1915,8 @@ mix local.hex --force
 
 #+begin_src shell :dir ~/.local/elixir-ls :mkdirp yes
 rm -rf *
-curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.14.3/elixir-ls-1.14-25.1.zip | busybox unzip -
+curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.17.3/elixir-ls-v0.17.3.zip > /tmp/elixir-ls.zip
+unzip /tmp/elixir-ls.zip
 chmod +x language_server.sh launch.sh debugger.sh
 #+end_src
 
