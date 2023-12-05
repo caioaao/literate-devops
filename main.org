@@ -1517,7 +1517,7 @@ gcloud init
 *** Other
 
 #+NAME: gcloud_sdk_version
-: 401.0.0
+: 454.0.0
 
 First we need python 3.9 since as of the time of this writing gcloud [[https://issuetracker.google.com/issues/205238176][does not support python 3.10]]
 
@@ -1527,7 +1527,7 @@ asdf install python 3.9.9
 #+end_src
 
 #+begin_src shell :dir /tmp :var version=gcloud_sdk_version
-curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${version}-linux-x86_64.tar.gz | tar -xz
+curl -fsSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-454.0.0-darwin-arm.tar.gz | tar -xz
 #+end_src
 
 #+begin_src shell :dir /sudo:: :var version=gcloud_sdk_version
