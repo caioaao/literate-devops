@@ -925,6 +925,12 @@ chmod +x /tmp/install-nord.sh
 /tmp/install-nord.sh -n
 #+end_src
 
+**** OSX
+
+#+begin_src shell :dir /tmp
+curl -fsSL https://downloads.nordcdn.com/apps/macos/generic/NordVPN-OpenVPN/latest/NordVPN.pkg -o nordvpn.pkg
+open nordvpn.pkg
+#+end_src
 *** Configure
 
 #+BEGIN_SRC shell :dir /sudo:: :var user=(user-login-name)
