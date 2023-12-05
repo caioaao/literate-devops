@@ -1310,7 +1310,7 @@ After that we need to re-login in order for it to take effect or use ~sudo su $U
 ** NodeJS
 
 #+NAME: node-nvm-version
-: v0.39.1
+: v0.39.5
 
 Installing NVM
 
