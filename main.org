@@ -279,10 +279,6 @@ plugins+=git
 plugins+=common-aliases
 #+end_src
 
-#+begin_src shell :tangle ~/.config/zsh.d/init-omz.d/10-emacs.sh
-plugins+=emacs
-#+end_src
-
 Now let's tangle the zshrc, which will be responsible for setting up
 oh-my-zsh and importing the configs in the folders above:
 
