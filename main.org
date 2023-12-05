@@ -63,6 +63,7 @@
   - [[#plantuml][Plantuml]]
   - [[#flyio][fly.io]]
   - [[#zig][Zig]]
+  - [[#aws-cli][AWS Cli]]
 - [[#cosmetics][Cosmetics]]
   - [[#make-fonts-great-again][Make fonts great again]]
   - [[#gnome-top-bar][Gnome top bar]]
@@ -2025,6 +2026,11 @@ ln -s /opt/zls-${version} /opt/zls
 export PATH=$PATH:/opt/zig:/opt/zls/bin
 #+end_src
 
+** AWS Cli
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-awscli.sh
+complete -C '/usr/local/bin/aws_completer' aws
+#+end_src
 * Cosmetics
 
 ** Make fonts great again
