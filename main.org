@@ -1569,9 +1569,17 @@ $HOME/.pulumi/bin/pulumi gen-completion zsh > $HOME/.config/zsh.d/apps.d/10-pulu
 
 ** ngrok
 
+*** Linux
+
 #+begin_src sh :dir ~/.local/bin
 curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-s390x.tgz | tar xvzf -
 chmod +x ngrok
+#+end_src
+
+*** OSX
+
+#+begin_src shell
+brew install ngrok/ngrok/ngrok
 #+end_src
 
 ** nats-cli
