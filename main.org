@@ -1067,6 +1067,39 @@ eval "$(zoxide init zsh)"
 
 ** Terminal Emulator
 
+*** Ghostty
+
+We got access, yay!
+
+Common config:
+
+#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-ghostty.sh :mkdirp yes
+export PATH=$PATH:~/.local/share/ghostty/zig-out/bin
+#+end_src
+
+**** Fedora
+
+Let's install the dependencies:
+
+#+begin_src shell :dir /sudo::
+dnf install libadwaita-devel gtk4-devel
+#+end_src
+
+And download the nightly version of Zig:
+
+#+begin_src shell :dir /tmp
+mkdir zig
+curl -fsSL https://ziglang.org/builds/zig-linux-x86_64-0.12.0-dev.1808+69195d0cd.tar.xz | tar -xJC zig --strip-components=1
+#+end_src
+
+#+begin_src shell :dir /tmp
+git clone git@github.com:mitchellh/ghostty.git
+cd ghostty
+git checkout tip
+direnv allow
+/tmp/zig/zig build -p ~/.local
+#+end_src
+
 *** foot
 
 Only in Wayland
