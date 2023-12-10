@@ -128,6 +128,12 @@ Lenovo has the good ol' pc speaker that makes those terrible beeps, so let's dis
 /sbin/rmmod pcspkr; echo "blacklist pcspkr" >>/etc/modprobe.d/blacklist.conf
 #+end_src
 
+Another thing, let's just enable fingerprint auth. For some reason it comes disabled in authselect's default profile.
+
+#+begin_src shell :dir /sudo::
+authselect enable-feature with-fingerprint
+#+end_src
+
 ** Macbook
 
 ** Emacs
