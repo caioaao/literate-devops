@@ -1966,11 +1966,14 @@ mix local.hex --force
 
 *** Install elixir-ls
 
-#+begin_src shell :dir ~/.local/elixir-ls :mkdirp yes
+#+name: elixir_ls_version
+: 0.18.1
+
+#+begin_src shell :dir ~/.local/elixir-ls :mkdirp yes :var version=elixir_ls_version
 rm -rf *
-curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v0.17.3/elixir-ls-v0.17.3.zip > /tmp/elixir-ls.zip
+curl -fsSL https://github.com/elixir-lsp/elixir-ls/releases/download/v${version}/elixir-ls-v${version}.zip > /tmp/elixir-ls.zip
 unzip /tmp/elixir-ls.zip
-chmod +x language_server.sh launch.sh debugger.sh
+chmod +x language_server.sh launch.sh
 #+end_src
 
 *** Install Phoenix
