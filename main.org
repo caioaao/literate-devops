@@ -1071,13 +1071,20 @@ eval "$(zoxide init zsh)"
 
 We got access, yay!
 
-Common config:
+**** Install
 
-#+begin_src shell :tangle ~/.config/zsh.d/apps.d/10-ghostty.sh :mkdirp yes
-export PATH=$PATH:~/.local/share/ghostty/zig-out/bin
+***** MacOS
+
+Since the repo is still private, it's easier to just go to [[https://github.com/mitchellh/ghostty/releases/download/tip/ghostty-macos-universal.zip][this link]], download and install it manually.
+
+After that, run:
+
+#+begin_src shell :dir /sudo:: :var user=(user-login-name)
+mv /Applications/Ghostty.app /tmp/Ghostty.app.bkp
+mv ~${user}/Downloads/Ghostty.app /Applications/Ghostty.app
 #+end_src
 
-**** Fedora
+***** Fedora
 
 Let's install the dependencies:
 
@@ -1098,6 +1105,12 @@ cd ghostty
 git checkout tip
 direnv allow
 /tmp/zig/zig build -p ~/.local
+#+end_src
+
+**** Configure
+
+#+begin_src config :tangle ~/.config/ghostty/config :mkdirp yes
+macos-option-as-alt = true
 #+end_src
 
 *** foot
