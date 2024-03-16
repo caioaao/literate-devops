@@ -59,6 +59,7 @@
   - [[#bazel][Bazel]]
   - [[#gis-tools][GIS tools]]
   - [[#erlang--elixir][Erlang / Elixir]]
+  - [[#gleam][Gleam]]
   - [[#rust][Rust]]
   - [[#plantuml][Plantuml]]
   - [[#flyio][fly.io]]
@@ -1982,6 +1983,13 @@ We install phoenix in the default version so we can create phoenix projects.
 
 #+begin_src shell
 mix archive.install hex phx_new --force
+#+end_src
+
+** Gleam
+
+#+begin_src shell
+asdf plugin-add gleam https://github.com/asdf-community/asdf-gleam.git
+asdf install gleam latest
 #+end_src
 
 ** Rust
